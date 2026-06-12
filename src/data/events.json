@@ -1,0 +1,61 @@
+{
+  "events": [
+    {
+      "id": "match001",
+      "type": "match",
+      "date": "2026-04-05",
+      "time": "14:00",
+      "team1": {
+        "name": "Équipe A",
+        "initials": "EA",
+        "logo": "🔵"
+      },
+      "team2": {
+        "name": "Équipe B",
+        "initials": "EB",
+        "logo": "🔴"
+      },
+      "status": "scheduled",
+      "score": null,
+      "location": "Stade Maya Kopé",
+      "stadium": "Stade Maya Kopé, Quartier"
+    },
+    {
+      "id": "match002",
+      "type": "match",
+      "date": "2026-04-12",
+      "time": "16:00",
+      "team1": {
+        "name": "Équipe C",
+        "initials": "EC",
+        "logo": "⚪"
+      },
+      "team2": {
+        "name": "Équipe D",
+        "initials": "ED",
+        "logo": "🟢"
+      },
+      "status": "scheduled",
+      "score": null,
+      "location": "Stade Maya Kopé"
+    },
+    {
+      "id": "drawing001",
+      "type": "drawing",
+      "date": "2026-04-02",
+      "time": "19:00",
+      "title": "Tirage au Sort - Groupe A",
+      "description": "Grand tirage au sort pour déterminer les groupes de la phase finale",
+      "location": "Siège TOP FOOT"
+    },
+    {
+      "id": "meeting001",
+      "type": "meeting",
+      "date": "2026-04-08",
+      "time": "18:00",
+      "title": "Réunion des Capitaines",
+      "description": "Réunion obligatoire de tous les capitaines d'équipes",
+      "location": "Siège TOP FOOT"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "teams": [
+    {
+      "id": "team001",
+      "name": "Équipe A",
+      "initials": "EA",
+      "color": "#0066CC",
+      "coach": "Coach 1",
+      "players": 11
+    },
+    {
+      "id": "team002",
+      "name": "Équipe B",
+      "initials": "EB",
+      "color": "#FF0000",
+      "coach": "Coach 2",
+      "players": 11
+    },
+    {
+      "id": "team003",
+      "name": "Équipe C",
+      "initials": "EC",
+      "color": "#FFFFFF",
+      "coach": "Coach 3",
+      "players": 11
+    },
+    {
+      "id": "team004",
+      "name": "Équipe D",
+      "initials": "ED",
+      "color": "#00AA00",
+      "coach": "Coach 4",
+      "players": 11
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+/* Couleurs primaires - Orange */
+:root {
+  --color-primary-orange: #FF8C00;
+  --color-primary-orange-light: #FFA500;
+  --color-primary-orange-dark: #E67E00;
+  
+  /* Couleurs secondaires - Vert Gazon */
+  --color-secondary-green: #4CAF50;
+  --color-secondary-green-light: #66BB6A;
+  --color-secondary-green-dark: #3A8B3F;
+  --color-secondary-green-soft: #A8D5BA;
+  --color-secondary-green-softer: #D4E8DC;
+  
+  /* Neutres */
+  --color-neutral-white: #FFFFFF;
+  --color-neutral-off-white: #F5F5F5;
+  --color-neutral-light-gray: #E8E8E8;
+  --color-neutral-gray: #999999;
+  --color-neutral-dark-gray: #666666;
+  --color-neutral-dark: #333333;
+  --color-neutral-black: #000000;
+  
+  /* Typo */
+  --font-family-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-family-mono: 'Courier New', monospace;
+}
+
+/* Classes utilitaires de couleur */
+.text-orange { color: var(--color-primary-orange); }
+.text-orange-light { color: var(--color-primary-orange-light); }
+.text-orange-dark { color: var(--color-primary-orange-dark); }
+
+.text-green { color: var(--color-secondary-green); }
+.text-green-light { color: var(--color-secondary-green-light); }
+.text-green-dark { color: var(--color-secondary-green-dark); }
+.text-green-soft { color: var(--color-secondary-green-soft); }
+
+.bg-orange { background-color: var(--color-primary-orange); }
+.bg-orange-light { background-color: var(--color-primary-orange-light); }
+.bg-orange-dark { background-color: var(--color-primary-orange-dark); }
+
+.bg-green { background-color: var(--color-secondary-green); }
+.bg-green-light { background-color: var(--color-secondary-green-light); }
+.bg-green-dark { background-color: var(--color-secondary-green-dark); }
+.bg-green-soft { background-color: var(--color-secondary-green-soft); }
+.bg-green-softer { background-color: var(--color-secondary-green-softer); }
+
+.border-orange { border-color: var(--color-primary-orange); }
+.border-green { border-color: var(--color-secondary-green); }
+.border-green-soft { border-color: var(--color-secondary-green-soft); }
+
+/* Dividers avec couleur de marque */
+.divider-orange {
+  height: 2px;
+  background: linear-gradient(to right, var(--color-primary-orange) 0%, var(--color-primary-orange-light) 100%);
+}
+
+.divider-green {
+  height: 2px;
+  background: linear-gradient(to right, var(--color-secondary-green-soft) 0%, var(--color-secondary-green) 100%);
+}
+
+.divider-soft {
+  height: 1px;
+  background-color: var(--color-neutral-light-gray);
+}

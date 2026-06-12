@@ -1,0 +1,24 @@
+{
+  "specialDays": [
+    {
+      "date": "2026-04-02",
+      "type": "drawing",
+      "label": "Tirage"
+    },
+    {
+      "date": "2026-04-05",
+      "type": "match_day",
+      "count": 1
+    },
+    {
+      "date": "2026-04-08",
+      "type": "meeting",
+      "label": "Réunion"
+    },
+    {
+      "date": "2026-04-12",
+      "type": "match_day",
+      "count": 1
+    }
+  ]
+}

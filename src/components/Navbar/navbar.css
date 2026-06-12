@@ -1,0 +1,24 @@
+/* Navbar Styles */
+
+nav {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+nav a {
+  position: relative;
+}
+
+nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #FF8C00;
+  transition: width 0.3s ease;
+}
+
+nav a:hover::after {
+  width: 100%;
+}

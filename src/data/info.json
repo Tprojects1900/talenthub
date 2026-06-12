@@ -1,0 +1,51 @@
+{
+  "dynamicInfo": [
+    {
+      "id": "info001",
+      "title": "Édition 2026",
+      "description": "Découvrez l'édition exceptionnelle de TOP FOOT 2026. Une compétition prestigieuse qui rassemble les meilleures équipes du quartier Maya Kopé.",
+      "icon": "Trophy",
+      "variant": "primary",
+      "order": 1
+    },
+    {
+      "id": "info002",
+      "title": "Prix et Récompenses",
+      "description": "1er: Trophée d'or + 500.000 FCFA | 2ème: Trophée d'argent + 300.000 FCFA | 3ème: Trophée de bronze + 200.000 FCFA",
+      "icon": "Award",
+      "variant": "secondary",
+      "order": 2
+    },
+    {
+      "id": "info003",
+      "title": "Inscrivez votre Équipe",
+      "description": "Vous avez une équipe? Inscrivez-vous dès maintenant! Les places sont limitées. Frais d'inscription: 50.000 FCFA.",
+      "icon": "Users",
+      "variant": "primary",
+      "actionText": "S'inscrire",
+      "actionUrl": "#inscription",
+      "order": 3
+    },
+    {
+      "id": "info004",
+      "title": "Soutenir le Tournoi",
+      "description": "Devenez sponsor de TOP FOOT et supportez le développement du football dans notre quartier!",
+      "icon": "Heart",
+      "variant": "secondary",
+      "actionText": "Nous Contacter",
+      "actionUrl": "#contact",
+      "order": 4
+    },
+    {
+      "id": "info005",
+      "title": "Impact sur le Quartier",
+      "description": "TOP FOOT crée des opportunités pour les jeunes du quartier Maya Kopé. Plus de 500 jeunes ont participé à nos tournois depuis 2023.",
+      "icon": "MapPin",
+      "variant": "primary",
+      "order": 5
+    }
+  ],
+  "heroTitle": "Bienvenue à TOP FOOT",
+  "heroSubtitle": "Le plus grand tournoi de football du quartier Maya Kopé",
+  "heroCTA": "Voir les Matchs"
+}
