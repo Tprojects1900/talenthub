@@ -51,7 +51,7 @@ export const EventModal = ({ isVisible, eventComing, teams, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
       onClick={onClose}
     >
       <div
@@ -90,7 +90,7 @@ export const EventModal = ({ isVisible, eventComing, teams, onClose }) => {
               <div className="flex items-center gap-2 mb-6">
                 <Calendar size={18} className="text-emerald-600" />
                 <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wider">
-                  Le tournoi commence dans
+                  L'évènement commence dans
                 </h2>
               </div>
               
@@ -108,7 +108,7 @@ export const EventModal = ({ isVisible, eventComing, teams, onClose }) => {
                     <div className="text-3xl md:text-4xl font-black text-emerald-600 tabular-nums">
                       {String(item.value).padStart(2, '0')}
                     </div>
-                    <div className="text-xs font-semibold text-emerald-700 uppercase tracking-wider mt-2">
+                    <div className="text-[7px] md:text-xs font-semibold text-emerald-700 uppercase tracking-wider mt-2">
                       {item.label}
                     </div>
                   </div>

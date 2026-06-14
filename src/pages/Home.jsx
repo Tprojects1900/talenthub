@@ -39,7 +39,7 @@ import { flexColCenter } from '../utils/tailwindHelpers'
 /**
  * Home - Page principale spectateurs
  */
-import { MainLayout } from '../components/Layout/MainLayout'
+import { MainLayout } from '../layouts'
 export default function Home() {
   const { events, loading } = useEvents()
   const [selectedDate, setSelectedDate] = useState(new Date())
@@ -50,8 +50,8 @@ export default function Home() {
 
   // Exemple d'événement à venir (Date dynamique pour le test)
   const tournamentEvent = {
-    title: "Le Choc des Champions 2026",
-    description: "Le tournoi inter-quartiers tant attendu commence bientôt. 16 équipes, 1 seul trophée !",
+    title: "Première réunion",
+    description: "La première réunion de prise de contact, de collectes des frais et de tirages au sort",
     day: 28,
     month: 6, // Juin
     year: 2026,
