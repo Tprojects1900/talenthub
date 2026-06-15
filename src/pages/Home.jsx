@@ -13,7 +13,7 @@ import { MainLayout } from '../layouts'
 import t1 from "../assets/images/t1.png"
 import t4 from "../assets/images/t4.png"
 export default function Home() {
-  const [isStart,setIsStart]=useState(false);
+  const [isStart,setIsStart]=useState(true);
 
      const matchPropsExample = {
     matchType: "Demi-Finale",
