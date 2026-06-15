@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 export const MatchCard = ({ match }) => {
     
   const isLive =
@@ -7,8 +8,9 @@ export const MatchCard = ({ match }) => {
 
   return (
   
-    <div className="bg-zinc-50 rounded-2xl p-4 flex items-center justify-between shadow-sm max-w-md mx-auto w-full">
+    <Link to={"/details"} className="bg-zinc-50 rounded-2xl p-4 flex items-center justify-between shadow-sm max-w-md mx-auto w-full">
       {/* Équipe A */}
+     
       <div className="flex flex-col items-center flex-1">
         <div className="relative">
           <img
@@ -85,7 +87,8 @@ export const MatchCard = ({ match }) => {
           {match.teamB.code}
         </span>
       </div>
-    </div>
+      
+    </Link>
   
   )
 }

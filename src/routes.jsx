@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import { MatchPage } from "./pages/Match";
 import TeamsPage from "./pages/Teams";
 import RankingPage from "./pages/Ranking";
+import CurrentMatchPage from "./pages/CurrentMatch";
 
 function AppRoutes() {
   return (
@@ -13,6 +14,7 @@ function AppRoutes() {
         <Route path="/matchs" element={<MatchPage />} />
         <Route path="/equipes" element={<TeamsPage />} />
         <Route path="/classement" element={<RankingPage />} />
+        <Route path="/details" element={<CurrentMatchPage />} />
     </Routes>
   );
 }
