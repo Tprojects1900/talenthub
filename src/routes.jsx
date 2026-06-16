@@ -6,6 +6,7 @@ import TeamsPage from "./pages/Teams";
 import RankingPage from "./pages/Ranking";
 import CurrentMatchPage from "./pages/CurrentMatch";
 import AdminLogin from "./pages/auth/Login";
+import MatchConsoleManager from "./pages/MatchConsoleManager";
 
 function AppRoutes() {
   return (
@@ -17,6 +18,7 @@ function AppRoutes() {
         <Route path="/classement" element={<RankingPage />} />
         <Route path="/details" element={<CurrentMatchPage />} />
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/match-gestion" element={<MatchConsoleManager />} />
     </Routes>
   );
 }
