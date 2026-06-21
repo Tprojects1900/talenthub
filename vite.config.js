@@ -6,6 +6,23 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [
     react(),
-    tailwindcss()
+    tailwindcss(),
+  
   ],
+   resolve: {
+    alias: [
+      {
+        // Intercepte uniquement l'import exact "@apollo/client/link"
+        find: /^@apollo\/client\/link$/,
+        replacement: '@apollo/client',
+      },
+    ],
+  },
+   optimizeDeps: {
+    // Force Vite à charger Apollo directement sans le pré-bundler
+      exclude: ['apollo-upload-client'],
+  }
 })
+
+
+

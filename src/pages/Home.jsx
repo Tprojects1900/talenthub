@@ -1,67 +1,158 @@
-import { useState, useMemo } from 'react'
-import  TopFootHero  from '../components/Hero'
-import CurrentMatchDetails from '../components/CurrentMatchDetails'
-import {
-  TournamentInfo,
-  PrizeSection,
-  RegisterTeam,
-  SupportTournament,
-  NeighborhoodImpact
-} from '../components/Features/FeaturesSections'
+import { useMemo } from "react";
+import TopFootHero from "../components/Hero";
+import CurrentMatchDetails from "../components/CurrentMatchDetails";
+import { useCurrentSchedule, useTeamStat } from "../hooks/useCalls";
+import { MainLayout } from "../layouts";
+import FootballLoader from "../components/FootBallLoader";
+import { formatDateTime } from "../utils/dateUtils";
 
-import { MainLayout } from '../layouts'
-import t1 from "../assets/images/t1.png"
-import t4 from "../assets/images/t4.png"
 export default function Home() {
-  const [isStart,setIsStart]=useState(true);
+  const { currentSchedule, isLoadingCurrentSchedule } = useCurrentSchedule();
 
-     const matchPropsExample = {
-    matchType: "Demi-Finale",
-    date: "Dimanche 5 Juillet 2026 à 16:00",
-    status: "En cours", // Options: "En cours", "Goal Checking", "Mi-temps", "Terminé"
-    homeTeam: {
-      name: "TALENT FC",
-      logo: t1, // Mettre lien logo réel
-      score: 2,
-      played: 5,
-      points: 12,
-      goalsScored: 11,
-      goalsConceded: 4,
-      topScorer: { name: "K. Agbala", goals: 5 },
-      teamEvents: [
-        { time: "14:20", eventType: "Carton Jaune", player: { name: "A. Mensah", dorsa: 4 ,teamCode:"TAL"}},
-        { time: "32:10", eventType: "But", player: { name: "K. Agbala", dorsa: 9 ,teamCode:"TAL" } },
-        { time: "75:00", eventType: "Changement", player: { name: "E. Togbé (Entrée)", dorsa: 14,teamCode:"TAL"  }, },
-        { time: "75:00", eventType: "Changement", player: { name: "E. Toress (Sortie)", dorsa: 24 ,teamCode:"TAL"}  }
-      ]
-    },
-    awayTeam: {
-      name: "NEW STAR",
-      logo: t4, // Test fallback avec icône par défaut
-      score: 1,
-      played: 5,
-      points: 9,
-      goalsScored: 8,
-      goalsConceded: 6,
-      topScorer: { name: "J. Ayité", goals: 4 },
-      teamEvents: [
-        { time: "44:55", eventType: "But", player: { name: "J. Ayité", dorsa: 10,teamCode:"NEW" },  },
-        { time: "61:15", eventType: "Carton Rouge", player: { name: "P. Kouma", dorsa: 5 ,teamCode:"NEW"},  }
-      ]
-    }
-  };
+  // 1. Récupération des IDs d'équipes du match courant (si disponible)
+  const homeTeamId = currentSchedule?.homeTeam?.id || currentSchedule?.homeTeam?._id;
+  const awayTeamId = currentSchedule?.awayTeam?.id || currentSchedule?.awayTeam?._id;
 
+  
+
+  // 2. Appel des hooks de statistiques pour chaque équipe
+  const { teamStats: homeStats, t_loaded: homeLoading } = useTeamStat(homeTeamId);
+  const { teamStats: awayStats, t_loaded: awayLoading } = useTeamStat(awayTeamId);
+
+  
+
+  const matchData = useMemo(() => {
+    const match = currentSchedule;
+    if (!match || !match.events) return null;
+
+    // Extraction et formatage des événements de l'équipe à Domicile (Home)
+    const homeEvents = match.events
+      .filter((e) => e.teamSide === "home")
+      .map((e) => {
+        const baseEvent = {
+          time: e.time,
+          eventType: e.eventType,
+          isSubstitution: e.isSubstitution,
+          teamLogo: match.homeTeam?.logo,
+        };
+
+        if (e.isSubstitution) {
+          return {
+            ...baseEvent,
+            playerIn: {
+              name: e.playerIn?.name || e.playerIn?.nom || "",
+              dorsa: e.playerIn?.dorsa,
+            },
+            playerOut: {
+              name: e.playerOut?.name || e.playerOut?.nom || "",
+              dorsa: e.playerOut?.dorsa,
+            },
+          };
+        }
+
+        return {
+          ...baseEvent,
+          player: {
+            name: e.player?.name || e.player?.nom || "Joueur inconnu",
+            dorsa: e.player?.dorsa,
+            teamCode: match.homeTeam?.code,
+          },
+        };
+      });
+
+    // Extraction et formatage des événements de l'équipe à l'Extérieur (Away)
+    const awayEvents = match.events
+      .filter((e) => e.teamSide === "away")
+      .map((e) => {
+        const baseEvent = {
+          time: e.time,
+          eventType: e.eventType,
+          isSubstitution: e.isSubstitution,
+          teamLogo: match.awayTeam?.logo,
+        };
+
+        if (e.isSubstitution) {
+          return {
+            ...baseEvent,
+            playerIn: {
+              name: e.playerIn?.name || e.playerIn?.nom || "",
+              dorsa: e.playerIn?.dorsa,
+            },
+            playerOut: {
+              name: e.playerOut?.name || e.playerOut?.nom || "",
+              dorsa: e.playerOut?.dorsa,
+            },
+          };
+        }
+
+        return {
+          ...baseEvent,
+          player: {
+            name: e.player?.name || e.player?.nom || "Joueur inconnu",
+            dorsa: e.player?.dorsa,
+            teamCode: match.awayTeam?.code,
+          },
+        };
+      });
+
+    return {
+      matchType: match.typeConfrontation,
+      date: formatDateTime(match.date,match.time),
+      status: match.status,
+      pitch: match.pitch,
+
+      homeTeam: {
+        name: match.homeTeam?.nom || match.homeTeam?.name,
+        logo: match.homeTeam?.logo,
+        score: match.events.filter(
+          (e) => e.teamSide === "home" && e.eventType?.toLowerCase().includes("but")
+        ).length,
+        // Données enrichies dynamiquement par ton service GraphQL
+        played: homeStats?.mj || 0,
+        points: homeStats?.pts || 0,
+        goalsScored: homeStats?.bp || 0,
+        goalsConceded: homeStats?.bc || 0,
+        topScorer: {
+          name: homeStats?.topScorer?.nom || "Aucun",
+          goals: homeStats?.topScorer?.goals || 0,
+        },
+        teamEvents: homeEvents,
+      },
+
+      awayTeam: {
+        name: match.awayTeam?.nom || match.awayTeam?.name,
+        logo: match.awayTeam?.logo,
+        score: match.events.filter(
+          (e) => e.teamSide === "away" && e.eventType?.toLowerCase().includes("but")
+        ).length,
+        // Données enrichies dynamiquement par ton service GraphQL
+        played: awayStats?.mj || 0,
+        points: awayStats?.pts || 0,
+        goalsScored: awayStats?.bp || 0,
+        goalsConceded: awayStats?.bc || 0,
+        topScorer: {
+          name: awayStats?.topScorer?.nom || "Aucun",
+          goals: awayStats?.topScorer?.goals || 0,
+        },
+        teamEvents: awayEvents,
+      },
+    };
+  }, [currentSchedule, homeStats, awayStats]);
+
+  // Globalisation du chargement (calendrier courant + statistiques des deux équipes)
+  const isGlobalLoading = isLoadingCurrentSchedule || homeLoading || awayLoading;
 
   return (
     <MainLayout>
-    <div className="w-full">
-      {/* Hero Section */}
-     {!isStart ? ( <TopFootHero />) : ( <CurrentMatchDetails {...matchPropsExample}/> ) }
-
-      
-
-     
-    </div>
+      <div className="w-full p-2">
+        {isGlobalLoading ? (
+          <FootballLoader />
+        ) : matchData ? (
+          <CurrentMatchDetails {...matchData} />
+        ) : (
+          <TopFootHero />
+        )}
+      </div>
     </MainLayout>
-  )
+  );
 }

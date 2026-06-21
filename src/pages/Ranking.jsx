@@ -1,59 +1,131 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import TeamsTable from "../components/tables/TeamsTable"; 
-import { MainLayout } from '../layouts'
-import { Shield, Trophy, Star } from "lucide-react";
-
-// Importations des Assets
-import t1 from "../assets/images/t1.png";
-import t2 from "../assets/images/t2.png";
-import t3 from "../assets/images/t3.png";
-import t4 from "../assets/images/t4.png";
-import t5 from "../assets/images/t5.png";
-import t6 from "../assets/images/t6.png";
-import t7 from "../assets/images/t7.png";
-import t8 from "../assets/images/t8.png";
-import t9 from "../assets/images/t9.png";
-import t10 from "../assets/images/t10.png";
-import t11 from "../assets/images/t11.png";
-import t12 from "../assets/images/t12.png";
-import t13 from "../assets/images/t13.png";
-import t14 from "../assets/images/t14.png";
-import t15 from "../assets/images/t15.png";
-import t16 from "../assets/images/t16.png";
+import { MainLayout } from '../layouts';
+import { Trophy, Star, Loader2 } from "lucide-react";
+import { useGroups, useTeamStat } from "../hooks/useCalls";
 import trophy from "../assets/images/trophy.png";
 
+// Composant intermédiaire pour gérer une équipe et récupérer ses statistiques via le hook
+const TeamRowLoader = ({ team, index, columns, onStatsLoaded }) => {
+  const teamId = team.id || team._id;
+  // Utilisation correcte du hook au niveau du cycle de vie du composant
+  const { teamStats, t_loaded } = useTeamStat(teamId);
+
+  //console.log("teamsta",teamStats)
+
+  useEffect(() => {
+    if (!t_loaded && teamStats) {
+      onStatsLoaded(teamId, {
+        id: teamId,
+        logo: team.logo,
+        name: team.nom || team.name,
+        matchP: teamStats.mj || 0,
+        victoire: teamStats.g || 0,
+        nul: teamStats.n || 0,
+        defaite: teamStats.p || 0,
+        butM: teamStats.bp || 0,
+        butE: teamStats.bc || 0,
+        diffB: teamStats.db !== undefined ? (teamStats.db > 0 ? `+${teamStats.db}` : `${teamStats.db}`) : "0",
+        point: teamStats.pts || 0
+      });
+    }
+  }, [teamStats, t_loaded, teamId]);
+
+  return null; // Composant purement utilitaire pour la synchronisation des données
+};
+
+// Sous-composant pour charger et injecter les statistiques dynamiques d'une poule
+const PouleTableContainer = ({ group, columns }) => {
+  const [resolvedTeamsMap, setResolvedTeamsMap] = useState({});
+  const rawTeams = group.teams || [];
+
+  const handleStatsLoaded = (teamId, completeTeamData) => {
+    setResolvedTeamsMap(prev => ({
+      ...prev,
+      [teamId]: completeTeamData
+    }));
+  };
+
+  // Convertir la map en tableau et la trier selon les règles officielles du football
+  const teamsData = Object.values(resolvedTeamsMap).sort((a, b) => {
+    if (b.point !== a.point) return b.point - a.point;
+    if (parseInt(b.diffB) !== parseInt(a.diffB)) return parseInt(b.diffB) - parseInt(a.diffB);
+    return b.butM - a.butM;
+  });
+
+  // Le chargement s'arrête dès que toutes les équipes ont poussé leurs stats dans la map
+  const loadingStats = teamsData.length < rawTeams.length;
+
+  return (
+    <div className="bg-zinc-900/40 backdrop-blur-sm p-4 rounded-2xl border border-zinc-800/60 shadow-xl">
+      {/* Rendu masqué des chargeurs de hooks pour alimenter la structure de données */}
+      {rawTeams.map((team, idx) => (
+        <TeamRowLoader 
+          key={team.id || team._id || idx} 
+          team={team} 
+          index={idx} 
+          onStatsLoaded={handleStatsLoaded}
+        />
+      ))}
+
+      {/* Titre de la Poule */}
+      <div className="flex items-center justify-between mb-4 px-1">
+        <div className="flex items-center gap-2">
+          <div className="w-2.5 h-2.5 bg-orange-500 rotate-45 rounded-xs"></div>
+          <h3 className="font-bold text-lg text-zinc-100 tracking-tight uppercase">
+            {group.name || `Poule ${group.id}`}
+          </h3>
+        </div>
+        <span className="text-[10px] font-mono font-medium text-zinc-500 uppercase tracking-wider">
+          {rawTeams.length} Équipes
+        </span>
+      </div>
+
+      {/* Tableau dynamique configuré pour le sport */}
+      <TeamsTable 
+        columns={columns} 
+        data={loadingStats ? [] : teamsData} 
+        loading={loadingStats}
+        searchPlaceholder="Rechercher une équipe..."
+        searchKey="name"
+      />
+    </div>
+  );
+};
+
 const RankingPage = () => {
-  // Définition des colonnes étendue avec les statistiques de football
+  // Récupération des groupes/poules réels depuis la base de données
+  const { groups, group_loaded } = useGroups();
+
   const columns = [
     {
       key: "rang",
       label: "RANG",
-      render: (ins, index) => {
+      render: (item, index) => {
         if (index === 0) {
           return (
-            <span className="bg-[#FFD700] text-black font-black px-2 py-0.5 rounded-sm text-xs shadow-sm">
+            <span className="bg-amber-500/10 text-amber-400 font-mono font-black border border-amber-500/20 px-2 py-0.5 rounded-md text-xs shadow-sm">
               1er
             </span>
           );
         }
-        return <span className="font-bold text-gray-500 text-xs">{index + 1}e</span>;
+        return <span className="font-mono font-bold text-zinc-500 text-xs">{index + 1}e</span>;
       },
     },
     {
       key: "logo",
       label: (
-        <div className="flex flex-col items-center">
-          <Star size={14} className="text-[#FFD700] mb-0.5" />
-          <span className="text-[10px]">LOGO</span>
+        <div className="flex flex-col items-center justify-center">
+          <Star size={11} className="text-orange-500 mb-0.5" />
+          <span className="text-[9px] tracking-wider text-zinc-500 font-bold">LOGO</span>
         </div>
       ),
       render: (item) => (
-        <div className="relative group flex justify-center">
-          <div className="absolute -inset-1 bg-[#FFD700] opacity-0 group-hover:opacity-100 transition-opacity rounded-full"></div>
+        <div className="flex justify-center">
           <img
-            src={item.logo}
+            src={item.logo || "https://placehold.co/100x100/png?text=FC"}
             alt={item.name}
-            className="relative w-8 h-8 object-contain bg-white p-0.5 rounded-full border border-gray-200"
+            className="w-7 h-7 object-cover bg-zinc-950 rounded-full border border-zinc-800"
           />
         </div>
       ),
@@ -61,13 +133,13 @@ const RankingPage = () => {
     {
       key: "name",
       label: (
-        <div className="flex flex-col items-start pl-2">
-          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Équipe</span>
+        <div className="flex flex-col items-start pl-1">
+          <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider">Équipe</span>
         </div>
       ),
       render: (item) => (
-        <div className="text-left pl-2">
-          <span className="font-black text-gray-800 uppercase italic tracking-wide text-xs block truncate max-w-[120px] sm:max-w-none">
+        <div className="text-left pl-1">
+          <span className="font-bold text-zinc-200 uppercase tracking-wide text-xs block truncate max-w-[130px] sm:max-w-none group-hover:text-zinc-100">
             {item.name}
           </span>
         </div>
@@ -75,37 +147,37 @@ const RankingPage = () => {
     },
     {
       key: "matchP",
-      label: <span className="text-[10px]" title="Matchs Joués">MJ</span>,
-      render: (item) => <span className="text-xs font-semibold text-gray-600">{item.matchP}</span>
+      label: <span className="text-[10px] font-bold text-zinc-500" title="Matchs Joués">MJ</span>,
+      render: (item) => <span className="text-xs font-bold font-mono text-zinc-300">{item.matchP}</span>
     },
     {
       key: "victoire",
-      label: <span className="text-[10px]" title="Matchs Gagnés">G</span>,
-      render: (item) => <span className="text-xs font-medium text-emerald-600">{item.victoire}</span>
+      label: <span className="text-[10px] font-bold text-zinc-500" title="Matchs Gagnés">V</span>,
+      render: (item) => <span className="text-xs font-bold font-mono text-emerald-500">{item.victoire}</span>
     },
     {
       key: "nul",
-      label: <span className="text-[10px]" title="Matchs Nuls">N</span>,
-      render: (item) => <span className="text-xs font-medium text-gray-500">{item.nul}</span>
+      label: <span className="text-[10px] font-bold text-zinc-500" title="Matchs Nuls">N</span>,
+      render: (item) => <span className="text-xs font-bold font-mono text-zinc-400">{item.nul}</span>
     },
     {
       key: "defaite",
-      label: <span className="text-[10px]" title="Matchs Perdus">P</span>,
-      render: (item) => <span className="text-xs font-medium text-red-500">{item.defaite}</span>
+      label: <span className="text-[10px] font-bold text-zinc-500" title="Matchs Perdus">D</span>,
+      render: (item) => <span className="text-xs font-bold font-mono text-red-400">{item.defaite}</span>
     },
     {
       key: "buts",
-      label: <span className="text-[10px]" title="Buts Pour : Buts Contre">BP:BC</span>,
-      render: (item) => <span className="text-xs font-mono text-gray-400">{item.butM}:{item.butE}</span>
+      label: <span className="text-[10px] font-bold text-zinc-500" title="Buts Pour : Buts Contre">BM:BE</span>,
+      render: (item) => <span className="text-xs font-mono text-zinc-500">{item.butM}:{item.butE}</span>
     },
     {
       key: "diffB",
-      label: <span className="text-[10px]" title="Différence de buts">DB</span>,
+      label: <span className="text-[10px] font-bold text-zinc-500" title="Différence de buts">DB</span>,
       render: (item) => {
-        const isPositive = item.diffB.startsWith('+');
-        const isZero = item.diffB === '0';
+        const isPositive = String(item.diffB).startsWith('+');
+        const isZero = String(item.diffB) === '0';
         return (
-          <span className={`text-xs font-bold font-mono ${isZero ? 'text-gray-400' : isPositive ? 'text-emerald-600' : 'text-red-500'}`}>
+          <span className={`text-xs font-black font-mono ${isZero ? 'text-zinc-500' : isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
             {item.diffB}
           </span>
         );
@@ -113,104 +185,59 @@ const RankingPage = () => {
     },
     {
       key: "point",
-      label: <span className="text-[10px] text-[#FFD700]" title="Points">PTS</span>,
-      render: (item) => <span className="text-sm font-black text-gray-900">{item.point}</span>
+      label: <span className="text-[10px] text-orange-400 font-bold tracking-wider" title="Points">PTS</span>,
+      render: (item) => <span className="text-sm font-black font-mono text-zinc-100">{item.point}</span>
     },
-  ];
-
-  // Distribution des 16 équipes sur les Poules avec leurs stats complètes
-  const pouleA = [
-    { logo: t1, name: "TALENT FC", matchP: 3, point: 9, defaite: 0, victoire: 3, nul: 0, butM: 10, butE: 3, diffB: '+7' },
-    { logo: t2, name: "VAPEUR FOOT", matchP: 3, point: 6, defaite: 1, victoire: 2, nul: 0, butM: 5, butE: 4, diffB: '+1' },
-    { logo: t3, name: "FC WARRIORS", matchP: 3, point: 1, defaite: 2, victoire: 0, nul: 1, butM: 2, butE: 6, diffB: '-4' },
-    { logo: t4, name: "NEW START", matchP: 3, point: 1, defaite: 2, victoire: 0, nul: 1, butM: 1, butE: 5, diffB: '-4' },
-  ];
-
-  const pouleB = [
-    { logo: t5, name: "AS TALENT", matchP: 3, point: 7, defaite: 0, victoire: 2, nul: 1, butM: 6, butE: 2, diffB: '+4' },
-    { logo: t6, name: "BLUE LOCK", matchP: 3, point: 6, defaite: 1, victoire: 2, nul: 0, butM: 8, butE: 4, diffB: '+4' },
-    { logo: t7, name: "FUTURS ETOILE", matchP: 3, point: 4, defaite: 1, victoire: 1, nul: 1, butM: 4, butE: 5, diffB: '-1' },
-    { logo: t8, name: "IRON BULLS FC", matchP: 3, point: 0, defaite: 3, victoire: 0, nul: 0, butM: 1, butE: 8, diffB: '-7' },
-  ];
-
-  const pouleC = [
-    { logo: t9, name: "MACHALLA", matchP: 3, point: 9, defaite: 0, victoire: 3, nul: 0, butM: 7, butE: 1, diffB: '+6' },
-    { logo: t10, name: "ATLANTIC FC", matchP: 3, point: 4, defaite: 1, victoire: 1, nul: 1, butM: 3, butE: 3, diffB: '0' },
-    { logo: t11, name: "UNION AC", matchP: 3, point: 3, defaite: 2, victoire: 1, nul: 0, butM: 4, butE: 6, diffB: '-2' },
-    { logo: t12, name: "AFRICA SPORT", matchP: 3, point: 1, defaite: 2, victoire: 0, nul: 1, butM: 2, butE: 6, diffB: '-4' },
-  ];
-
-  const pouleD = [
-    { logo: t13, name: "VICTORIA FC", matchP: 2, point: 4, defaite: 0, victoire: 1, nul: 1, butM: 3, butE: 1, diffB: '+2' },
-    { logo: t14, name: "BSB FC", matchP: 2, point: 1, defaite: 1, victoire: 0, nul: 1, butM: 1, butE: 3, diffB: '-2' },
-  ];
-
-  const pouleE = [
-    { logo: t15, name: "TUDOR FC", matchP: 1, point: 3, defaite: 0, victoire: 1, nul: 0, butM: 2, butE: 0, diffB: '+2' },
-  ];
-
-  const pouleF = [
-    { logo: t16, name: "RÉVEIL ESPOIR FC", matchP: 1, point: 0, defaite: 1, victoire: 0, nul: 0, butM: 0, butE: 2, diffB: '-2' },
-  ];
-
-  const toutesLesPoules = [
-    { id: "A", data: pouleA },
-    { id: "B", data: pouleB },
-    { id: "C", data: pouleC },
-    { id: "D", data: pouleD },
-    { id: "E", data: pouleE },
-    { id: "F", data: pouleF },
   ];
 
   return (
     <MainLayout>
-      {/* 1. Header plein écran (w-full, m-0, p-0) avec l'image trophy.png */}
-      <div className="relative w-full h-[360px] m-0 p-0 overflow-hidden shadow-2xl bg-black">
+      <div className="relative w-full h-[380px] m-0 p-0 overflow-hidden bg-zinc-950">
         <img
           src={trophy}
           alt="Tournoi Trophy Header"
-          className="w-full h-full object-cover opacity-85"
+          className="w-full h-full object-cover opacity-40 select-none pointer-events-none"
         />
-        {/* Dégradé immersif noir et doré */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-black/40 to-transparent flex flex-col justify-end p-8 lg:p-12">
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/50 to-transparent flex flex-col justify-end p-6 sm:p-10 lg:p-14">
           <div className="max-w-7xl mx-auto w-full">
-            <div className="inline-flex items-center gap-2 bg-[#FFD700] text-black px-3 py-1 text-xs font-black uppercase tracking-widest mb-3 rounded-sm">
-              <Trophy size={14} /> Classement Officiel
+            <div className="inline-flex items-center gap-2 bg-orange-500/10 text-orange-400 border border-orange-500/20 px-3 py-1.5 rounded-xl text-xs font-mono uppercase tracking-widest mb-4">
+              <Trophy size={13} className="text-orange-500" /> Classement Officiel
             </div>
-            <h1 className="text-white text-4xl lg:text-6xl font-black uppercase italic tracking-tighter leading-none">
-              LES POULES <span className="text-[#FFD700]">TOP FOOT</span>
+            <h1 className="text-zinc-100 text-4xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-none">
+              LES POULES <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-500">TOP FOOT</span>
             </h1>
-            <p className="text-gray-300 text-sm lg:text-base font-medium mt-2 max-w-xl">
-              Suivez en direct l'évolution, les points et le goal-average de chaque groupe pour la phase finale.
+            <p className="text-zinc-400 text-xs sm:text-sm lg:text-base font-medium mt-3 max-w-xl leading-relaxed">
+              Suivez en direct l'évolution, les points et le goal-average de chaque groupe qualificatif pour la phase finale.
             </p>
           </div>
         </div>
       </div>
 
-      {/* 2. Contenu des Tableaux (w-full avec p-4) */}
-      <div className="w-full p-6 max-w-8xl mx-auto -mt-8 relative z-10 grid grid-cols-1 xl:grid-cols-2 gap-8 pb-16">
-        {toutesLesPoules.map((poule) => (
-          <div 
-            key={poule.id} 
-            className="bg-zinc-50 backdrop-blur-sm p-3 rounded-lg border border-gray-100 shadow-sm"
-          >
-            {/* Titre de la Poule */}
-            <div className="flex items-center gap-2 mb-3 px-2">
-              <div className="w-3 h-3 bg-[#FFD700] rotate-45"></div>
-              <h3 className="font-black text-xl text-gray-900 tracking-tight uppercase">
-                POULE {poule.id}
-              </h3>
-            </div>
-
-            {/* Tableau dynamique configuré pour le sport */}
-            <TeamsTable 
-              columns={columns} 
-              data={poule.data} 
-              searchPlaceholder={`Filtrer la poule ${poule.id}...`}
-              searchKey="name"
-            />
+      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto -mt-10 relative z-10 pb-24">
+        {!group_loaded ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {groups && groups.map((group) => (
+              <PouleTableContainer 
+                key={group.id || group._id} 
+                group={group} 
+                columns={columns} 
+              />
+            ))}
           </div>
-        ))}
+        ) : (
+          <div className="flex flex-col items-center justify-center py-20 bg-zinc-900/20 border border-zinc-800/40 rounded-2xl backdrop-blur-sm gap-4">
+            <Loader2 className="animate-spin text-orange-500" size={36} strokeWidth={2.5} />
+            <span className="text-xs font-mono uppercase tracking-widest text-zinc-500 animate-pulse">
+              Initialisation des classements...
+            </span>
+          </div>
+        )}
+
+        {!group_loaded && (!groups || groups.length === 0) && (
+          <div className="text-center py-16 bg-zinc-900/20 border border-zinc-800/40 rounded-2xl text-zinc-500 font-medium italic text-sm">
+            Aucun groupe ou poule n'a été configuré pour le moment.
+          </div>
+        )}
       </div>
     </MainLayout>
   );

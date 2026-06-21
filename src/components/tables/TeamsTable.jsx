@@ -1,91 +1,132 @@
 import React, { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 
-const TeamsTable = ({ columns, data, searchPlaceholder = "Rechercher...", searchKey = "name" ,title=null}) => {
+const TeamsTable = ({ 
+  columns, 
+  data = [], 
+  searchPlaceholder = "RECHERCHER...", 
+  searchKey = "name", 
+  title = null,
+  loading = false 
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Filtrage générique basé sur la clé de recherche fournie (par défaut 'name')
   const filteredData = data.filter(item => {
     const valueToSearch = item[searchKey];
-    return valueToSearch ? valueToSearch.toLowerCase().includes(searchTerm.toLowerCase()) : true;
+    return valueToSearch ? String(valueToSearch).toLowerCase().includes(searchTerm.toLowerCase()) : true;
   });
 
   return (
-    <div className="w-full bg-white shadow-2xl rounded-sm overflow-hidden border border-gray-200">
+    <div className="w-full bg-black border border-zinc-900 rounded-none overflow-hidden relative selection:bg-white selection:text-black">
       
-      {/* Barre de Filtres */}
-      <div className="p-4 bg-gray-50 border-b border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-      {title && (  <h2 className="text-xl font-black uppercase tracking-tighter text-black  flex items-center gap-2">
-          <div className="w-2 h-8 bg-[#FFD700]"></div>
-        {title}
-        </h2>)}
-        <div className="relative group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#FFD700] transition-colors" size={18} />
+      {/* En-tête / Filtre Puriste */}
+      <div className="p-5 border-b border-zinc-900 bg-zinc-950/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {title && (  
+          <div>
+            <h2 className="text-sm font-black tracking-widest text-white uppercase flex items-center gap-2">
+              <span className="inline-block w-1.5 h-3 bg-white"></span>
+              {title}
+            </h2>
+          </div>
+        )}
+        
+        {/* Input de recherche Brutaliste / Minimaliste */}
+        <div className="relative w-full sm:w-64 group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-zinc-400 transition-colors" size={14} />
           <input
             type="text"
-            placeholder={searchPlaceholder}
-            className="pl-10 pr-4 py-2 bg-white text-black border-2 border-gray-200 rounded-none focus:border-[#FFD700] outline-none transition-all w-full md:w-80"
+            disabled={loading}
+            placeholder={loading ? "CHARGEMENT..." : searchPlaceholder.toUpperCase()}
+            className="w-full pl-9 pr-4 py-1.5 bg-black text-zinc-200 border border-zinc-800 rounded-none text-xs font-mono tracking-wider placeholder-zinc-700 focus:outline-none focus:border-zinc-400 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
 
-      {/* Tableau Structure Table 05 */}
-      <div className="overflow-x-auto">
+      {/* Structure de Données Matrice */}
+      <div className="overflow-x-auto relative min-h-[180px] scrollbar-thin scrollbar-thumb-zinc-900 scrollbar-track-black">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-[#1a1a1a] text-white">
+            <tr className="border-b border-zinc-900 bg-zinc-950">
               {columns.map((col, index) => {
-                // Style spécial pour la toute première colonne (# LOGO du design)
+                const thKey = `th-${index}-${col.key || ''}`;
+                
                 if (index === 0) {
                   return (
-                    <th key={col.key || index} className="p-4 bg-[#FFD700] text-black font-black uppercase text-sm text-center">
+                    <th key={thKey} className="p-3.5 bg-zinc-900/30 text-white font-mono font-black text-[10px] text-center tracking-widest w-14 border-r border-zinc-900">
                       {col.label}
                     </th>
                   );
                 }
-                // Style pour les autres colonnes
                 return (
-                  <th key={col.key || index} className="p-4 font-bold uppercase text-xs tracking-widest border-r border-gray-700 text-center last:border-r-0">
+                  <th key={thKey} className="p-3.5 text-zinc-500 font-mono font-bold text-[10px] text-center tracking-widest border-r border-zinc-900/50 last:border-r-0">
                     {col.label}
                   </th>
                 );
               })}
             </tr>
           </thead>
-          <tbody>
-            {filteredData.map((item, rowIndex) => (
-              <tr key={rowIndex} className="border-b border-gray-100 hover:bg-yellow-50/50 transition-colors group">
-                {columns.map((col, colIndex) => {
-                  
-                  // Contenu de la cellule : Utilise render() si présent, sinon valeur par défaut
-                  const cellContent = col.render ? col.render(item, rowIndex) : item[col.key];
+          
+          {!loading && filteredData.length > 0 && (
+            <tbody className="divide-y divide-zinc-900/60">
+              {filteredData.map((item, rowIndex) => {
+                const rowKey = item.id || item._id || `row-${rowIndex}`;
 
-                  // Style de cellule spécial si c'est la première colonne (colonne dorée/logo)
-                  if (colIndex === 0) {
-                    return (
-                      <td key={col.key || colIndex} className="p-4 bg-gray-50 flex justify-center border-b border-gray-100">
-                        {cellContent}
-                      </td>
-                    );
-                  }
+                return (
+                  <tr 
+                    key={rowKey} 
+                    className="hover:bg-zinc-950/80 transition-colors group border-b border-zinc-900/40 last:border-b-0"
+                  >
+                    {columns.map((col, colIndex) => {
+                      const cellContent = col.render ? col.render(item, rowIndex) : item[col.key];
+                      const cellKey = `cell-${rowKey}-${colIndex}`;
 
-                  // Style par défaut pour le reste des cellules
-                  return (
-                    <td key={col.key || colIndex} className="p-4 text-center border-r border-gray-100 last:border-r-0 font-medium text-gray-700">
-                      {cellContent}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
+                      // Index / Rang
+                      if (colIndex === 0) {
+                        return (
+                          <td 
+                            key={cellKey} 
+                            className="p-3.5 bg-zinc-950/40 text-center font-mono font-bold text-xs text-zinc-400 group-hover:text-white border-r border-zinc-900 transition-colors"
+                          >
+                            {cellContent}
+                          </td>
+                        );
+                      }
+
+                      // Cellules Standards
+                      return (
+                        <td 
+                          key={cellKey} 
+                          className="p-3.5 text-center font-mono text-xs text-zinc-300 group-hover:text-white border-r border-zinc-900/40 last:border-r-0 transition-colors"
+                        >
+                          {cellContent}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          )}
         </table>
         
-        {filteredData.length === 0 && (
-          <div className="p-10 text-center text-gray-400 italic">
-            Aucun élément ne correspond à votre recherche...
+        {/* Loader Puriste */}
+        {loading && (
+          <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center gap-2">
+            <Loader2 className="animate-spin text-zinc-500" size={20} strokeWidth={2} />
+            <span className="text-[9px] font-mono tracking-widest text-zinc-600 uppercase animate-pulse">
+              SYNC_DATA_STREAM...
+            </span>
+          </div>
+        )}
+
+        {/* Aucun Résultat */}
+        {!loading && filteredData.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-16 text-zinc-600">
+            <span className="text-[10px] font-mono tracking-widest uppercase text-zinc-700">
+              [ NO_RESULTS_FOUND ]
+            </span>
           </div>
         )}
       </div>

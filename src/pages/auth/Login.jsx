@@ -1,25 +1,74 @@
-import React, { useState } from 'react';
+import React, { useState ,useContext} from 'react';
 import { ShieldCheck, User, Lock, Eye, EyeOff, RefreshCw, LogIn } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import topfoot from "../../assets/images/topfoot.png"
+import {toast} from 'react-toastify';
+import {useLogin}  from '../../lib/graphql.service'
+import Cookies from "js-cookie"
+import { AuthContext } from '../../context/AuthContext';
+import GuardMiddleware from '../../middleware/guard.middleware';
 const AdminLogin = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+   const [auth, setAuth] = useState(null)
+   const { setUser } = useContext(AuthContext);
+   const navigate = useNavigate()
+const [login, { loading: log_ing }] = useLogin()
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+
+
+  const handleLogin = async (e) => {
+ try{
+   e.preventDefault();
     if (!username || !password) return;
 
-    setIsLoading(true);
-    // Simulation de l'authentification sécurisée
-    setTimeout(() => {
-      setIsLoading(false);
-      alert("Authentification réussie. Bienvenue dans le panel Admin !");
-    }, 1500);
-  };
+     const { data } = await login({
+        variables: {
+          identifiant:username,
+          password,
+        },
+      })
+
+    if (data?.login?.token) {
+          // Stocker le token
+               const isProduction = window.location.protocol === "https:"
+  
+          Cookies.set("token", data.login.token, {
+            secure: isProduction,
+            sameSite: "lax",
+            expires: 7,
+            path: "/",
+          })
+          localStorage.setItem("token", data.login.token)
+  
+  
+          const user = data.login.user
+          const profile = data.login.user.profile
+          const authData = { user, profile }
+  
+          setAuth(authData)
+          setUser(authData)
+          // Afficher un message de succès
+          toast.success("Connexion réussie")
+          //const context={data?.login.user,data?.login.user.profile};
+          // Redirection vers la page protégée
+          navigate("/dashboard")
+        } else {
+          toast.error("Connexion échouée. Vérifiez vos informations.")
+        }
+      } catch (err) {
+        const message =
+          err?.graphQLErrors?.[0]?.message ||
+          err?.message ||
+          "Une erreur inattendue s’est produite."
+        toast.error(message)
+      }
+    }
 
   return (
+    <GuardMiddleware reverse={true}>
     <div className="min-h-screen w-full bg-zinc-950 flex items-center justify-center p-4 relative overflow-hidden font-sans">
       
       {/* Éléments de Design en Arrière-plan (Lueurs d'ambiance) */}
@@ -102,10 +151,10 @@ const AdminLogin = () => {
           {/* BOUTON DE CONNEXION PRINCIPAL */}
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={log_ing}
             className="w-full mt-2 py-3.5 px-4 bg-[#FFD700] hover:bg-[#ffe240] text-black font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none group shadow-[0_4px_20px_rgba(255,215,0,0.15)]"
           >
-            {isLoading ? (
+            {log_ing ? (
               <RefreshCw size={16} className="animate-spin text-black" />
             ) : (
               <>
@@ -123,6 +172,7 @@ const AdminLogin = () => {
 
       </div>
     </div>
+    </GuardMiddleware>
   );
 };
 

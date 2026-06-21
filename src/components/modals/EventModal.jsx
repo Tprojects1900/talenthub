@@ -145,7 +145,7 @@ export const EventModal = ({ isVisible, eventComing, teams, onClose }) => {
                     <div className="w-16 h-16 rounded-full bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center mb-3 overflow-hidden">
                       <img
                         src={team.logo}
-                        alt={`Logo ${team.name}`}
+                        alt={`Logo ${team.nom}`}
                         className="w-14 h-14 object-contain"
                         onError={(e) => {
                           e.target.src = 'https://placehold.co/100x100/ecfdf5/10b981?text=FC';
@@ -153,10 +153,10 @@ export const EventModal = ({ isVisible, eventComing, teams, onClose }) => {
                       />
                     </div>
                     <div className="text-sm font-bold text-gray-900 text-center line-clamp-2 w-full">
-                      {team.name}
+                      {team.nom}
                     </div>
                     <div className="text-xs text-gray-500 text-center mt-1 line-clamp-1">
-                      {team.from}
+                      {team.quartier}
                     </div>
                   </div>
                 ))}

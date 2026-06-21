@@ -35,3 +35,14 @@ html {
   animation: slideIn 0.5s ease-out;
 }
 
+/* Chrome, Safari et Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* IE, Edge et Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+

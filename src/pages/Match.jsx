@@ -1,353 +1,216 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { GroupTable } from '../components/tables/GroupTable'
 import { MatchCard } from '../components/cards/MatchCard'
 import { MainLayout } from '../layouts'
 import { useScreen } from '../context/ScreenContext'
-import { Inbox, CalendarX } from "lucide-react"
-import t1 from "../assets/images/t1.png"
-import t2 from "../assets/images/t2.png"
-import t3 from "../assets/images/t3.png"
-import t4 from "../assets/images/t4.png"
-import t5 from "../assets/images/t5.png"
-import t6 from "../assets/images/t6.png"
-import t7 from "../assets/images/t7.png"
-import t8 from "../assets/images/t8.png"
-import t9 from "../assets/images/t9.png"
-import t10 from "../assets/images/t10.png"
-import t11 from "../assets/images/t11.png"
-import t12 from "../assets/images/t12.png"
-import t13 from "../assets/images/t13.png"
-import t14 from "../assets/images/t14.png"
-import t15 from "../assets/images/t15.png"
-import t16 from "../assets/images/t16.png"
-// Données fictives
-const MOCK_GROUPS_DATA = [
-    {
-        name: "Poule A",
-        teams: [
-            {
-                name: "TALENT FC",
-                code: "TAL",
-                logo: t1,
-                from: "ADAMAVO"
-            },
-            {
-                name: "VAPEUR FOOT",
-                code: "VAP",
-                logo: t2,
-                from: "ENFAME"
-            },
-            {
-                name: "FC WARRIORS",
-                code: "FC",
-                logo: t3,
-                from: "TOKOIN"
-            },
-            {
-                name: "NEW START",
-                code: "NEW",
-                logo:t4,
-                from: "ZONGO"
-            }
-        ],
-       
-        weekMatches: [
-            {
-                id: "m4",
-                teamA: {
-                    name: "TALENT FC",
-                    code: "TAL",
-                    logo: t1
-                },
-                teamB: {
-                    name: "VAPEUR FOOT",
-                    code: "VAP",
-                    logo: t2
-                },
-                scoreA: 0,
-                scoreB: 2,
-                status: "Terminé",
-                dateInfo: "Dimanche - 21:00",
-                groupName: "Groupe A"
-            },
-            {
-                id: "m3",
-                teamA: {
-                    name: "FC WARRIORS",
-                    code: "FC",
-                    logo: t3
-                },
-                teamB: {
-                    name: "NEW START",
-                    code: "NEW",
-                    logo: t4
-                },
-                scoreA: 2,
-                scoreB: 1,
-                status: "Terminé",
-                dateInfo: "Dimanche - 18:00",
-                groupName: "Groupe A"
-            },
-            {
-                id: "m2",
-                teamA: {
-                    name: "TALENT FC",
-                    code: "TAL",
-                    logo: t1
-                },
-                teamB: {
-                    name: "FC WARRIORS",
-                    code: "FC",
-                    logo: t3
-                },
-                scoreA: 1,
-                scoreB: 1,
-                status: "Mi-temps",
-                dateInfo: "Samedi - 21:00",
-                groupName: "Groupe A"
-            },
-            {
-                id: "m1",
-                teamA: {
-                    name: "NEW START",
-                    code: "NEW",
-                    logo: t4
-                },
-                teamB: {
-                    name: "VAPEUR FOOT",
-                    code: "VAP",
-                    logo: t2
-                },
-                status: "Bientôt",
-                dateInfo: "Samedi - 15:00",
-                groupName: "Groupe A"
-            }
-        ]
-    },
-    {
-        name: "Poule B",
-        teams: [
-            {
-                name: "AS TALENT",
-                code: "AS",
-                logo: t5,
-                from: "AVEPOZO"
-            },
-            {
-                name: "BLUE LOCK",
-                code: "BLU",
-                logo: t6,
-                from: "KEGUE"
-            },
-            {
-                name: "FUTURS ETOILES",
-                code: "FUT",
-                logo: t7,
-                from: "ADAMAVO"
-            },
-            {
-                name: "IRON BULLS",
-                code: "IRO",
-                logo: t8,
-                from: "AGOE LONKUVI"
-            }
-        ],
-        weekMatches: [
-            {
-                id: "m8",
-                teamA: {
-                    name: "FUTURS ETOILES",
-                    code: "FUT",
-                    logo: t7
-                },
-                teamB: {
-                    name: "IRON BULLS",
-                    code: "IRO",
-                    logo: t8
-                },
-                scoreA: 3,
-                scoreB: 3,
-                status: "En cours",
-                dateInfo: "Dimanche - 22:30",
-                groupName: "Groupe B"
-            },
-            {
-                id: "m7",
-                teamA: {
-                    name: "AS TALENT",
-                    code: "AS",
-                    logo: t5
-                },
-                teamB: {
-                    name: "BLUE LOCK",
-                    code: "BLU",
-                    logo: t6
-                },
-                scoreA: 1,
-                scoreB: 0,
-                status: "Terminé",
-                dateInfo: "Dimanche - 16:00",
-                groupName: "Groupe B"
-            },
-            {
-                id: "m6",
-                teamA: {
-                    name: "AS TALENT",
-                    code: "AS",
-                    logo: t5
-                },
-                teamB: {
-                    name: "FUTURS ETOILES",
-                    code: "FUT",
-                    logo: t7
-                },
-                scoreA: 0,
-                scoreB: 2,
-                status: "Terminé",
-                dateInfo: "Samedi - 20:00",
-                groupName: "Groupe B"
-            },
-            {
-                id: "m5",
-                teamA: {
-                    name: "BLUE LOCK",
-                    code: "BLU",
-                    logo: t6
-                },
-                teamB: {
-                    name: "IRON BULLS",
-                    code: "IRO",
-                    logo: t8
-                },
-                scoreA: 0,
-                scoreB: 1,
-                status: "Terminé",
-                dateInfo: "Samedi - 14:00",
-                groupName: "Groupe B"
-            }
-        ]
-       
-    }
-]
+import { Inbox, CalendarX, Search, Trophy, Flame } from "lucide-react"
+import { useGroups, useSchedules } from '../hooks/useCalls'
+import FootballLoader from '../components/FootBallLoader'
 
 export const MatchPage = () => {
-    const { isMobile, isTablet, isDesktop } = useScreen()
+    const { isMobile } = useScreen()
     const [activeTab, setActiveTab] = useState('tous')
+    const [searchQuery, setSearchQuery] = useState('')
 
-    const filteredGroups = MOCK_GROUPS_DATA.map((group) => {
-        if (activeTab === 'direct') {
+    // 1. Récupération des données réelles de l'API
+    const { schedules, loaded_schedule, loa } = useSchedules()
+    const { groups, group_loaded } = useGroups()
+
+    // 2. Sécurité absolue sur le chargement
+    const isSchedulesReady = loaded_schedule === true || loa === true || (schedules && schedules.length > 0);
+    const isGroupsReady = group_loaded === true || (groups && groups.length > 0);
+    const isFullyLoaded = isSchedulesReady && isGroupsReady;
+
+    // 3. Filtrage dynamique, Recherche, et Tri intelligent des matchs
+    const filteredAndSortedMatches = useMemo(() => {
+        if (!schedules) return [];
+
+        return schedules
+            .filter(match => {
+                const status = String(match.status || '').toLowerCase();
+                const homeName = String(match.homeTeam?.nom || match.homeTeam?.code || '').toLowerCase();
+                const awayName = String(match.awayTeam?.nom || match.awayTeam?.code || '').toLowerCase();
+                const groupName = String(match.groupName || '').toLowerCase();
+                const query = searchQuery.toLowerCase();
+
+                // Filtre d'onglet (Tous vs En Direct)
+                if (activeTab === 'direct' && !(status === 'live' || status === 'half-time' || status === 'en cours')) {
+                    return false;
+                }
+
+                // Filtre de recherche textuelle
+                if (searchQuery.trim() !== '') {
+                    return homeName.includes(query) || awayName.includes(query) || groupName.includes(query);
+                }
+
+                return true;
+            })
+            .sort((a, b) => {
+                const statusA = String(a.status || '').toLowerCase();
+                const statusB = String(b.status || '').toLowerCase();
+
+                const isALive = statusA === 'live' || statusA === 'half-time' || statusA === 'en cours';
+                const isBLive = statusB === 'live' || statusB === 'half-time' || statusB === 'en cours';
+
+                // Règle 1 : Les matchs en direct passent en premier
+                if (isALive && !isBLive) return -1;
+                if (!isALive && isBLive) return 1;
+
+                // Règle 2 : Tri par date (du plus récent ou chronologique)
+                const dateA = a.date ? new Date(`${a.date}T${a.time || '00:00'}`) : new Date(0);
+                const dateB = b.date ? new Date(`${b.date}T${b.time || '00:00'}`) : new Date(0);
+                return dateB - dateA; 
+            });
+    }, [schedules, activeTab, searchQuery]);
+
+    // 4. Association des équipes par groupe provenant de l'API
+    const apiGroupsData = useMemo(() => {
+        if (!groups) return [];
+        return groups.map(group => {
+            const groupMatches = filteredAndSortedMatches.filter(match => 
+                String(match.groupId || match.groupName || '').toLowerCase() === String(group.id || group.name || '').toLowerCase()
+            );
             return {
                 ...group,
-                weekMatches: group.weekMatches.filter(
-                    (match) =>
-                        match.status === 'En cours' ||
-                        match.status === 'Mi-temps'
-                ),
-            }
-        }
+                teams: group.teams || [], 
+                weekMatches: groupMatches
+            };
+        });
+    }, [groups, filteredAndSortedMatches]);
 
-        return group
-    })
-
-    const allMatches = filteredGroups.flatMap(
-        (group) => group.weekMatches
-    )
-
+    if (!isFullyLoaded) {
+        return (
+            <MainLayout>
+                <div className="flex h-[75vh] flex-col items-center justify-center gap-4 bg-zinc-950">
+                    <FootballLoader />
+                    <p className="text-xs text-zinc-500 font-mono tracking-widest uppercase animate-pulse">
+                        Synchronisation live...
+                    </p>
+                </div>
+            </MainLayout>
+        );
+    }
 
     return (
         <MainLayout>
-            <div className=" bg-gray-50">
-                {/* Header */}
-                <header className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 text-white border-b sticky top-0 z-50">
-                    <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-                        <h1 className="text-xl font-bold text-zinc-50">
-                            Tournoi de football
-                        </h1>
+            <div className="bg-zinc-950 min-h-screen text-zinc-100 selection:bg-orange-500/30 selection:text-orange-400">
+                
+                {/* HERO BANNER & SEARCH CONTROL */}
+                <header className="border-b border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md sticky top-0 z-50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <div>
+                                <div className="flex items-center gap-2 text-zinc-400 text-xs font-mono tracking-wider uppercase mb-1">
+                                    <Trophy size={12} className="text-orange-500" />
+                                    <span>Compétition Officielle</span>
+                                </div>
+                                <h1 className="text-2xl font-black tracking-tight text-white bg-clip-text">
+                                    TOP FOOT <span className="text-orange-500 font-light">Edition 5</span>
+                                </h1>
+                            </div>
 
-                        <span className="bg-orange-600/25 px-3 py-1 rounded-lg text-sm text-zinc-50">
-                            TOP FOOT Edition 5
-                        </span>
-                    </div>
-                    <div className="flex items-center gap-2 mb-8 p-4">
-                        <button
-                            onClick={() => setActiveTab('tous')}
-                            className={`px-4 py-2 rounded-lg font-medium ${activeTab === 'tous'
-                                ? 'bg-green-500 shadow text-white'
-                                : 'bg-gray-700 text-zinc-50'
-                                }`}
-                        >
-                            Tous les matchs
-                        </button>
+                            {/* BARRE DE RECHERCHE UNIVERSELLE */}
+                            <div className="relative w-full md:w-80">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
+                                <input
+                                    type="text"
+                                    placeholder="Rechercher une équipe, une poule..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full pl-9 pr-4 py-2 bg-zinc-900/90 border border-zinc-800 rounded-xl text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/30 transition-all font-medium"
+                                />
+                            </div>
+                        </div>
 
-                        <button
-                            onClick={() => setActiveTab('direct')}
-                            className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 ${activeTab === 'direct'
-                                ? 'bg-[#009966] shadow text-red-500'
-                                : 'bg-gray-700 text-'
+                        {/* ONGLETS NAV / FILTRES STATUS */}
+                        <div className="flex items-center gap-3 mt-4 pt-2 border-t border-zinc-800/40">
+                            <button
+                                onClick={() => setActiveTab('tous')}
+                                className={`px-4 py-1.5 rounded-lg font-semibold text-xs tracking-wide uppercase transition-all duration-200 ${
+                                    activeTab === 'tous'
+                                        ? 'bg-zinc-100 text-zinc-950 shadow-lg shadow-black/20'
+                                        : 'bg-zinc-900 text-zinc-400 border border-zinc-800/60 hover:text-zinc-200 hover:bg-zinc-800/50'
                                 }`}
-                        >
-                            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                            En direct
-                        </button>
+                            >
+                                Tous les matchs
+                            </button>
+
+                            <button
+                                onClick={() => setActiveTab('direct')}
+                                className={`px-4 py-1.5 rounded-lg font-semibold text-xs tracking-wide uppercase flex items-center gap-2 transition-all duration-200 ${
+                                    activeTab === 'direct'
+                                        ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/20'
+                                        : 'bg-zinc-900 text-zinc-400 border border-zinc-800/60 hover:text-zinc-200 hover:bg-zinc-800/50'
+                                }`}
+                            >
+                                <span className={`w-2 h-2 rounded-full bg-current ${activeTab === 'direct' ? 'animate-ping' : ''}`}></span>
+                                En direct
+                            </button>
+                        </div>
                     </div>
                 </header>
 
-                <main className="w-full max-w-full mx-auto px-4 py-8">
+                {/* CONTENU PRINCIPAL SÉPARÉ EN DEUX SECTIONS */}
+                <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <div className={`flex ${isMobile ? 'flex-col-reverse gap-8' : 'md:flex-row gap-8'}`}>
 
-                    {/* Filtres */}
+                        {/* SECTION CLASSEMENTS ET POULES (65%) */}
+                        <div className="w-full md:w-[62%] bg-zinc-900/30 border border-zinc-800/50 rounded-2xl p-6 backdrop-blur-sm">
+                            <section>
+                                <div className="flex items-center justify-between mb-6 border-b border-zinc-800 pb-3">
+                                    <h2 className="text-lg font-bold text-zinc-100 tracking-tight">
+                                        Tableaux des Groupes
+                                    </h2>
+                                    <span className="text-xs font-mono text-zinc-500 bg-zinc-900 px-2 py-1 rounded border border-zinc-800">
+                                        {apiGroupsData.length} Poules
+                                    </span>
+                                </div>
 
-
-
-                    <div className={`flex ${isMobile ? 'flex-col-reverse' : ''} md:flex-row`}>
-
-                        {/* LEFT */}
-                        <div className="w-full md:w-[71.428%] bg-zinc-50 shadow-sm p-4">
-                            <section className="mt-12">
-                                <h2 className="text-2xl font-bold mb-6 text-orange-400">
-                                    Classement des groupes
-                                </h2>
-
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                    {filteredGroups.length === 0 ? (
-                                        <div className="col-span-full flex flex-col items-center justify-center py-16 text-gray-500">
-                                            <Inbox size={48} className="mb-3 text-gray-400" />
-                                            <p className="text-lg font-semibold">
-                                                Aucun groupe disponible
-                                            </p>
-                                            <p className="text-sm">
-                                                Les groupes apparaîtront ici dès qu’ils seront créés.
-                                            </p>
+                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                                    {apiGroupsData.length === 0 ? (
+                                        <div className="col-span-full flex flex-col items-center justify-center py-20 text-zinc-600">
+                                            <Inbox size={40} className="mb-3 text-zinc-700" />
+                                            <p className="text-sm font-medium">Aucun groupe ne correspond</p>
                                         </div>
                                     ) : (
-                                        filteredGroups.map((group) => (
-                                            <GroupTable key={group.name} group={group} />
+                                        apiGroupsData.map((group) => (
+                                            <div key={group.id || group.name} className="transition-all hover:translate-y-[-2px] duration-300">
+                                                <GroupTable group={group} />
+                                            </div>
                                         ))
                                     )}
                                 </div>
                             </section>
                         </div>
 
-                        {/* RIGHT */}
-                        <div className="w-full md:w-[28.572%] bg-gray-100 shadow-lg p-4">
+                        {/* SECTION FLUX DES MATCHS (38%) */}
+                        <div className="w-full md:w-[38%] bg-zinc-900/30 border border-zinc-800/50 rounded-2xl p-6 backdrop-blur-sm">
                             <section>
-                                <h2 className="text-2xl font-bold mb-6 text-black">
-                                    Matchs du week-end
-                                </h2>
+                                <div className="flex items-center justify-between mb-6 border-b border-zinc-800 pb-3">
+                                    <h2 className="text-lg font-bold text-zinc-100 tracking-tight flex items-center gap-2">
+                                        <span>Rencontres</span>
+                                        {filteredAndSortedMatches.some(m => ['live', 'half-time'].includes(String(m.status).toLowerCase())) && (
+                                            <span className="flex h-2 w-2 relative">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                            </span>
+                                        )}
+                                    </h2>
+                                    <span className="text-xs font-mono text-zinc-500 bg-zinc-900 px-2 py-1 rounded border border-zinc-800">
+                                        {filteredAndSortedMatches.length} Matchs
+                                    </span>
+                                </div>
 
-                                <div className="flex flex-col gap-2">
-                                    {allMatches.length === 0 ? (
-                                        <div className="flex flex-col items-center justify-center py-16 text-gray-500">
-                                            <CalendarX size={48} className="mb-3 text-gray-400" />
-                                            <p className="text-lg font-semibold">
-                                                Aucun match disponible
-                                            </p>
-                                            <p className="text-sm">
-                                                Revenez plus tard pour voir les rencontres.
-                                            </p>
+                                <div className="flex flex-col gap-4 max-h-[70vh] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-zinc-800">
+                                    {filteredAndSortedMatches.length === 0 ? (
+                                        <div className="flex flex-col items-center justify-center py-20 text-zinc-600">
+                                            <CalendarX size={40} className="mb-3 text-zinc-700" />
+                                            <p className="text-sm font-medium">Aucun match trouvé</p>
+                                            <p className="text-xs text-zinc-600 text-center mt-1">Ajustez vos filtres ou votre terme de recherche.</p>
                                         </div>
                                     ) : (
-                                        allMatches.map((match) => (
-                                            <MatchCard key={match.id} match={match} />
+                                        filteredAndSortedMatches.map((match) => (
+                                            <MatchCard key={match.id || match._id} match={match} />
                                         ))
                                     )}
                                 </div>
@@ -355,14 +218,7 @@ export const MatchPage = () => {
                         </div>
 
                     </div>
-
-
-
-
-
                 </main>
-
-
             </div>
         </MainLayout>
     )
