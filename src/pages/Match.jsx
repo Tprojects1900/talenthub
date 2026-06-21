@@ -17,10 +17,10 @@ export const MatchPage = () => {
     const { groups, group_loaded } = useGroups()
 
     // 2. Sécurité absolue sur le chargement
-    const isSchedulesReady = loaded_schedule === true || loa === true || (schedules && schedules.length > 0);
-    const isGroupsReady = group_loaded === true || (groups && groups.length > 0);
+    const isSchedulesReady = loaded_schedule ;
+    const isGroupsReady = group_loaded ;
     const isFullyLoaded = isSchedulesReady && isGroupsReady;
-    // console.log("load full",isGroupsReady,isSchedulesReady)
+    console.log("load full",isGroupsReady,isSchedulesReady)
     // 3. Filtrage dynamique, Recherche, et Tri intelligent des matchs
     const filteredAndSortedMatches = useMemo(() => {
         if (!schedules) return [];
