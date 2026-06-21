@@ -7,6 +7,7 @@ import AdminLayout from '../../layouts/AdminLayout';
 import { useTeams, useSchedules } from '../../hooks/useCalls';
 import ConfirmModal from "../../components/modals/ConfirmationModal"; 
 import { useScreen } from '../../context/ScreenContext';
+import { formatDateTime } from '../../utils/dateUtils';
 import { 
   useAddGroup, useRemoveGroup, useEditGroupTeams, useGetGroups, 
   useSaveSchedule, useRemoveSchedule 
@@ -480,7 +481,7 @@ const scheduledMatches = useMemo(
                               {prog ? (
                                 <div className="text-[10px] text-emerald-400 font-semibold mt-1 flex flex-wrap gap-x-2 gap-y-0.5 items-center">
                                   <span className="bg-emerald-950/40 px-1 rounded border border-emerald-900/30">{prog.typeConfrontation}</span>
-                                  <span>• {prog.date} à {prog.time}</span>
+                                  <span>• {formatDateTime(prog.date,prog.time)}</span>
                                   <span className="text-zinc-500 truncate">({prog.pitch})</span>
                                 </div>
                               ) : (
@@ -541,8 +542,8 @@ const scheduledMatches = useMemo(
                       <div className="flex justify-between items-center text-[9px] font-mono gap-2">
                         <span className="font-black text-[#FFD700] uppercase bg-zinc-950 px-1.5 py-0.5 rounded border border-zinc-900 truncate">{match.typeConfrontation}</span>
                         <div className="text-zinc-400 font-bold bg-zinc-950 px-1.5 py-0.5 rounded border border-zinc-900 flex gap-2 shrink-0">
-                          <span>{match.date}</span>
-                          <span className="text-emerald-400">{match.time}</span>
+                          <span className='text-emerald-400'>{formatDateTime(match.date,match?.time)}</span>
+                          {/* <span className="text-emerald-400">{match.time}</span> */}
                         </div>
                       </div>
                       <div className="text-xs font-black text-zinc-200 flex justify-between items-center gap-2">
