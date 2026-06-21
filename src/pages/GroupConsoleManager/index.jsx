@@ -24,7 +24,7 @@ const GroupAndMatchManager = () => {
 
   // --- HOOKS GRAPHQL DYNAMIQUES ---
   const { data: groupsData, loading: loadingGroups, refetch: refetchGroups } = useGetGroups();
-  const [addGroup] = useAddGroup();
+  const [createGroup ,{loading:group_added}] = useAddGroup();
   const [removeGroup, { loading: group_droped }] = useRemoveGroup();
   const [editGroupTeams] = useEditGroupTeams();
   const [saveMatchSchedule,{loading:save_loaded}] = useSaveSchedule();
@@ -94,40 +94,41 @@ const scheduledMatches = useMemo(
   };
   
   // --- GESTION DES GROUPES (DYNAMIQUE) ---
-  const createGroup = async (e) => {
+  const addGroup  = async (e) => {
     e.preventDefault();
     if (!groupName.trim()) return;
-    
+   // console.log(groupName,"groupName")
     try {
-      const response = await addGroup({
+      const {data} = await createGroup({
         variables: { input: { name: groupName.trim() } }
       });
-      
-      if (response.data.createGroup.success) {
-        toast.success(response.data.createGroup.message);
+     // console.log(data);
+      if (data.createGroup.success) {
+        toast.success(data.createGroup.message);
         setGroupName('');
         refetchGroups();
       } else {
-        toast.error(response.data.createGroup.message);
+        toast.error(data.createGroup.message);
       }
     } catch (error) {
       toast.error("Erreur lors de la création du groupe.");
+     // console.error(error);
     }
   };
 
   const deleteGroup = async () => {
     try {
-      const response = await removeGroup({
+      const {data} = await removeGroup({
         variables: { deleteGroupId: deletedId }
       });
 
-      if (response.data.deleteGroup.success) {
-        toast.success(response.data.deleteGroup.message);
+      if (data.deleteGroup.success) {
+        toast.success(data.deleteGroup.message);
         if (activeSelectGroupId === deletedId) setActiveSelectGroupId(null);
         refetchGroups();
         handleClose();
       } else {
-        toast.error(response.data.deleteGroup.message);
+        toast.error(data.deleteGroup.message);
         handleClose();
       }
     } catch (error) {
@@ -137,7 +138,7 @@ const scheduledMatches = useMemo(
 
   const persistGroupTeamsUpdate = async (groupId, targetTeamIds) => {
     try {
-      const response = await editGroupTeams({
+      const {data} = await editGroupTeams({
         variables: {
           input: {
             groupId: groupId,
@@ -145,10 +146,10 @@ const scheduledMatches = useMemo(
           }
         }
       });
-      if (response.data.updateGroupTeams.success) {
+      if (data.updateGroupTeams.success) {
         refetchGroups();
       } else {
-        toast.error(response.data.updateGroupTeams.message);
+        toast.error(data.updateGroupTeams.message);
       }
     } catch (error) {
       toast.error("Erreur lors de la mise à jour de la poule.");
@@ -371,7 +372,7 @@ const scheduledMatches = useMemo(
                   
                   {/* Formulaire & Vivier Équipes */}
                   <div className="md:col-span-1 space-y-4 min-w-0">
-                    <form onSubmit={createGroup} className="bg-zinc-900/60 border border-zinc-850 rounded-2xl p-4 space-y-3">
+                    <form onSubmit={addGroup} className="bg-zinc-900/60 border border-zinc-850 rounded-2xl p-4 space-y-3">
                       <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Créer un nouveau groupe</label>
                       <div className="flex gap-2">
                         <input 
@@ -379,7 +380,7 @@ const scheduledMatches = useMemo(
                           onChange={(e) => setGroupName(e.target.value)}
                           className="flex-1 min-w-0 bg-zinc-950 border border-zinc-800 focus:border-[#FFD700] rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none"
                         />
-                        <button type="submit" className="p-2.5 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-white shrink-0"><Plus size={14} /></button>
+                        <button disabled={group_added} type="submit" className="p-2.5 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-white shrink-0"><Plus size={14} /></button>
                       </div>
                     </form>
 
