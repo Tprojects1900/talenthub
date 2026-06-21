@@ -46,6 +46,17 @@ export const useMatchConsole = () => {
   const [awayRoster, setAwayRoster] = useState([]);
   const [isHomeSaved, setIsHomeSaved] = useState(false);
   const [isAwaySaved, setIsAwaySaved] = useState(false);
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      await refetchSchedules();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  fetchData();
+}, []);
 
 // ==========================================
   // --- GESTION NETTOYÉE DU CHRONOMÈTRE ---

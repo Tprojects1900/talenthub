@@ -12,6 +12,8 @@ import GroupAndMatchManager from "./pages/GroupConsoleManager";
 import AdminDashboardPage from "./pages/admin/Dashboard";
 import TeamMangerPage from "./pages/TeamManager";
 import LogoutPage from "./pages/auth/Logout";
+import TeamStatPage from "./pages/admin/TeamStat/index";
+
 
 
 function AppRoutes() {
@@ -27,6 +29,7 @@ function AppRoutes() {
         <Route path="/login" element={<AdminLogin />} />
         <Route path="/admin/match-gestion" element={<MatchConsoleManager />} />
         <Route path="/admin/equipes" element={<TeamMangerPage />} />
+        <Route path="/admin/statistiques" element={<TeamStatPage />} />
         <Route path="/admin/equipe-gestion" element={<TeamCreationManager />} />
         <Route path="/admin/group-gestion" element={<GroupAndMatchManager />} />
         <Route path="/dashboard" element={<AdminDashboardPage />} />

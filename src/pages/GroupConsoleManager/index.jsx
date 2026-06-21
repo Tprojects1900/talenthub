@@ -337,7 +337,7 @@ const scheduledMatches = useMemo(
   const isFormUpdating = !isDirectCreation && !!findExistingSchedule(currentMatchToSchedule);
 
   return (
-    <AdminLayout>
+    <AdminLayout pageTitle={"POULES / MATCH EN DIRECT"}>
       <div className="min-h-screen bg-zinc-950 text-white p-3 sm:p-6 font-sans select-none overflow-x-hidden" onDragOver={handleDragOver} onDrop={handleDropOutside}>
         
         {/* HEADER */}
@@ -387,7 +387,7 @@ const scheduledMatches = useMemo(
 
                     <div className="bg-zinc-900/60 border border-zinc-850 rounded-2xl p-4 space-y-3">
                       <h3 className="text-[10px] font-black uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">Membres Isolés ({unassignedTeams.length})</h3>
-                      <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1 min-w-0">
+                      <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1 min-w-0 scrollbar-hide">
                         {unassignedTeams.map(team => (
                           <div key={team.id} draggable onDragStart={(e) => handleDragStart(e, team.id)} className="bg-zinc-950 border border-zinc-850 p-2 rounded-xl flex items-center justify-between gap-2 cursor-grab text-xs hover:border-zinc-700 transition-colors">
                             <span className="font-bold text-zinc-300 truncate">{team.nom}</span>

@@ -41,6 +41,54 @@ query GetAllTeams {
         code
       }
     }
+       stat {
+      id
+      nom
+      slogan
+      code
+      quartier
+      logo
+      mj
+      g
+      n
+      p
+      bp
+      bc
+      db
+      pts
+      topScorer {
+        id
+        nom
+        dorsa
+        goals
+      }
+      listOfScorers {
+        id
+        nom
+        dorsa
+        goals
+      }
+      yellowCards {
+        player {
+          id
+          nom
+          dorsa
+          goals
+        }
+        time
+        matchId
+      }
+      redCards {
+        player {
+          id
+          nom
+          dorsa
+          goals
+        }
+        time
+        matchId
+      }
+    }
   }
 }
 `;
@@ -73,8 +121,104 @@ query GetGroups {
           code
           quartier
           logo
+           stat {
+      id
+      nom
+      slogan
+      code
+      quartier
+      logo
+      mj
+      g
+      n
+      p
+      bp
+      bc
+      db
+      pts
+      topScorer {
+        id
+        nom
+        dorsa
+        goals
+      }
+      listOfScorers {
+        id
+        nom
+        dorsa
+        goals
+      }
+      yellowCards {
+        player {
+          id
+          nom
+          dorsa
+          goals
+        }
+        time
+        matchId
+      }
+      redCards {
+        player {
+          id
+          nom
+          dorsa
+          goals
+        }
+        time
+        matchId
+      }
+    }
         }
       }
+         stat {
+      id
+      nom
+      slogan
+      code
+      quartier
+      logo
+      mj
+      g
+      n
+      p
+      bp
+      bc
+      db
+      pts
+      topScorer {
+        id
+        nom
+        dorsa
+        goals
+      }
+      listOfScorers {
+        id
+        nom
+        dorsa
+        goals
+      }
+      yellowCards {
+        player {
+          id
+          nom
+          dorsa
+          goals
+        }
+        time
+        matchId
+      }
+      redCards {
+        player {
+          id
+          nom
+          dorsa
+          goals
+        }
+        time
+        matchId
+      }
+    }
     }
     teamIds
   }
@@ -207,6 +351,54 @@ query GetLastLiveMatch {
       code
       quartier
       logo
+       stat {
+      id
+      nom
+      slogan
+      code
+      quartier
+      logo
+      mj
+      g
+      n
+      p
+      bp
+      bc
+      db
+      pts
+      topScorer {
+        id
+        nom
+        dorsa
+        goals
+      }
+      listOfScorers {
+        id
+        nom
+        dorsa
+        goals
+      }
+      yellowCards {
+        player {
+          id
+          nom
+          dorsa
+          goals
+        }
+        time
+        matchId
+      }
+      redCards {
+        player {
+          id
+          nom
+          dorsa
+          goals
+        }
+        time
+        matchId
+      }
+    }
       members {
         id
         nom
@@ -231,6 +423,54 @@ query GetLastLiveMatch {
       code
       quartier
       logo
+       stat {
+      id
+      nom
+      slogan
+      code
+      quartier
+      logo
+      mj
+      g
+      n
+      p
+      bp
+      bc
+      db
+      pts
+      topScorer {
+        id
+        nom
+        dorsa
+        goals
+      }
+      listOfScorers {
+        id
+        nom
+        dorsa
+        goals
+      }
+      yellowCards {
+        player {
+          id
+          nom
+          dorsa
+          goals
+        }
+        time
+        matchId
+      }
+      redCards {
+        player {
+          id
+          nom
+          dorsa
+          goals
+        }
+        time
+        matchId
+      }
+    }
       members {
         id
         nom

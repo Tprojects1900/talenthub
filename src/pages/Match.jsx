@@ -201,7 +201,7 @@ export const MatchPage = () => {
                                     </span>
                                 </div>
 
-                                <div className="flex flex-col gap-4 max-h-[70vh] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-zinc-800">
+                                <div className="flex flex-col gap-4 max-h-[70vh] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-hide">
                                     {filteredAndSortedMatches.length === 0 ? (
                                         <div className="flex flex-col items-center justify-center py-20 text-zinc-600">
                                             <CalendarX size={40} className="mb-3 text-zinc-700" />
