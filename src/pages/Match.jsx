@@ -20,7 +20,7 @@ export const MatchPage = () => {
     const isSchedulesReady = loaded_schedule === true || loa === true || (schedules && schedules.length > 0);
     const isGroupsReady = group_loaded === true || (groups && groups.length > 0);
     const isFullyLoaded = isSchedulesReady && isGroupsReady;
-
+    // console.log("load full",isGroupsReady,isSchedulesReady)
     // 3. Filtrage dynamique, Recherche, et Tri intelligent des matchs
     const filteredAndSortedMatches = useMemo(() => {
         if (!schedules) return [];
@@ -78,7 +78,7 @@ export const MatchPage = () => {
         });
     }, [groups, filteredAndSortedMatches]);
 
-    if (!isFullyLoaded) {
+    if (isFullyLoaded) {
         return (
             <MainLayout>
                 <div className="flex h-[75vh] flex-col items-center justify-center gap-4 bg-zinc-950">
@@ -210,7 +210,7 @@ export const MatchPage = () => {
                                         </div>
                                     ) : (
                                         filteredAndSortedMatches.map((match) => (
-                                            <MatchCard key={match.id || match._id} match={match} />
+                                            <MatchCard key={match?.id || match?._id} match={match} />
                                         ))
                                     )}
                                 </div>
