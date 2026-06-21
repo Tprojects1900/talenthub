@@ -572,121 +572,150 @@ const scheduledMatches = useMemo(
         </div>
 
         {/* MODAL DE PROGRAMMATION (PROPRE & SECURISE) */}
-        {isModalOpen && currentMatchToSchedule && (
-          <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-            <form onSubmit={saveMatchSched} className="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl my-auto">
-              
-              <div className="flex justify-between items-center border-b border-zinc-800 pb-2 gap-2">
-                <h4 className="text-xs font-black uppercase tracking-wider text-zinc-300 flex items-center gap-1.5 truncate">
-                  <Calendar size={13} className="text-[#FFD700]" /> <span>{isFormUpdating ? 'Ajuster' : 'Configurer'}</span>
-                </h4>
-                <button type="button" onClick={() => setIsModalOpen(false)} className="text-zinc-500 hover:text-white shrink-0"><X size={15} /></button>
-              </div>
+     {isModalOpen && currentMatchToSchedule && (
+  <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <form onSubmit={saveMatchSched} className="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl my-auto">
+      
+      <div className="flex justify-between items-center border-b border-zinc-800 pb-2 gap-2">
+        <h4 className="text-xs font-black uppercase tracking-wider text-zinc-300 flex items-center gap-1.5 truncate">
+          <Calendar size={13} className="text-[#FFD700]" /> <span>{isFormUpdating ? 'Ajuster' : 'Configurer'}</span>
+        </h4>
+        <button type="button" onClick={() => setIsModalOpen(false)} className="text-zinc-500 hover:text-white shrink-0"><X size={15} /></button>
+      </div>
 
-              <div className="bg-zinc-950 p-3 rounded-xl border border-zinc-850 space-y-3">
-                <div>
-                  <label className="block text-[9px] font-bold text-zinc-500 uppercase mb-1">
-                    Type / Journée de la Confrontation *
-                  </label>
-                  <input 
-                    type="text" placeholder="Ex: 1ère Journée..." required
-                    value={scheduleForm.typeConfrontation}
-                    onChange={(e) => setScheduleForm({ ...scheduleForm, typeConfrontation: e.target.value })}
-                    className="w-full bg-zinc-900 border border-zinc-800 text-xs p-2 rounded-lg text-zinc-200 focus:outline-none focus:border-[#FFD700]"
-                  />
-                  <div className="flex flex-wrap gap-1 mt-1.5">
-                    {suggestionsType.map(st => (
-                      <button
-                        key={st} type="button" onClick={() => setScheduleForm({ ...scheduleForm, typeConfrontation: st })}
-                        className="text-[8px] bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-850 px-1.5 py-0.5 rounded"
-                      >
-                        {st}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-zinc-900">
-                  <div>
-                    <label className="block text-[9px] font-bold text-zinc-400 uppercase mb-1">Date *</label>
-                    <input 
-                      type="date" required value={scheduleForm.date}
-                      onChange={(e) => setScheduleForm({ ...scheduleForm, date: e.target.value })}
-                      className="w-full bg-zinc-900 border border-zinc-800 text-xs p-2 rounded-lg text-zinc-200 focus:outline-none focus:border-[#FFD700]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[9px] font-bold text-zinc-400 uppercase mb-1">Heure *</label>
-                    <input 
-                      type="time" required value={scheduleForm.time}
-                      onChange={(e) => setScheduleForm({ ...scheduleForm, time: e.target.value })}
-                      className="w-full bg-zinc-900 border border-zinc-800 text-xs p-2 rounded-lg text-zinc-200 focus:outline-none focus:border-[#FFD700]"
-                    />
-                  </div>
-                </div>
-
-                <div className="pt-2 border-t border-zinc-900">
-                  <label className="block text-[9px] font-bold text-zinc-400 uppercase mb-1">Terrain / Emplacement</label>
-                  <input 
-                    type="text" placeholder="Ex: Maya Kopé" value={scheduleForm.pitch}
-                    onChange={(e) => setScheduleForm({ ...scheduleForm, pitch: e.target.value })}
-                    className="w-full bg-zinc-900 border border-zinc-800 text-xs p-2 rounded-lg text-zinc-200 focus:outline-none focus:border-[#FFD700]"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-zinc-900">
-                  <div>
-                    <label className="block text-[9px] font-bold text-zinc-400 uppercase mb-1">Équipe Domicile *</label>
-                    {isDirectCreation ? (
-                      <select
-                        required value={scheduleForm.homeId}
-                        onChange={(e) => setScheduleForm({ ...scheduleForm, homeId: e.target.value })}
-                        className="w-full bg-zinc-900 border border-zinc-800 text-xs p-2 rounded-lg text-zinc-200 font-semibold outline-none"
-                      >
-                        <option value="">-- Choisir --</option>
-                        {teamsList.map(t => (
-                          <option key={t.id} value={t.id}>{t.nom}</option>
-                        ))}
-                      </select>
-                    ) : (
-                      <div className="bg-zinc-900 p-2 rounded-lg border border-zinc-800 text-xs font-bold text-zinc-300 truncate">
-                        {getTeam(scheduleForm.homeId).nom}
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-[9px] font-bold text-zinc-400 uppercase mb-1">Équipe Extérieur *</label>
-                    {isDirectCreation ? (
-                      <select
-                        required value={scheduleForm.awayId}
-                        onChange={(e) => setScheduleForm({ ...scheduleForm, awayId: e.target.value })}
-                        className="w-full bg-zinc-900 border border-zinc-800 text-xs p-2 rounded-lg text-zinc-200 font-semibold outline-none"
-                      >
-                        <option value="">-- Choisir --</option>
-                        {teamsList.map(t => (
-                          <option key={t.id} value={t.id}>{t.nom}</option>
-                        ))}
-                      </select>
-                    ) : (
-                      <div className="bg-zinc-900 p-2 rounded-lg border border-zinc-800 text-xs font-bold text-zinc-300 truncate">
-                        {getTeam(scheduleForm.awayId).nom}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold rounded-xl transition-colors">
-                  Annuler
-                </button>
-                <button type="submit" className="px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-zinc-950 text-xs font-black uppercase tracking-wider rounded-xl transition-all">
-                  {save_loaded ? "En cours...": ' Confirmer'}
-                </button>
-              </div>
-            </form>
+      <div className="bg-zinc-950 p-3 rounded-xl border border-zinc-850 space-y-3">
+        <div>
+          <label className="block text-[9px] font-bold text-zinc-500 uppercase mb-1">
+            Type / Journée de la Confrontation *
+          </label>
+          <input 
+            type="text" placeholder="Ex: 1ère Journée..." required
+            value={scheduleForm.typeConfrontation}
+            onChange={(e) => setScheduleForm({ ...scheduleForm, typeConfrontation: e.target.value })}
+            className="w-full bg-zinc-900 border border-zinc-800 text-xs p-2 rounded-lg text-zinc-200 focus:outline-none focus:border-[#FFD700]"
+          />
+          <div className="flex flex-wrap gap-1 mt-1.5">
+            {suggestionsType.map(st => (
+              <button
+                key={st} type="button" onClick={() => setScheduleForm({ ...scheduleForm, typeConfrontation: st })}
+                className="text-[8px] bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-850 px-1.5 py-0.5 rounded"
+              >
+                {st}
+              </button>
+            ))}
           </div>
-        )}
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-zinc-900">
+          <div>
+            <label className="block text-[9px] font-bold text-zinc-400 uppercase mb-1">Date *</label>
+            <input 
+              type="date" required value={scheduleForm.date}
+              onChange={(e) => setScheduleForm({ ...scheduleForm, date: e.target.value })}
+              className="w-full bg-zinc-900 border border-zinc-800 text-xs p-2 rounded-lg text-zinc-200 focus:outline-none focus:border-[#FFD700]"
+            />
+          </div>
+          <div>
+            <label className="block text-[9px] font-bold text-zinc-400 uppercase mb-1">Heure *</label>
+            <input 
+              type="time" required value={scheduleForm.time}
+              onChange={(e) => setScheduleForm({ ...scheduleForm, time: e.target.value })}
+              className="w-full bg-zinc-900 border border-zinc-800 text-xs p-2 rounded-lg text-zinc-200 focus:outline-none focus:border-[#FFD700]"
+            />
+          </div>
+        </div>
+
+        <div className="pt-2 border-t border-zinc-900">
+          <label className="block text-[9px] font-bold text-zinc-400 uppercase mb-1">Terrain / Emplacement</label>
+          <input 
+            type="text" placeholder="Ex: Maya Kopé" value={scheduleForm.pitch}
+            onChange={(e) => setScheduleForm({ ...scheduleForm, pitch: e.target.value })}
+            className="w-full bg-zinc-900 border border-zinc-800 text-xs p-2 rounded-lg text-zinc-200 focus:outline-none focus:border-[#FFD700]"
+          />
+        </div>
+
+        {/* SECTION DES ÉQUIPES AVEC OPTION DE PERMUTATION (SWITCH) */}
+        <div className="relative pt-2 border-t border-zinc-900">
+          
+          {/* Bouton de Permutation Absolu */}
+          <div className="absolute left-1/2 top-[55%] -translate-x-1/2 -translate-y-1/2 z-10">
+            <button
+              type="button"
+              onClick={() => setScheduleForm({
+                ...scheduleForm,
+                homeId: scheduleForm.awayId,
+                awayId: scheduleForm.homeId
+              })}
+              title="Inverser Domicile / Extérieur"
+              className="p-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-[#FFD700] rounded-lg transition-all shadow-md flex items-center justify-center group"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="rotate-0 sm:rotate-90 transition-transform duration-300 group-hover:scale-110">
+                <path d="m7 21-4-4 4-4"/>
+                <path d="M3 17h18"/>
+                <path d="m17 3 4 4-4 4"/>
+                <path d="M21 7H3"/>
+              </svg>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            {/* Bloc Domicile */}
+            <div>
+              <label className="block text-[9px] font-bold text-zinc-400 uppercase mb-1">Équipe Domicile *</label>
+              {isDirectCreation ? (
+                <select
+                  required value={scheduleForm.homeId}
+                  onChange={(e) => setScheduleForm({ ...scheduleForm, homeId: e.target.value })}
+                  className="w-full bg-zinc-900 border border-zinc-800 text-xs p-2 rounded-lg text-zinc-200 font-semibold outline-none focus:border-[#FFD700]"
+                >
+                  <option value="">-- Choisir --</option>
+                  {teamsList.map(t => (
+                    <option key={t.id} value={t.id} disabled={t.id === scheduleForm.awayId}>{t.nom}</option>
+                  ))}
+                </select>
+              ) : (
+                <div className="bg-zinc-900 p-2.5 rounded-lg border border-zinc-800 text-xs font-bold text-zinc-300 truncate min-h-[36px] flex items-center">
+                  {getTeam(scheduleForm.homeId)?.nom || "Non définie"}
+                </div>
+              )}
+            </div>
+
+            {/* Bloc Extérieur */}
+            <div>
+              <label className="block text-[9px] font-bold text-zinc-400 uppercase mb-1">Équipe Extérieur *</label>
+              {isDirectCreation ? (
+                <select
+                  required value={scheduleForm.awayId}
+                  onChange={(e) => setScheduleForm({ ...scheduleForm, awayId: e.target.value })}
+                  className="w-full bg-zinc-900 border border-zinc-800 text-xs p-2 rounded-lg text-zinc-200 font-semibold outline-none focus:border-[#FFD700]"
+                >
+                  <option value="">-- Choisir --</option>
+                  {teamsList.map(t => (
+                    <option key={t.id} value={t.id} disabled={t.id === scheduleForm.homeId}>{t.nom}</option>
+                  ))}
+                </select>
+              ) : (
+                <div className="bg-zinc-900 p-2.5 rounded-lg border border-zinc-800 text-xs font-bold text-zinc-300 truncate min-h-[36px] flex items-center">
+                  {getTeam(scheduleForm.awayId)?.nom || "Non définie"}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div className="flex justify-end gap-2 pt-2">
+        <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold rounded-xl transition-colors">
+          Annuler
+        </button>
+        <button type="submit" className="px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-zinc-950 text-xs font-black uppercase tracking-wider rounded-xl transition-all">
+          {save_loaded ? "En cours...": ' Confirmer'}
+        </button>
+      </div>
+    </form>
+  </div>
+)}
 
         {/* MODAL DE CONFIRMATION DE SUPPRESSION (REUTILISABLE) */}
         <ConfirmModal 
