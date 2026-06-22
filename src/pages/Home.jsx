@@ -16,9 +16,10 @@ export default function Home() {
   
 
   // 2. Appel des hooks de statistiques pour chaque équipe
-  const { teamStats: homeStats, t_loaded: homeLoading } = useTeamStat(homeTeamId);
-  const { teamStats: awayStats, t_loaded: awayLoading } = useTeamStat(awayTeamId);
-
+  // const { teamStats: homeStats, t_loaded: homeLoading } = useTeamStat(homeTeamId);
+  // const { teamStats: awayStats, t_loaded: awayLoading } = useTeamStat(awayTeamId);
+  const homeStats=currentSchedule?.homeTeam?.stat || {}
+  const awayStats=currentSchedule?.awayTeam?.stat || {}
   
 
   const matchData = useMemo(() => {
@@ -96,6 +97,7 @@ export default function Home() {
       });
 
     return {
+      match,
       matchType: match.typeConfrontation,
       date: formatDateTime(match.date,match.time),
       status: match.status,
@@ -140,12 +142,12 @@ export default function Home() {
   }, [currentSchedule, homeStats, awayStats]);
 
   // Globalisation du chargement (calendrier courant + statistiques des deux équipes)
-  const isGlobalLoading = isLoadingCurrentSchedule || homeLoading || awayLoading;
+ // const isGlobalLoading = false;
 
   return (
     <MainLayout>
       <div className="w-full p-2">
-        {isGlobalLoading ? (
+        {!matchData ? (
           <FootballLoader />
         ) : matchData ? (
           <CurrentMatchDetails {...matchData} />

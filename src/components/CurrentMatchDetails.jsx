@@ -7,6 +7,7 @@ import {
 
 import { useScreen } from '../context/ScreenContext';
 import MatchStatusBadge from './MatchStatusBadge';
+import MatchTimer from './MatchTimer';
 
 const CurrentMatchDetails = ({
     homeTeam,
@@ -14,11 +15,14 @@ const CurrentMatchDetails = ({
     matchType,
     date,
     status,
-    pitch
+    pitch,
+    match,
+    loading
 }) => {
     const { isMobile } = useScreen();
     const [activeTab, setActiveTab] = useState('live');
 
+    // console.log("match",match)
     // SÉCURITÉ : Ajout d'une valeur par défaut pour le tri afin d'éviter le crash de localeCompare
     const allEvents = [
         ...(homeTeam.teamEvents || []).map(e => ({ ...e, side: 'home' })),
@@ -97,6 +101,7 @@ const CurrentMatchDetails = ({
                             <span className="text-[#FFD700] text-2xl sm:text-4xl font-light opacity-60">:</span>
                             <span className={isLive ? 'text-emerald-400 animate-pulse' : 'text-white'}>{awayTeam.score ?? 0}</span>
                         </div>
+                        <MatchTimer selectedMatch={match} size='text-xs' loading={loading}/>
                         <div className="mt-2 flex items-center gap-1 text-xs text-zinc-500 uppercase tracking-widest font-semibold">
                             <Map size={12} className="text-[#FFD700]" /> {pitch}
                         </div>
@@ -128,8 +133,9 @@ const CurrentMatchDetails = ({
                             <div className="relative border-l sm:border-l-0 sm:before:absolute sm:before:left-1/2 sm:before:top-0 sm:before:bottom-0 sm:before:w-[1px] sm:before:bg-zinc-800 pl-4 sm:pl-0 space-y-6">
                                 {allEvents.map((event, index) => {
                                     const isHome = event.side === 'home';
+                                   // console.log("event",isHome,"=>",index)
                                     return (
-                                        <div key={index} className={`flex flex-col sm:flex-row items-start sm:items-center ${isHome ? 'sm:flex-row-reverse' : ''} relative`}>
+                                        <div key={index} className={`flex flex-col sm:flex-row items-start sm:items-center ${isHome ? '' : 'sm:flex-row-reverse'} relative`}>
                                             
                                             {/* Temps au milieu */}
                                             <div className="absolute -left-[25px] sm:left-1/2 sm:-translate-x-1/2 bg-zinc-900 border border-zinc-700 text-[#FFD700] text-[10px] font-mono px-1.5 py-0.5 rounded-md z-10 shadow-md">

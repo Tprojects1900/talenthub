@@ -30,9 +30,13 @@ const AuthMiddleware = ({ children }) => {
     }, [user, loading, navigate, token, location.pathname]);
 
     // On affiche le loader tant que l'état global ou local n'est pas stable
-    if (loading || isChecking) {
-        return <Loader />;
-    }
+   if (loading || isChecking) {
+    return (
+        <div className="fixed inset-0 flex items-center justify-center bg-zinc-950/50">
+            <Loader />
+        </div>
+    );
+}
 
     return children;
 };

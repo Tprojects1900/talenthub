@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import TeamsTable from "../components/tables/TeamsTable"; 
+import TeamsTable from "../components/tables/TeamsTable";
 import { MainLayout } from '../layouts';
 import { Trophy, Star, Loader2, Award } from "lucide-react";
 import { useGroups, useTeamStat, useTeams } from "../hooks/useCalls";
@@ -37,12 +37,20 @@ const PouleTableContainer = ({ group, columns, onPouleDataResolved }) => {
   const rawTeams = group.teams || [];
 
   const handleStatsLoaded = (teamId, completeTeamData) => {
-    setResolvedTeamsMap(prev => {
-      const updated = { ...prev, [teamId]: completeTeamData };
-      onPouleDataResolved(group.id || group._id, Object.values(updated));
-      return updated;
-    });
+    setResolvedTeamsMap(prev => ({
+      ...prev,
+      [teamId]: completeTeamData
+    }));
   };
+
+  useEffect(() => {
+    if (Object.keys(resolvedTeamsMap).length > 0) {
+      onPouleDataResolved(
+        group.id || group._id,
+        Object.values(resolvedTeamsMap)
+      );
+    }
+  }, [resolvedTeamsMap]);
 
   const teamsData = Object.values(resolvedTeamsMap).sort((a, b) => {
     if (b.point !== a.point) return b.point - a.point;
@@ -55,10 +63,10 @@ const PouleTableContainer = ({ group, columns, onPouleDataResolved }) => {
   return (
     <div className="bg-zinc-900/40 backdrop-blur-sm p-4 rounded-2xl border border-zinc-800/60 shadow-xl">
       {rawTeams.map((team, idx) => (
-        <TeamRowLoader 
-          key={team.id || team._id || idx} 
-          team={team} 
-          index={idx} 
+        <TeamRowLoader
+          key={team.id || team._id || idx}
+          team={team}
+          index={idx}
           onStatsLoaded={handleStatsLoaded}
         />
       ))}
@@ -75,9 +83,9 @@ const PouleTableContainer = ({ group, columns, onPouleDataResolved }) => {
         </span>
       </div>
 
-      <TeamsTable 
-        columns={columns} 
-        data={loadingStats ? [] : teamsData} 
+      <TeamsTable
+        columns={columns}
+        data={loadingStats ? [] : teamsData}
         loading={loadingStats}
         searchPlaceholder="Rechercher une équipe..."
         searchKey="name"
@@ -88,10 +96,10 @@ const PouleTableContainer = ({ group, columns, onPouleDataResolved }) => {
 
 const RankingPage = () => {
   const { groups, group_loaded } = useGroups();
-  
+
   // Utilisation stratégique de useTeams pour le classement des buteurs
   const { teams: apiTeams, loading: teamsLoading } = useTeams();
-  
+
   const [activeTab, setActiveTab] = useState("poules");
   const [globalGroupsData, setGlobalGroupsData] = useState({});
 
@@ -128,7 +136,7 @@ const RankingPage = () => {
   const isGlobalDataLoading = useMemo(() => {
     if (group_loaded || teamsLoading) return true;
     if (!groups || groups.length === 0) return false;
-    
+
     // return groups.some(g => {
     //   const resolvedCount = globalGroupsData[g.id || g._id]?.length || 0;
     //   console.log("resolved",resolvedCount,g.teams)
@@ -140,7 +148,7 @@ const RankingPage = () => {
     {
       key: "rang",
       label: "RANG",
-      render: (item, index) => index === 0 
+      render: (item, index) => index === 0
         ? <span className="bg-amber-500/10 text-amber-400 font-mono font-black border border-amber-500/20 px-2 py-0.5 rounded-md text-xs shadow-sm">1er</span>
         : <span className="font-mono font-bold text-zinc-500 text-xs">{index + 1}e</span>
     },
@@ -233,21 +241,19 @@ const RankingPage = () => {
         <div className="flex border-b border-zinc-800/80 mb-8 gap-6 font-mono text-xs tracking-widest uppercase">
           <button
             onClick={() => setActiveTab("poules")}
-            className={`pb-3 font-bold transition-all relative ${
-              activeTab === "poules" ? "text-orange-400" : "text-zinc-500 hover:text-zinc-300"
-            }`}
+            className={`pb-3 font-bold transition-all relative ${activeTab === "poules" ? "text-orange-400" : "text-zinc-500 hover:text-zinc-300"
+              }`}
           >
             CLASSEMENT PAR POULE
             {activeTab === "poules" && (
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500" />
             )}
           </button>
-          
+
           <button
             onClick={() => setActiveTab("buteurs")}
-            className={`pb-3 font-bold transition-all relative flex items-center gap-1.5 ${
-              activeTab === "buteurs" ? "text-orange-400" : "text-zinc-500 hover:text-zinc-300"
-            }`}
+            className={`pb-3 font-bold transition-all relative flex items-center gap-1.5 ${activeTab === "buteurs" ? "text-orange-400" : "text-zinc-500 hover:text-zinc-300"
+              }`}
           >
             CLASSEMENT BUTEURS
             <span className="text-[10px] bg-zinc-900 text-zinc-400 border border-zinc-800 px-1.5 py-0.2 rounded font-sans">TOP 10</span>
@@ -269,10 +275,10 @@ const RankingPage = () => {
             {/* INJECTEUR POUR LE CHARGEMENT ET LA SYNCHRONISATION DU CLASSEMENT DES POULES */}
             <div className="hidden">
               {groups && groups.map((group) => (
-                <PouleTableContainer 
-                  key={group.id || group._id} 
-                  group={group} 
-                  columns={columnsPoules} 
+                <PouleTableContainer
+                  key={group.id || group._id}
+                  group={group}
+                  columns={columnsPoules}
                   onPouleDataResolved={handlePouleDataResolved}
                 />
               ))}
@@ -296,13 +302,14 @@ const RankingPage = () => {
                           {(group.teams || []).length} Équipes
                         </span>
                       </div>
-                      <TeamsTable 
-                        columns={columnsPoules} 
-                        data={resolvedData.sort((a, b) => {
+                      <TeamsTable
+                        columns={columnsPoules}
+                        data={[...resolvedData].sort((a, b) => {
                           if (b.point !== a.point) return b.point - a.point;
-                          if (parseInt(b.diffB) !== parseInt(a.diffB)) return parseInt(b.diffB) - parseInt(a.diffB);
+                          if (parseInt(b.diffB) !== parseInt(a.diffB))
+                            return parseInt(b.diffB) - parseInt(a.diffB);
                           return b.butM - a.butM;
-                        })} 
+                        })}
                         loading={false}
                         searchPlaceholder="Rechercher une équipe..."
                         searchKey="name"
@@ -320,7 +327,7 @@ const RankingPage = () => {
                   <Award size={16} className="text-orange-400" />
                   <h3 className="font-bold text-base text-zinc-100 uppercase tracking-tight">SOULIER D'OR — CLASSEMENT DES BUTEURS</h3>
                 </div>
-                
+
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
@@ -349,9 +356,9 @@ const RankingPage = () => {
                             </td>
                             <td className="py-3.5 px-3 text-zinc-400">
                               <div className="flex items-center gap-2">
-                                <img 
-                                  src={scorer.teamLogo || "https://placehold.co/40x40/000?text=FC"} 
-                                  alt="" 
+                                <img
+                                  src={scorer.teamLogo || "https://placehold.co/40x40/000?text=FC"}
+                                  alt=""
                                   className="w-5 h-5 object-contain bg-zinc-950 rounded-full border border-zinc-850 p-0.5"
                                 />
                                 <span className="font-bold text-zinc-400 text-xs uppercase truncate max-w-[150px] sm:max-w-none">{scorer.teamName}</span>

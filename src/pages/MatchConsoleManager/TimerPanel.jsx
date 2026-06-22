@@ -4,15 +4,14 @@
 import {
   Play, Clock, X, Trash2, ChevronRight, User, Users, AlertTriangle, ArrowRightLeft, CheckCircle, Edit3, RotateCcw
 } from 'lucide-react';
-const TimerPanel = ({ seconds, formatTime, matchStatus, isHomeSaved, isAwaySaved, switchMode, onFinishClick }) => (
+import MatchTimer from '../../components/MatchTimer';
+const TimerPanel = ({ seconds, formatTime,match, matchStatus, isHomeSaved, isAwaySaved, switchMode, onFinishClick ,loading=false}) => (
   <div className="bg-zinc-900 border border-zinc-850 rounded-2xl p-5 text-center">
-    <div className="font-mono text-4xl font-black text-zinc-100 flex items-center justify-center gap-2">
-      <Clock className="text-[#FFD700]" size={28} /> {formatTime(seconds)}
-    </div>
+   <MatchTimer selectedMatch={match}  loading={loading} />
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
       <button
         disabled={(!isHomeSaved || !isAwaySaved) || matchStatus !== 'programmed'}
-        onClick={() => switchMode('live')}
+        onClick={() => switchMode('start')}
         className="py-2 bg-[#FFD700] text-black font-black text-xs rounded-lg uppercase tracking-wide disabled:opacity-20 transition-all"
       >
         Démarrer
@@ -20,7 +19,7 @@ const TimerPanel = ({ seconds, formatTime, matchStatus, isHomeSaved, isAwaySaved
 
       <button
         disabled={matchStatus !== 'live'}
-        onClick={() => switchMode('half-time')}
+        onClick={() => switchMode('pause')}
         className="py-2 bg-zinc-800 text-zinc-300 font-bold text-xs rounded-lg uppercase disabled:opacity-20 transition-all"
       >
         Mi-temps
@@ -28,7 +27,7 @@ const TimerPanel = ({ seconds, formatTime, matchStatus, isHomeSaved, isAwaySaved
 
       <button
         disabled={matchStatus !== 'half-time'}
-        onClick={() => switchMode('live')}
+        onClick={() => switchMode('restart')}
         className="py-2 bg-emerald-600 text-white font-bold text-xs rounded-lg uppercase disabled:opacity-20 transition-all"
       >
         Reprendre

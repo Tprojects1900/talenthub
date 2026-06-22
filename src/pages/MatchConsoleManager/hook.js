@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback,useRef } from 'react';
 import { useTeams, useGroups, useSchedules, useMatchRosters } from '../../hooks/useCalls';
 import { useAddMatchRoster, useRemoveMatchRoster, useDropActor, useSwitchMatchMode, useCreateStandarEvent, useCreateSub ,useDropEvent,useEditTimerOrPlayer} from '../../lib/graphql.service';
 import { toast } from 'react-toastify';
 
 export const useMatchConsole = () => {
-  const [eventDropId,setEventDropId]=useState(null);
-  const [eventShow,setEventShow]=useState(false);
+  const [eventDropId, setEventDropId] = useState(null);
+  const [eventShow, setEventShow] = useState(false);
   const { teams: apiTeams, loading: team_loaded } = useTeams();
   const { schedules, loaded_schedule, refetchSchedules } = useSchedules();
   const { groups, group_loaded } = useGroups();
@@ -30,9 +30,7 @@ export const useMatchConsole = () => {
   
   // États critiques du cycle de vie du match
   const [matchStatus, setMatchStatus] = useState('programmed'); 
-  const [seconds, setSeconds] = useState(0);
-  const [isActive, setIsActive] = useState(false);
-  const increment = useRef(null);
+  const [displayTime, setDisplayTime] = useState("00:00");
 
   const [matchEvents, setMatchEvents] = useState([]);
   const [eventTriggerConfig, setEventTriggerConfig] = useState(null); 
@@ -46,94 +44,77 @@ export const useMatchConsole = () => {
   const [awayRoster, setAwayRoster] = useState([]);
   const [isHomeSaved, setIsHomeSaved] = useState(false);
   const [isAwaySaved, setIsAwaySaved] = useState(false);
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      await refetchSchedules();
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
-  fetchData();
+  useEffect(() => {
+    refetchRosters();
+  }, [refetchRosters]);
+
+
+// Contient le nombre de secondes du timer reçu depuis l'API
+const baseSecondsRef = useRef(0);
+
+// Contient la date à laquelle on a reçu ce timer
+const timerFetchedAtRef = useRef(Date.now());
+
+const getLiveTimer = useCallback(() => {
+  const elapsedSeconds = Math.floor(
+    (Date.now() - timerFetchedAtRef.current) / 1000
+  );
+
+  const totalSeconds = baseSecondsRef.current + elapsedSeconds;
+
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 }, []);
 
-// ==========================================
-  // --- GESTION NETTOYÉE DU CHRONOMÈTRE ---
-  // ==========================================
+useEffect(() => {
+  if (!selectedMatch) return;
 
-  // 1. SYNC INITIALE ET ANTI-F5 (Au changement de match)
-  useEffect(() => {
-    if (!matchId) return;
+  // Match terminé ou pas encore commencé
+  if (selectedMatch.status !== "live") {
+    setDisplayTime(selectedMatch.timer || "00:00");
+    return;
+  }
 
-    const savedMatchId = localStorage.getItem('console_match_id');
-    const currentStatus = selectedMatch?.status || 'programmed';
-    
-    if (savedMatchId === String(matchId)) {
-      const savedSeconds = localStorage.getItem('console_seconds');
-      const savedIsActive = localStorage.getItem('console_is_active');
+  // Conversion du timer reçu de l'API ("28:08") en secondes
+  let baseSeconds = 0;
 
-      if (savedSeconds) setSeconds(parseInt(savedSeconds, 10));
-      if (savedIsActive) {
-        setIsActive(savedIsActive === 'true');
-      } else {
-        setIsActive(currentStatus === 'live');
-      }
-    } else {
-      // Premier chargement de ce match
-      localStorage.setItem('console_match_id', String(matchId));
-      localStorage.setItem('console_seconds', '0');
-      
-      const shouldBeActive = currentStatus === 'live';
-      localStorage.setItem('console_is_active', String(shouldBeActive));
-      setSeconds(0);
-      setIsActive(shouldBeActive);
+  if (selectedMatch.timer?.includes(":")) {
+    const [mins, secs] = selectedMatch.timer.split(":").map(Number);
+
+    if (!isNaN(mins) && !isNaN(secs)) {
+      baseSeconds = mins * 60 + secs;
     }
-  }, [matchId, selectedMatch?.status]);
+  }
 
-  // 2. UNIQUE EFFET POUR L'INCRÉMENTATION DU TIMER LIVE
-  useEffect(() => {
-    // Nettoyage systématique de l'ancien intervalle de sécurité
-    if (increment.current) {
-      clearInterval(increment.current);
-    }
+  // On mémorise la valeur reçue et le moment où on l'a reçue
+  baseSecondsRef.current = baseSeconds;
+  timerFetchedAtRef.current = Date.now();
 
-    if (isActive && matchStatus === 'live') {
-      increment.current = setInterval(() => {
-        setSeconds(prev => {
-          const nextSecs = prev + 1;
-          localStorage.setItem('console_seconds', String(nextSecs));
-          return nextSecs;
-        });
-      }, 1000);
-    }
+  // Affichage immédiat
+  setDisplayTime(selectedMatch.timer);
 
-    return () => {
-      if (increment.current) clearInterval(increment.current);
-    };
-  }, [isActive, matchStatus]);
+  // Incrémentation locale chaque seconde
+  const interval = setInterval(() => {
+    setDisplayTime(getLiveTimer());
+  }, 1000);
 
-  // 3. SYNCHRONISATION DU STATUT DEPUIS LA SOURCE DE VÉRITÉ (BDD)
+  return () => clearInterval(interval);
+}, [selectedMatch, getLiveTimer]);
+
+  // Synchronisation du statut depuis la BDD
   useEffect(() => {
     if (selectedMatch) {
       const currentStatus = selectedMatch.status || 'programmed';
       setMatchStatus(currentStatus);
-      
-      if (currentStatus === 'finished' || currentStatus === 'programmed' || currentStatus === 'cancelled') {
-        setIsActive(false);
-        localStorage.setItem('console_is_active', 'false');
-      } else if (currentStatus === 'live') {
-        setIsActive(true);
-        localStorage.setItem('console_is_active', 'true');
-      }
     }
   }, [selectedMatch]);
 
-// Synchronisation intelligente des rosters (Version Corrigée)
+  // Synchronisation intelligente des rosters
   useEffect(() => {
-    // Si l'API n'a renvoyé aucun roster pour ce match
     if (!rosters || rosters.length === 0) {
-      // On ne vide localement QUE si l'équipe était marquée comme sauvegardée précédemment
       if (isHomeSaved) { setHomeRoster([]); setIsHomeSaved(false); }
       if (isAwaySaved) { setAwayRoster([]); setIsAwaySaved(false); }
       return;
@@ -142,30 +123,21 @@ useEffect(() => {
     const homeData = rosters.find(r => r.side === 'home');
     const awayData = rosters.find(r => r.side === 'away');
 
-    // Sync Équipe Home
     if (homeData) {
       setIsHomeSaved(homeData.isSaved || false);
       setHomeRoster(homeData.actors || []);
-    } else {
-      // S'il n'y a rien en BDD mais qu'on avait validé avant, on reset
-      if (isHomeSaved) {
-        setHomeRoster([]);
-        setIsHomeSaved(false);
-      }
+    } else if (isHomeSaved) {
+      setHomeRoster([]);
+      setIsHomeSaved(false);
     }
 
-    // Sync Équipe Away
     if (awayData) {
       setIsAwaySaved(awayData.isSaved || false);
       setAwayRoster(awayData.actors || []);
-    } else {
-      // S'il n'y a rien en BDD mais qu'on avait validé avant, on reset
-      if (isAwaySaved) {
-        setAwayRoster([]);
-        setIsAwaySaved(false);
-      }
+    } else if (isAwaySaved) {
+      setAwayRoster([]);
+      setIsAwaySaved(false);
     }
-    // Suppression des écoutes sur .length pour éviter les boucles de suppression intempestives
   }, [rosters, isHomeSaved, isAwaySaved]);
 
   // Alimentation initiale des faits de jeu
@@ -173,12 +145,6 @@ useEffect(() => {
     if (!selectedMatch) return;
     setMatchEvents(selectedMatch?.events || []);
   }, [selectedMatch]);
-
-  const formatTime = useCallback((totalSecs) => {
-    const mins = Math.floor(totalSecs / 60).toString().padStart(2, '0');
-    const secs = (totalSecs % 60).toString().padStart(2, '0');
-    return `${mins}:${secs}`;
-  }, []);
 
   const filteredMatches = useMemo(() => {
     const query = searchQuery.toLowerCase();
@@ -203,43 +169,33 @@ useEffect(() => {
   const currentProvisionalList = activeTeamType === 'home' ? homeRoster : awayRoster;
   const currentStats = useMemo(() => getRosterStats(currentProvisionalList), [currentProvisionalList, getRosterStats]);
 
-const currentTeamData = useMemo(() => {
-  if (!selectedMatch) return null;
-  
-  // On passe en minuscule pour éviter les conflits 'home' vs 'Home' ou 'away' vs 'Away'
-  const side = String(activeTeamType).toLowerCase();
-  
-  if (side === 'home') {
-    return selectedMatch.homeTeam;
-  } else if (side === 'away') {
-    return selectedMatch.awayTeam;
-  }
-  
-  return null;
-}, [selectedMatch, activeTeamType]);
+  const currentTeamData = useMemo(() => {
+    if (!selectedMatch) return null;
+    const side = String(activeTeamType).toLowerCase();
+    
+    if (side === 'home') return selectedMatch.homeTeam;
+    if (side === 'away') return selectedMatch.awayTeam;
+    return null;
+  }, [selectedMatch, activeTeamType]);
 
-const availableUsersFromDb = useMemo(() => {
-  if (!currentTeamData) return [];
-  
-  // On récupère les membres peu importe si la clé est en français ou en anglais
-  const members = currentTeamData.members || currentTeamData.membres || [];
-  
-  return members.filter(u => {
-    // 1. Vérifier si déjà dans la liste provisoire actuelle (Home ou Away)
-    const alreadyAdded = currentProvisionalList.some(
-      p => String(p.playerId || p.id || p.userId) === String(u.id || u._id)
-    );
-    if (alreadyAdded) return false;
+  const availableUsersFromDb = useMemo(() => {
+    if (!currentTeamData) return [];
+    const members = currentTeamData.members || currentTeamData.membres || [];
+    
+    return members.filter(u => {
+      const alreadyAdded = currentProvisionalList.some(
+        p => String(p.playerId || p.id || p.userId) === String(u.id || u._id)
+      );
+      if (alreadyAdded) return false;
 
-    // 2. Filtrage par type (Joueur / Staff)
-    const userType = String(u.type || 'joueur').toLowerCase();
-    if (formType === 'staff') {
-      return userType === 'staff';
-    } else {
-      return userType === 'joueur';
-    }
-  });
-}, [currentTeamData, currentProvisionalList, formType]);
+      const userType = String(u.type || 'joueur').toLowerCase();
+      if (formType === 'staff') {
+        return userType === 'staff';
+      } else {
+        return userType === 'joueur';
+      }
+    });
+  }, [currentTeamData, currentProvisionalList, formType]);
 
   const expelledPlayerIds = useMemo(() => {
     const expelled = new Set();
@@ -265,7 +221,6 @@ const availableUsersFromDb = useMemo(() => {
     return roster.filter(p => !expelledPlayerIds.has(p.playerId || p.id));
   }, [homeRoster, awayRoster, expelledPlayerIds]);
 
-  // Système centralisé de notifications typées avec emojis
   const showToast = (type, details = '') => {
     switch (type) {
       case 'But ⚽':
@@ -297,82 +252,71 @@ const availableUsersFromDb = useMemo(() => {
     }
   };
 
-const handleSelectMatch = useCallback((match) => {
+  const handleSelectMatch = useCallback((match) => {
     setSelectedMatch(match);
-    const mId = match?.id || match?._id;
     const currentStatus = match?.status || 'programmed';
-    
     setMatchStatus(currentStatus);
     setMatchEvents(match?.events || []);
     setEventTriggerConfig(null);
-    
-    // Au lieu de forcer à 0, on laisse le useEffect n°1 (Sync initiale) 
-    // décider s'il doit récupérer le temps du localStorage ou l'initialiser
   }, []);
 
-const addMemberToProvisionalList = () => {
-  if (!assignmentForm.userId || !currentTeamData) return;
-  
-  const members = currentTeamData.members || currentTeamData.membres || [];
-  const baseUser = members.find(u => String(u.id || u._id) === String(assignmentForm.userId));
-  if (!baseUser) return;
+  const addMemberToProvisionalList = () => {
+    if (!assignmentForm.userId || !currentTeamData) return;
+    
+    const members = currentTeamData.members || currentTeamData.membres || [];
+    const baseUser = members.find(u => String(u.id || u._id) === String(assignmentForm.userId));
+    if (!baseUser) return;
 
-  const userType = (baseUser.type || formType || 'joueur').toLowerCase();
+    const userType = (baseUser.type || formType || 'joueur').toLowerCase();
 
-  if (userType === 'joueur' && currentStats.totalJoueurs >= 23) {
-    toast.info("Maximum 23 joueurs autorisés !");
-    return;
-  }
-  if (userType === 'staff' && currentStats.staffCount >= 5) {
-    toast.error("Maximum 5 membres du staff autorisés !");
-    return;
-  }
+    if (userType === 'joueur' && currentStats.totalJoueurs >= 23) {
+      toast.info("Maximum 23 joueurs autorisés !");
+      return;
+    }
+    if (userType === 'staff' && currentStats.staffCount >= 5) {
+      toast.error("Maximum 5 membres du staff autorisés !");
+      return;
+    }
 
-  const newAssignment = {
-    id: baseUser.id || baseUser._id,
-    playerId: baseUser.id || baseUser._id,
-    nom: baseUser.nom || baseUser.name,
-    dorsa: userType === 'staff' ? 'Staff' : (assignmentForm.dorsa || 'N/A'),
-    matchStatus: userType === 'staff' ? 'Staff' : assignmentForm.matchStatus,
-    role: userType === 'staff' ? 'Staff' : assignmentForm.matchStatus 
+    const newAssignment = {
+      id: baseUser.id || baseUser._id,
+      playerId: baseUser.id || baseUser._id,
+      nom: baseUser.nom || baseUser.name,
+      dorsa: userType === 'staff' ? 'Staff' : (assignmentForm.dorsa || 'N/A'),
+      matchStatus: userType === 'staff' ? 'Staff' : assignmentForm.matchStatus,
+      role: userType === 'staff' ? 'Staff' : assignmentForm.matchStatus 
+    };
+
+    const teamType = String(activeTeamType).toLowerCase();
+
+    if (teamType === 'home') {
+      setHomeRoster(prev => [...prev, newAssignment]);
+    } else if (teamType === 'away') {
+      setAwayRoster(prev => [...prev, newAssignment]);
+    }
+
+    setAssignmentForm({ userId: '', dorsa: '', matchStatus: 'Titulaire' });
   };
-
-  const teamType = String(activeTeamType).toLowerCase();
-
-  if (teamType === 'home') {
-    setHomeRoster(prev => [...prev, newAssignment]);
-  } else if (teamType === 'away') {
-    setAwayRoster(prev => [...prev, newAssignment]);
-  }
-
-  setAssignmentForm({ userId: '', dorsa: '', matchStatus: 'Titulaire' });
-};
 
   const removeMemberFromProvisionalList = async (actor) => {
     const isSaved = activeTeamType === 'home' ? isHomeSaved : isAwaySaved;
     const targetPlayerId = actor?.playerId || actor?.id;
 
-    // 1. SUPPRESSION LOCALE IMMEDIAT (Local-First)
     if (activeTeamType === 'home') {
       setHomeRoster(prev => prev.filter(p => (p.playerId || p.id) !== targetPlayerId));
     } else {
       setAwayRoster(prev => prev.filter(p => (p.playerId || p.id) !== targetPlayerId));
     }
 
-    // 2. SYNCHRONISATION ARRIÈRE-PLAN AVEC L'API
     if (isSaved && matchId && currentTeamId && targetPlayerId) {
       try {
         await deleteActorFromRoster({
-          variables: {
-            matchId,
-            teamId: currentTeamId,
-            playerId: targetPlayerId
-          }
+          variables: { matchId, teamId: currentTeamId, playerId: targetPlayerId }
         });
         await refetchRosters();
         toast.success("Membre retiré avec succès !");
       } catch (error) {
-        toast.error(`Erreur lors de la suppression en base de données : ${error.message}`);
+        toast.error(`Erreur lors de la suppression : ${error.message}`);
       }
     }
   };
@@ -383,17 +327,11 @@ const addMemberToProvisionalList = () => {
 
     try {
       const { data } = await switchMatchMode({
-        variables: {
-          matchId: targetMatchId,
-          mode, 
-        },
+        variables: { matchId: targetMatchId, mode },
       });
 
       if (data?.switchMatchMode) {
-        // Mutation réussie : Ajustement synchronisé des états locaux
         setMatchStatus(mode);
-        setIsActive(mode === 'live');
-        
         setSelectedMatch(prev => prev ? { ...prev, status: mode } : null);
         showToast(mode);
       } else {
@@ -438,15 +376,10 @@ const addMemberToProvisionalList = () => {
 
   const clearEntireRosterFromDb = async () => {
     if (!matchId || !currentTeamId) return;
-    if (!window.confirm("Voulez-vous vraiment effacer toute la composition de cette équipe ?")) return;
+    if (!window.confirm("Voulez-vous vraiment effacer toute la composition ?")) return;
     
     try {
-      await removeMatchRosterApi({
-        variables: {
-          matchId,
-          teamId: currentTeamId
-        }
-      });
+      await removeMatchRosterApi({ variables: { matchId, teamId: currentTeamId } });
       
       if (activeTeamType === 'home') {
         setHomeRoster([]);
@@ -462,8 +395,9 @@ const addMemberToProvisionalList = () => {
     }
   };
 
+  // Branché directement sur la valeur dynamique de displayTime
   const openPlayerSelectModal = (type, teamSide) => {
-    setEventTriggerConfig({ type, teamSide, eventTime: formatTime(seconds) });
+    setEventTriggerConfig({ type, teamSide, eventTime: displayTime });
   };
 
   const submitStandardEvent = useCallback(async (player) => {
@@ -494,7 +428,7 @@ const addMemberToProvisionalList = () => {
 
       setEventTriggerConfig(null);
     } catch (error) {
-      toast.error(`Erreur lors de l'enregistrement de l'événement : ${error.message}`);
+      toast.error(`Erreur lors de l'enregistrement : ${error.message}`);
     }
   }, [eventTriggerConfig, selectedMatch, createStandardEvent, refetchSchedules]);
 
@@ -555,149 +489,120 @@ const addMemberToProvisionalList = () => {
       toast.error(`Erreur lors du remplacement : ${error.message}`);
     }
   }, [eventTriggerConfig, selectedMatch, createSubstitutionEvents, refetchSchedules]);
- const handleCloseEventDrop=()=>{
-  setEventDropId(null)
-  setEventShow(false);
-  }
- const deleteEvent = useCallback(async (eventId) => {
-  // 1. Détermination de l'ID cible (sécurisé avec const)
-  const dropId = eventDropId || eventId;
-  if (!dropId) return;
 
-  try {
-    // 2. Appel API en premier (si l'API échoue, l'état local ne sera pas altéré par erreur)
-    await deleteMatchEvent({
-      variables: {
-        eventId: dropId
-      }
-    });
+  const handleCloseEventDrop = () => {
+    setEventDropId(null);
+    setEventShow(false);
+  };
 
-    // 3. Mise à jour de l'état local de manière synchrone et pure
-    setMatchEvents(prev => {
-      const target = prev.find(ev => ev.id === dropId);
-      
-      if (target && target.isSubstitution) {
-        const processRevert = (roster) => roster.map(p => {
-          const pId = p.playerId || p.id;
-          if (pId === target.playerIn?.id) return { ...p, role: 'Remplaçant' };
-          if (pId === target.playerOut?.id) return { ...p, role: 'Titulaire' };
-          return p;
-        });
+  const deleteEvent = useCallback(async (eventId) => {
+    const dropId = eventDropId || eventId;
+    if (!dropId) return;
 
-        if (target.teamSide === 'home') {
-          setHomeRoster(prevR => processRevert(prevR));
-        } else {
-          setAwayRoster(prevR => processRevert(prevR));
+    try {
+      await deleteMatchEvent({ variables: { eventId: dropId } });
+
+      setMatchEvents(prev => {
+        const target = prev.find(ev => ev.id === dropId);
+        
+        if (target && target.isSubstitution) {
+          const processRevert = (roster) => roster.map(p => {
+            const pId = p.playerId || p.id;
+            if (pId === target.playerIn?.id) return { ...p, role: 'Remplaçant' };
+            if (pId === target.playerOut?.id) return { ...p, role: 'Titulaire' };
+            return p;
+          });
+
+          if (target.teamSide === 'home') {
+            setHomeRoster(prevR => processRevert(prevR));
+          } else {
+            setAwayRoster(prevR => processRevert(prevR));
+          }
         }
-      }
-
-      // Retourne le nouveau tableau filtré
-      return prev.filter(ev => ev.id !== dropId);
-    });
-     await refetchSchedules();
-    toast.success('Événement supprimé.');
-    handleCloseEventDrop();
-
-  } catch (error) {
-    toast.error(`Erreur survenue : ${error?.message || 'Erreur inconnue'}`);
-    throw error;
-  }
-}, [eventDropId, deleteMatchEvent,refetchSchedules]); // N'oublie pas d'ajouter les dépendances requises au hook useCallback
-
-  const handleDropOpen=(eventId)=>{
-     setEventDropId(eventId)
-     setEventShow(true);
-  }
-
- 
-
-const updateMatchEvent = useCallback(async (updatedEvent) => {
-  try {
-   
-    const eventType = updatedEvent?.eventType;
-    const eventId = updatedEvent?.id;
-    const newTime = updatedEvent?.time;
-
-    // Payload qui sera envoyé à l'API et mis à jour localement
-    let newPlayerPayload = null;
-
-    // 1. Gestion spécifique si c'est un Changement (Substitution)
-    if (eventType === "🔄 Changement" || updatedEvent?.isSubstitution) {
-      await updateMatchEventTimeOrPlayer({
-        variables: {
-          eventId: eventId,
-          newTime: newTime,
-          newPlayer: null // On passe null explicitement pour une substitution
-        }
+        return prev.filter(ev => ev.id !== dropId);
       });
-    } else {
-      // 2. Gestion des événements standards (But, Carton, etc.)
-      const playerId = updatedEvent?.playerId;
 
-      // CORRECTION : rosters étant un tableau, on extrait tous les acteurs de chaque côté ('home' et 'away')
-      const allActors = Array.isArray(rosters) 
-        ? rosters.flatMap(r => r?.actors || []) 
-        : (rosters?.getMatchRosters?.flatMap(r => r?.actors || []) || []);
-
-      // On cherche l'acteur correspondant dans ce tableau à plat
-      const actorFound = allActors.find(actor => actor?.playerId === playerId);
-     
-      // Construction sécurisée de l'objet du joueur pour l'API
-      newPlayerPayload = actorFound ? {
-        id: actorFound.playerId,
-        name: actorFound.nom,
-        // Évite le piège du null/undefined et convertit proprement en chaîne
-        dorsa: actorFound.dorsa !== undefined && actorFound.dorsa !== null ? String(actorFound.dorsa) : null
-      } : null;
-
-      await updateMatchEventTimeOrPlayer({
-        variables: {
-          eventId: eventId,
-          newTime: newTime,
-          newPlayer: newPlayerPayload
-        }
-      });
-    }
-
-    // 3. Mise à jour de l'état local uniquement après succès de la requête API
-    setMatchEvents(prev => 
-      prev.map(ev => {
-        if (ev.id === updatedEvent.id) {
-          return { 
-            ...ev, 
-            ...updatedEvent,
-            // On injecte le nouveau payload pour que l'interface (EventList) affiche immédiatement les bonnes infos
-            player: updatedEvent.playerId ? newPlayerPayload : ev.player 
-          };
-        }
-        return ev;
-      })
-    );
-
-    // 4. Rafraîchissement des données globales
-    if (typeof refetchSchedules === "function") {
       await refetchSchedules();
+      toast.success('Événement supprimé.');
+      handleCloseEventDrop();
+    } catch (error) {
+      toast.error(`Erreur survenue : ${error?.message || 'Erreur inconnue'}`);
+      throw error;
     }
+  }, [eventDropId, deleteMatchEvent, refetchSchedules]);
 
-    toast.success("Modification effectuée avec succès !");
+  const handleDropOpen = (eventId) => {
+    setEventDropId(eventId);
+    setEventShow(true);
+  };
 
-  } catch (error) {
-    console.error("Erreur updateMatchEvent:", error);
-    toast.error(`Une erreur est survenue : ${error?.message || "Erreur inconnue"}`);
-    throw error;
-  }
-// Ne pas oublier d'inclure 'rosters' dans les dépendances du hook
-}, [rosters, updateMatchEventTimeOrPlayer, refetchSchedules]);
+  const updateMatchEvent = useCallback(async (updatedEvent) => {
+    try {
+      const eventType = updatedEvent?.eventType;
+      const eventId = updatedEvent?.id;
+      const newTime = updatedEvent?.time;
+
+      let newPlayerPayload = null;
+
+      if (eventType === "🔄 Changement" || updatedEvent?.isSubstitution) {
+        await updateMatchEventTimeOrPlayer({
+          variables: { eventId, newTime, newPlayer: null }
+        });
+      } else {
+        const playerId = updatedEvent?.playerId;
+        const allActors = Array.isArray(rosters) 
+          ? rosters.flatMap(r => r?.actors || []) 
+          : (rosters?.getMatchRosters?.flatMap(r => r?.actors || []) || []);
+
+        const actorFound = allActors.find(actor => actor?.playerId === playerId);
+       
+        newPlayerPayload = actorFound ? {
+          id: actorFound.playerId,
+          name: actorFound.nom,
+          dorsa: actorFound.dorsa !== undefined && actorFound.dorsa !== null ? String(actorFound.dorsa) : null
+        } : null;
+
+        await updateMatchEventTimeOrPlayer({
+          variables: { eventId, newTime, newPlayer: newPlayerPayload }
+        });
+      }
+
+      setMatchEvents(prev => 
+        prev.map(ev => {
+          if (ev.id === updatedEvent.id) {
+            return { 
+              ...ev, 
+              ...updatedEvent,
+              player: updatedEvent.playerId ? newPlayerPayload : ev.player 
+            };
+          }
+          return ev;
+        })
+      );
+
+      if (typeof refetchSchedules === "function") {
+        await refetchSchedules();
+      }
+
+      toast.success("Modification effectuée avec succès !");
+    } catch (error) {
+      console.error("Erreur updateMatchEvent:", error);
+      toast.error(`Une erreur est survenue : ${error?.message || "Erreur inconnue"}`);
+      throw error;
+    }
+  }, [rosters, updateMatchEventTimeOrPlayer, refetchSchedules]);
+
   return {
     apiTeams, team_loaded, schedules, loaded_schedule, groups, group_loaded, roster_loaded,
     selectedMatch, handleSelectMatch, searchQuery, setSearchQuery, filteredMatches,
-    matchStatus, setMatchStatus, seconds, setSeconds, isActive, setIsActive, formatTime,
+    matchStatus, setMatchStatus, displayTime, setDisplayTime,
     matchEvents, openPlayerSelectModal, eventTriggerConfig, setEventTriggerConfig,
     submitStandardEvent, submitMultipleSubstitutionEvents, deleteEvent, updateMatchEvent,
     isModalOpen, setIsModalOpen, activeTeamType, setActiveTeamType, formType, setFormType,
     assignmentForm, setAssignmentForm, homeRoster, awayRoster, isHomeSaved, isAwaySaved,
     currentProvisionalList, currentStats, availableUsersFromDb,
     addMemberToProvisionalList, removeMemberFromProvisionalList, saveFinalRoster,
-    getLiveRosterBySide, clearEntireRosterFromDb, roster_added, switchMode,add_stan,add_sub,handleCloseEventDrop,handleDropOpen,eventShow,eventDropId,event_droped
+    getLiveRosterBySide, clearEntireRosterFromDb, roster_added, switchMode, add_stan, add_sub, 
+    handleCloseEventDrop, handleDropOpen, eventShow, eventDropId, event_droped
   };
 };

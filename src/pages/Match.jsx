@@ -20,7 +20,7 @@ export const MatchPage = () => {
     const isSchedulesReady = loaded_schedule ;
     const isGroupsReady = group_loaded ;
     const isFullyLoaded = isSchedulesReady && isGroupsReady;
-    console.log("load full",isGroupsReady,isSchedulesReady)
+    // console.log("load full",isGroupsReady,isSchedulesReady)
     // 3. Filtrage dynamique, Recherche, et Tri intelligent des matchs
     const filteredAndSortedMatches = useMemo(() => {
         if (!schedules) return [];

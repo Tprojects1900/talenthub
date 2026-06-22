@@ -22,9 +22,10 @@ export default function CurrentMatchPage(){
   // 2. Appel des hooks de statistiques pour chaque équipe
   const { teamStats: homeStats, t_loaded: homeLoading } = useTeamStat(homeTeamId);
   const { teamStats: awayStats, t_loaded: awayLoading } = useTeamStat(awayTeamId);
-
+   // console.log(apiMatch)
   const matchData = useMemo(() => {
     const match = apiMatch;
+   
     if (!match || !match.events) return null;
 
     // Extraction et formatage des événements de l'équipe à Domicile (Home)
@@ -98,6 +99,8 @@ export default function CurrentMatchPage(){
       });
 
     return {
+      match,
+      loading:match_loaded,
       matchType: match.typeConfrontation,
       date: formatDateTime(match.date, match.time),
       status: match.status,

@@ -21,13 +21,13 @@ import MatchStatusBadge from '../../components/MatchStatusBadge';
 
 const MatchConsoleManager = () => {
   const {
-    selectedMatch, handleSelectMatch, searchQuery, setSearchQuery, filteredMatches,
+    selectedMatch, handleSelectMatch, searchQuery, setSearchQuery, filteredMatches,displayTime,setDisplayTime,
     matchStatus, seconds, isActive, formatTime, matchEvents, openPlayerSelectModal,
     eventTriggerConfig, setEventTriggerConfig, submitStandardEvent, submitMultipleSubstitutionEvents,
     deleteEvent, isModalOpen, setIsModalOpen, activeTeamType, setActiveTeamType,
     formType, setFormType, assignmentForm, setAssignmentForm, homeRoster, awayRoster,
     isHomeSaved, isAwaySaved, currentProvisionalList, currentStats, availableUsersFromDb,
-    addMemberToProvisionalList, removeMemberFromProvisionalList, saveFinalRoster,event_droped,
+    addMemberToProvisionalList, removeMemberFromProvisionalList, saveFinalRoster,event_droped,loaded_schedule,
     getLiveRosterBySide, updateMatchEvent, roster_added, switchMode, add_stan, add_sub,handleCloseEventDrop,handleDropOpen,eventDropId,eventShow  } = useMatchConsole();
 
   const [editingEventId, setEditingEventId] = useState(null);
@@ -100,6 +100,7 @@ const MatchConsoleManager = () => {
           {/* COLONNE GAUCHE */}
           <div className="space-y-6 lg:col-span-1">
             <MatchList
+              loading={loaded_schedule}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
               filteredMatches={filteredMatches}
@@ -124,7 +125,9 @@ const MatchConsoleManager = () => {
             {selectedMatch ? (
               <>
                 <TimerPanel
-                  seconds={seconds}
+                  match={selectedMatch}
+                  loading={loaded_schedule}
+                  seconds={displayTime}
                   formatTime={formatTime}
                   matchStatus={matchStatus}
                   isHomeSaved={isHomeSaved}

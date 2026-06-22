@@ -76,6 +76,7 @@ query GetAllTeams {
           goals
         }
         time
+        
         matchId
       }
       redCards {
@@ -86,6 +87,7 @@ query GetAllTeams {
           goals
         }
         time
+        
         matchId
       }
     }
@@ -156,6 +158,7 @@ query GetGroups {
           goals
         }
         time
+        
         matchId
       }
       redCards {
@@ -166,6 +169,7 @@ query GetGroups {
           goals
         }
         time
+        
         matchId
       }
     }
@@ -206,6 +210,7 @@ query GetGroups {
           goals
         }
         time
+        
         matchId
       }
       redCards {
@@ -216,6 +221,7 @@ query GetGroups {
           goals
         }
         time
+        
         matchId
       }
     }
@@ -229,6 +235,7 @@ export const SCHEDULESMATCH=gql`
 query GetScheduledMatches {
   getScheduledMatches {
     id
+    timer
     typeConfrontation
     groupId
     groupName
@@ -284,6 +291,7 @@ query GetScheduledMatches {
     }
     date
     time
+    
     pitch
     status
     createdAt
@@ -310,6 +318,7 @@ query GetScheduledMatches {
       }
       teamSide
       time
+      
     }
   }
 }
@@ -344,6 +353,7 @@ query GetLastLiveMatch {
     groupName
     homeId
     awayId
+    timer
     homeTeam {
       id
       nom
@@ -386,6 +396,7 @@ query GetLastLiveMatch {
           goals
         }
         time
+        
         matchId
       }
       redCards {
@@ -396,6 +407,7 @@ query GetLastLiveMatch {
           goals
         }
         time
+        
         matchId
       }
     }
@@ -458,6 +470,7 @@ query GetLastLiveMatch {
           goals
         }
         time
+        
         matchId
       }
       redCards {
@@ -468,6 +481,7 @@ query GetLastLiveMatch {
           goals
         }
         time
+        
         matchId
       }
     }
@@ -498,6 +512,7 @@ query GetLastLiveMatch {
     }
     date
     time
+    
     pitch
     status
     createdAt
@@ -506,6 +521,7 @@ query GetLastLiveMatch {
       id
       matchId
       time
+      
       eventType
       teamSide
       player {
@@ -559,6 +575,7 @@ query GetTeamStat($teamId: ID!) {
         goals
       }
       time
+      
       matchId
     }
     slogan
@@ -576,6 +593,7 @@ query GetTeamStat($teamId: ID!) {
         goals
       }
       time
+      
       matchId
     }
   }
@@ -617,6 +635,7 @@ query GetMatchById($getMatchByIdId: ID) {
       id
       matchId
       time
+      
       eventType
       teamSide
       player {
@@ -666,7 +685,9 @@ query GetMatchById($getMatchByIdId: ID) {
     pitch
     status
     time
+    
     typeConfrontation
+    timer
     updatedAt
   }
 }
