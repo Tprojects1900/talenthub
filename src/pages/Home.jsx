@@ -1,26 +1,18 @@
 import { useMemo } from "react";
 import TopFootHero from "../components/Hero";
 import CurrentMatchDetails from "../components/CurrentMatchDetails";
-import { useCurrentSchedule, useTeamStat } from "../hooks/useCalls";
+import { useCurrentSchedule } from "../hooks/useCalls";
 import { MainLayout } from "../layouts";
 import FootballLoader from "../components/FootBallLoader";
 import { formatDateTime } from "../utils/dateUtils";
 
 export default function Home() {
+  // Ajoutez ou vérifiez si votre hook expose une propriété comme 'data' ou s'il permet de savoir
+  // si c'est le tout premier chargement. Généralement avec SWR ou React Query, on utilise 'isLoading' vs 'isValidating'.
   const { currentSchedule, isLoadingCurrentSchedule } = useCurrentSchedule();
 
-  // 1. Récupération des IDs d'équipes du match courant (si disponible)
-  const homeTeamId = currentSchedule?.homeTeam?.id || currentSchedule?.homeTeam?._id;
-  const awayTeamId = currentSchedule?.awayTeam?.id || currentSchedule?.awayTeam?._id;
-
-  
-
-  // 2. Appel des hooks de statistiques pour chaque équipe
-  // const { teamStats: homeStats, t_loaded: homeLoading } = useTeamStat(homeTeamId);
-  // const { teamStats: awayStats, t_loaded: awayLoading } = useTeamStat(awayTeamId);
-  const homeStats=currentSchedule?.homeTeam?.stat || {}
-  const awayStats=currentSchedule?.awayTeam?.stat || {}
-  
+  const homeStats = currentSchedule?.homeTeam?.stat || {};
+  const awayStats = currentSchedule?.awayTeam?.stat || {};
 
   const matchData = useMemo(() => {
     const match = currentSchedule;
@@ -99,17 +91,16 @@ export default function Home() {
     return {
       match,
       matchType: match.typeConfrontation,
-      date: formatDateTime(match.date,match.time),
+      date: formatDateTime(match.date, match.time),
       status: match.status,
       pitch: match.pitch,
 
       homeTeam: {
         name: match.homeTeam?.nom || match.homeTeam?.name,
         logo: match.homeTeam?.logo,
-        score: match.events.filter(
+        score: (match.events || []).filter(
           (e) => e.teamSide === "home" && e.eventType?.toLowerCase().includes("but")
         ).length,
-        // Données enrichies dynamiquement par ton service GraphQL
         played: homeStats?.mj || 0,
         points: homeStats?.pts || 0,
         goalsScored: homeStats?.bp || 0,
@@ -124,10 +115,9 @@ export default function Home() {
       awayTeam: {
         name: match.awayTeam?.nom || match.awayTeam?.name,
         logo: match.awayTeam?.logo,
-        score: match.events.filter(
+        score: (match.events || []).filter(
           (e) => e.teamSide === "away" && e.eventType?.toLowerCase().includes("but")
         ).length,
-        // Données enrichies dynamiquement par ton service GraphQL
         played: awayStats?.mj || 0,
         points: awayStats?.pts || 0,
         goalsScored: awayStats?.bp || 0,
@@ -141,17 +131,21 @@ export default function Home() {
     };
   }, [currentSchedule, homeStats, awayStats]);
 
-  // Globalisation du chargement (calendrier courant + statistiques des deux équipes)
- // const isGlobalLoading = false;
+  // --- CONTRÔLE DU LOADER POUR LE POLLING ---
+  // On affiche le loader UNIQUEMENT si l'API charge ET qu'on n'a encore aucune donnée en mémoire.
+  const isInitialLoading = isLoadingCurrentSchedule && !currentSchedule;
 
   return (
     <MainLayout>
       <div className="w-full p-2">
-        {!matchData ? (
+        {isInitialLoading ? (
+          /* S'affiche uniquement au tout premier chargement de la page */
           <FootballLoader />
         ) : matchData ? (
+          /* Si on a des données (neuves ou issues du polling précédent), on affiche le match */
           <CurrentMatchDetails {...matchData} />
         ) : (
+          /* Si le chargement est fini (ou en cours de polling) mais qu'il n'y a STRICTEMENT aucun match */
           <TopFootHero />
         )}
       </div>
