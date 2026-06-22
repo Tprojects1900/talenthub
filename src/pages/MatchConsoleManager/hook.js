@@ -321,6 +321,19 @@ useEffect(() => {
     }
   };
 
+  const getMode=(mode)=>{
+   switch(mode){
+    case 'start':
+      return 'live';
+    case 'restart':
+      return 'live';
+    case 'pause':
+      return 'half-time';
+    default :
+    return mode;      
+   }
+  }
+
   const switchMode = async (mode) => {
     if (!selectedMatch) return;
     const targetMatchId = selectedMatch.id || selectedMatch._id;
@@ -332,8 +345,8 @@ useEffect(() => {
 
       if (data?.switchMatchMode) {
         setMatchStatus(mode);
-        setSelectedMatch(prev => prev ? { ...prev, status: mode } : null);
-        showToast(mode);
+        setSelectedMatch(prev => prev ? { ...prev, status: getMode(mode) } : null);
+        showToast(getMode(mode));
       } else {
         toast.error("Le serveur n'a pas pu modifier le statut.");
       }
