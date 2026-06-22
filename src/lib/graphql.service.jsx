@@ -14,7 +14,9 @@ export const useGetAuth = () => {
 //QUERIES
 
 export const useGetTeams=()=>{
-   return useQuery(TEAMS);
+   return useQuery(TEAMS,{
+     fetchPolicy: "network-only",
+   });
 }
 
 export const useGetGroups=()=>{
@@ -30,6 +32,7 @@ export const useGetSchedules = () => {
 export const useEachMatchRosters = (matchId) => {
   return useQuery(EACHMATCHROSTER, {
     variables: { matchId },
+     fetchPolicy: "network-only",
     skip: !matchId,
   });
 };
