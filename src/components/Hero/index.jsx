@@ -1,238 +1,152 @@
-import React, { useState } from "react";
-import { Shield, Calendar, MapPin, DollarSign, Users, CheckSquare, Phone, ArrowUpRight } from "lucide-react";
+import React, { useEffect, useState } from 'react';
+import { Calendar, MapPin, DollarSign, Trophy, Users, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useTeams } from '../../hooks/useCalls';
+const HomePage = () => {
 
-export default function FootballTournamentHero() {
+  const [eff,setEff]=useState(0);
+  const {teams,loading}=useTeams()
+  useEffect(()=>{
+  if(!loading){
+    setEff(teams?.length || 0);
+  }
+  },[loading,teams])
   return (
-    <div className="w-full bg-black text-zinc-300 font-mono antialiased selection:bg-white selection:text-black">
+    <div className="bg-zinc-950 text-zinc-100 min-h-screen font-sans antialiased overflow-x-hidden">
       
-      {/* ================= HERO SECTION ================= */}
-      <section className="relative w-full min-h-screen bg-black border-b border-zinc-900 flex flex-col justify-center px-4 sm:px-8 lg:px-16 pt-24 pb-16">
-        {/* Grille de fond de type Blueprint */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1f1f1a_1px,transparent_1px),linear-gradient(to_bottom,#1f1f1f1a_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
-        
-        <div className="relative z-10 max-w-7xl mx-auto w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-            
-            {/* Colonne Gauche - Identité & Titre */}
-            <div className="lg:col-span-8 flex flex-col gap-8">
-              <div className="inline-flex items-center gap-3 border border-zinc-800 bg-zinc-950 px-4 py-1.5 w-fit rounded-none">
-                <span className="inline-block w-2 h-2 bg-white animate-pulse"></span>
-                <span className="text-[11px] font-bold uppercase tracking-widest text-zinc-400">
-                  5EME EDITION / TOP. 2026
-                </span>
-              </div>
-
-              <div className="flex flex-col">
-                <h1 className="text-6xl sm:text-8xl lg:text-[110px] font-black leading-none tracking-tighter text-white uppercase m-0">
-                  TOP FOOT
-                </h1>
-                <h2 className="text-2xl sm:text-4xl font-black text-zinc-600 tracking-widest uppercase mt-2">
-                  [ TOURNOI ]
-                </h2>
-              </div>
-
-              <p className="text-sm sm:text-base text-zinc-400 font-sans leading-relaxed max-w-xl border-l border-zinc-800 pl-4">
-                L'arène footballistique majeure de la commune revient. Compétition absolue, rigueur tactique et confrontation d'élite. Préparez vos effectifs pour l'impact.
-              </p>
-
-              {/* Actions Brutalistes */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <a
-                  href="#inscription"
-                  className="group flex items-center justify-center gap-2 bg-white text-black font-black px-8 py-4 rounded-none hover:bg-zinc-200 transition-colors uppercase text-xs tracking-widest text-center"
-                >
-                  REJOINDRE L'ARENE
-                  <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                </a>
-                <a
-                  href="#details"
-                  className="border border-zinc-800 text-zinc-400 font-bold px-8 py-4 rounded-none hover:bg-zinc-950 hover:text-white transition-colors uppercase text-xs tracking-widest text-center"
-                >
-                  SPECIFICATIONS_TECHNIQUES
-                </a>
-              </div>
-            </div>
-
-            {/* Colonne Droite - Bloc de Données Flottant */}
-            <div className="lg:col-span-4 w-full border border-zinc-900 bg-zinc-950/60 p-6 backdrop-blur-sm self-center">
-              <div className="space-y-6">
-                <div className="border-b border-zinc-900 pb-4">
-                  <span className="text-[10px] text-zinc-600 uppercase tracking-widest block mb-1">PROGRAMME_MAIN</span>
-                  <div className="flex items-center gap-3 text-white font-bold text-sm">
-                    <Calendar size={16} className="text-zinc-500" />
-                    <span>05 JUILLET 2026</span>
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-[10px] text-zinc-600 uppercase tracking-widest block mb-1">LOCALISATION_ARENE</span>
-                  <div className="flex items-center gap-3 text-white font-bold text-sm">
-                    <MapPin size={16} className="text-zinc-500" />
-                    <span className="uppercase">TERRAIN_MAYA_KOPE</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* ================= DETAILS SECTION ================= */}
-      <section id="details" className="w-full py-24 px-4 sm:px-8 lg:px-16 bg-black border-b border-zinc-900">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 mb-16">
-            <span className="w-6 h-[1px] bg-zinc-700"></span>
-            <h2 className="text-xs font-black tracking-[0.3em] uppercase text-zinc-500">
-              01 // PARAMETRES_COMPETITION
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-zinc-900 border border-zinc-900 bg-zinc-950/30">
-            {/* Bloc 1 */}
-            <div className="p-8 flex flex-col justify-between group hover:bg-zinc-950 transition-colors">
-              <div>
-                <div className="text-zinc-600 group-hover:text-white transition-colors mb-6">
-                  <Users size={24} strokeWidth={1.5} />
-                </div>
-                <h3 className="text-sm font-black uppercase tracking-wider text-white mb-3">CATEGORIES</h3>
-                <p className="text-zinc-400 font-sans text-xs leading-relaxed">
-                  Séniors et Juniors. Phase d'accès ouverte aux équipes communales et régionales homologuées.
-                </p>
-              </div>
-              <div className="mt-6 pt-4 border-t border-zinc-900/60">
-                <span className="text-[10px] text-zinc-600 tracking-wider">CAPACITE_MAX : 20 EQUIPES</span>
-              </div>
-            </div>
-
-            {/* Bloc 2 */}
-            <div className="p-8 flex flex-col justify-between group hover:bg-zinc-950 transition-colors">
-              <div>
-                <div className="text-zinc-600 group-hover:text-white transition-colors mb-6">
-                  <MapPin size={24} strokeWidth={1.5} />
-                </div>
-                <h3 className="text-sm font-black uppercase tracking-wider text-white mb-3">LOGISTIQUE</h3>
-                <p className="text-zinc-400 font-sans text-xs leading-relaxed">
-                  Planification fixée sur le Terrain de Maya Kopé, Lomé. Infrastructures sécurisées et encadrement arbitral agréé.
-                </p>
-              </div>
-              <div className="mt-6 pt-4 border-t border-zinc-900/60">
-                <span className="text-[10px] text-zinc-600 tracking-wider">REPERE : DERRIERE RADIO LA GRÂCE</span>
-              </div>
-            </div>
-
-            {/* Bloc 3 */}
-            <div className="p-8 flex flex-col justify-between group hover:bg-zinc-950 transition-colors">
-              <div>
-                <div className="text-zinc-600 group-hover:text-white transition-colors mb-6">
-                  <DollarSign size={24} strokeWidth={1.5} />
-                </div>
-                <h3 className="text-sm font-black uppercase tracking-wider text-white mb-3">CONSTITUTION_DOSSIER</h3>
-                <p className="text-zinc-400 font-sans text-xs leading-relaxed">
-                  Frais de participation uniques requis pour l'activation réglementaire de la licence d'équipe.
-                </p>
-              </div>
-              <div className="mt-6 pt-4 border-t border-zinc-900/60 flex items-baseline justify-between">
-                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wide">MONTANT :</span>
-                <span className="text-lg font-black text-white font-mono">25 000 FCFA</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ================= FORMAT & RULES SECTION ================= */}
-      <section className="w-full py-24 px-4 sm:px-8 lg:px-16 bg-zinc-950/40 border-b border-zinc-900">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 mb-16">
-            <span className="w-6 h-[1px] bg-zinc-700"></span>
-            <h2 className="text-xs font-black tracking-[0.3em] uppercase text-zinc-500">
-              02 // STRUCTURATION_MATRICIELLE
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-            
-            {/* Workflow Technique */}
-            <div className="lg:col-span-5 space-y-4">
-              {[
-                { step: "01", title: "PHASE DE GROUPES", desc: "Série de confrontations circulaires au sein de poules tirées au sort." },
-                { step: "02", title: "ELIMINATION DIRECTE", desc: "Demi-finales à haute intensité. Élimination instantanée en cas de défaite." },
-                { step: "03", title: "FINALE & PROTOCOLE", desc: "Match ultime, protocole de clôture et attribution des distinctions." }
-              ].map((item, idx) => (
-                <div key={idx} className="p-5 border border-zinc-900 bg-black flex gap-4 items-start">
-                  <span className="font-mono font-black text-xs text-zinc-600 px-2 py-0.5 border border-zinc-900 bg-zinc-950">{item.step}</span>
-                  <div>
-                    <h4 className="text-xs font-black text-white uppercase tracking-wider mb-1">{item.title}</h4>
-                    <p className="text-[11px] font-sans text-zinc-400 leading-relaxed">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Clauses / Critères Restrictifs */}
-            <div className="lg:col-span-7 border border-zinc-900 bg-black p-8">
-              <h4 className="text-xs font-black tracking-widest text-zinc-400 uppercase mb-6 flex items-center gap-2">
-                <Shield size={14} className="text-zinc-600" /> CRITERES_D_ELIGIBILITE_OBLIGATOIRES
-              </h4>
-
-              <div className="space-y-4 font-sans text-xs text-zinc-400">
-                {[
-                  "Enregistrement strict limité à 20 joueurs inscrits et 2 dirigeants certifiés par entité.",
-                  "Fiche technique validée : aucun joueur non répertorié ne sera toléré sur la feuille de match.",
-                  "Contrôle d'identité physique obligatoire sur présentation d'une pièce officielle valide avant le coup d'envoi.",
-                  "Règlement total des frais de participation et des droits exigés avant l'autorisation d'accès au premier match de poule.",
-                  "Uniformité vestimentaire : équipements complets et identiques aux couleurs officielles déclarées."
-                ].map((rule, idx) => (
-                  <div key={idx} className="flex gap-3 items-start py-2 border-b border-zinc-900/60 last:border-none">
-                    <CheckSquare size={14} className="text-white mt-0.5 flex-shrink-0 font-mono" />
-                    <span>{rule}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* ================= CTA SECTION ================= */}
-      <section id="inscription" className="w-full py-28 px-4 sm:px-8 lg:px-16 bg-black relative overflow-hidden">
-        <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
-        
-        <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10">
-       <h2 className="text-4xl sm:text-sm font-black tracking-tighter uppercase text-white m-0 truncate">
-  PROFILING_EN_COURS
-</h2>
-          <p className="text-xs sm:text-sm text-zinc-500 max-w-xl mx-auto font-sans leading-relaxed">
-            Soumettez votre effectif à la commission d'organisation. Enregistrement direct via les passerelles de communication sécurisées ci-dessous.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <a
-              href="https://chat.whatsapp.com/Bh26e1MttG29J8bvmag87M"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-white text-black font-black px-8 py-4 rounded-none hover:bg-zinc-200 transition-colors text-xs tracking-widest uppercase flex items-center justify-center gap-2"
-            >
-              SOUMETTRE VIA WHATSAPP
-            </a>
-            <a
-              href="tel:+22871614052"
-              className="border border-zinc-800 bg-zinc-950 text-white font-bold px-8 py-4 rounded-none hover:bg-black transition-colors text-xs tracking-widest uppercase flex items-center justify-center gap-2"
-            >
-              <Phone size={12} /> +228 71 61 40 52
-            </a>
-          </div>
-
-          <div className="pt-6">
-            <span className="text-[10px] bg-zinc-950 text-zinc-600 font-mono tracking-widest uppercase px-3 py-1 border border-zinc-900">
-              DEADLINE_SYSTEME : 28 JUIN 2026
+      {/* SECTION HERO */}
+      <section className="relative bg-gradient-to-b from-zinc-900 to-zinc-950 pt-20 md:pt-28">
+        <div className="max-w-7xl mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          
+          {/* Texte du Hero */}
+          <div className="space-y-6 text-center lg:text-left">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <Trophy className="w-3.5 h-3.5" /> 5ème Édition — Tournoi
             </span>
+            <h1 className="text-4xl md:text-6xl font-black tracking-tight text-white uppercase leading-none">
+              TOP FOOT <span className="text-emerald-500">2026</span>
+            </h1>
+            <p className="text-zinc-400 text-base md:text-lg max-w-xl mx-auto lg:mx-0 font-light leading-relaxed">
+              La plus grande messe footballistique locale est de retour. Suivez les statistiques en direct, l'évolution des effectifs et l'histoire de chaque club engagé dans la compétition.
+            </p>
+            
+            {/* Badges d'informations clés du tournoi */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 max-w-md mx-auto lg:mx-0">
+              <div className="bg-zinc-900/60 border border-zinc-800 p-4 rounded-xl flex flex-col items-center lg:items-start gap-2">
+                <Calendar className="w-5 h-5 text-emerald-400" />
+                <span className="text-[11px] font-mono text-zinc-500 uppercase">Coup d'envoi</span>
+                <span className="text-sm font-bold text-white">05 Juillet 2026</span>
+              </div>
+              <div className="bg-zinc-900/60 border border-zinc-800 p-4 rounded-xl flex flex-col items-center lg:items-start gap-2">
+                <MapPin className="w-5 h-5 text-emerald-400" />
+                <span className="text-[11px] font-mono text-zinc-500 uppercase">Le Théâtre</span>
+                <span className="text-sm font-bold text-white">Terrain Maya Kopé</span>
+              </div>
+              <div className="bg-zinc-900/60 border border-zinc-800 p-4 rounded-xl flex flex-col items-center lg:items-start gap-2">
+                <DollarSign className="w-5 h-5 text-emerald-400" />
+                <span className="text-[11px] font-mono text-zinc-500 uppercase">Engagement</span>
+                <span className="text-sm font-bold text-white">25 000 FCFA</span>
+              </div>
+            </div>
           </div>
+
+          {/* Visuel d'illustration à droite (Optionnel/Design) */}
+          <div className="hidden lg:flex justify-center relative">
+            <div className="absolute inset-0 bg-emerald-500/10 rounded-full filter blur-3xl w-72 h-72 mx-auto top-10"></div>
+            <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-300 max-w-sm relative z-10">
+              <div className="flex justify-between items-center mb-6">
+                <span className="text-xs font-mono uppercase text-zinc-500">Tableau de Bord Officiel</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              </div>
+              <div className="space-y-4">
+                <div className="h-12 bg-zinc-950 border border-zinc-800 rounded-xl flex items-center justify-between px-4">
+                  <span className="text-sm font-bold">{eff} Équipes Engagées</span>
+                  <Users className="w-4 h-4 text-zinc-400" />
+                </div>
+                <div className="h-12 bg-zinc-950 border border-zinc-800 rounded-xl flex items-center justify-between px-4">
+                  <span className="text-sm font-bold">Statistiques Live</span>
+                  <span className="text-xs font-mono bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">Actif</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* INJECTION DU WAVE AVEC LA COULEUR FOOTBALL (Vert Émeraude Profond #047857) */}
+        <div className="w-full rotate-180 -mb-1 pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" className="w-full h-auto">
+            <path 
+              fill="#047857" 
+              fillOpacity="0.5" 
+              d="M0,128L48,128C96,128,192,128,288,117.3C384,107,480,85,576,106.7C672,128,768,192,864,197.3C960,203,1056,149,1152,112C1248,75,1344,53,1392,42.7L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+            ></path>
+          </svg>
         </div>
       </section>
 
+      {/* SECTION : À PROPOS DU PROJET (Riche, Puriste & Structurée) */}
+      <section className="max-w-7xl mx-auto px-6 py-20">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-xs font-mono uppercase tracking-widest text-emerald-400 mb-3">Manifeste & Vision</h2>
+          <p className="text-3xl md:text-4xl font-extrabold text-white tracking-tight uppercase">
+            Une Gestion Rigoureuse Pour Les Amoureux Du Vrai Football
+          </p>
+          <div className="w-12 h-1 bg-emerald-500 mx-auto mt-4 rounded"></div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          
+          {/* Bloc 1 : L'essence du tournoi */}
+          <div className="bg-zinc-900/40 border border-zinc-900 p-8 rounded-2xl hover:border-zinc-800 transition-all duration-200 group">
+            <div className="w-12 h-12 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-center text-emerald-400 mb-6 group-hover:bg-emerald-500/10 group-hover:border-emerald-500/20 transition-all">
+              <Trophy className="w-5 h-5" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-3 uppercase tracking-wide">La Quête du Sacre</h3>
+            <p className="text-zinc-400 text-sm font-light leading-relaxed">
+              TOP FOOT n'est pas qu'un simple tournoi d'été, c'est une arène où le talent local est valorisé de manière professionnelle. {eff} équipes se disputent la reconnaissance ultime à travers une formule de championnat moderne et compétitive.
+            </p>
+          </div>
+
+          {/* Bloc 2 : Clarté administrative & financière */}
+          <div className="bg-zinc-900/40 border border-zinc-900 p-8 rounded-2xl hover:border-zinc-800 transition-all duration-200 group">
+            <div className="w-12 h-12 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-center text-emerald-400 mb-6 group-hover:bg-emerald-500/10 group-hover:border-emerald-500/20 transition-all">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-3 uppercase tracking-wide">Transparence & Discipline</h3>
+            <p className="text-zinc-400 text-sm font-light leading-relaxed">
+              Avec des frais d'engagement fixés à 25 000 FCFA par club, la plateforme garantit une gestion rigoureuse de l'organisation : arbitrage certifié, sécurité sur le terrain mythique de Maya Kopé, et respect strict du règlement de la compétition.
+            </p>
+          </div>
+
+          {/* Bloc 3 : Innovation technologique (La touche Senior dev) */}
+          <div className="bg-zinc-900/40 border border-zinc-900 p-8 rounded-2xl hover:border-zinc-800 transition-all duration-200 group">
+            <div className="w-12 h-12 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-center text-emerald-400 mb-6 group-hover:bg-emerald-500/10 group-hover:border-emerald-500/20 transition-all">
+              <Users className="w-5 h-5" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-3 uppercase tracking-wide">Fiches & Effectifs Numérisés</h3>
+            <p className="text-zinc-400 text-sm font-light leading-relaxed">
+              Nous poussons le professionnalisme au-delà des lignes de touche. Chaque joueur possède sa fiche technique individuelle, ses statistiques de jeu, et chaque club est répertorié de manière unique pour offrir une visibilité médiatique inédite.
+            </p>
+          </div>
+
+        </div>
+
+        {/* FOOTER INTERNE PROPRE / CALL TO ACTION ACCESSIBLE */}
+        <div className="mt-16 bg-gradient-to-r from-zinc-900 to-zinc-950 border border-zinc-800 p-8 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-6">
+          <div>
+            <h4 className="text-lg font-bold text-white">Prêt à suivre l'événement ?</h4>
+            <p className="text-sm text-zinc-400 font-light">Accédez directement à la liste complète des clubs inscrits pour analyser la composition des équipes.</p>
+          </div>
+          <Link to = "/equipes" 
+          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm px-5 py-3 rounded-xl transition-all shadow-lg shadow-emerald-950/20 group">
+            Explorer les Équipes
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+        </div>
+
+      </section>
     </div>
   );
-}
+};
+
+export default HomePage;

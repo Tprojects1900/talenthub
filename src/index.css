@@ -1,11 +1,15 @@
 @import "tailwindcss";
 
-/* 1. Importation de la police Poppins depuis Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+/* 1. Importation des polices Exo 2 (Design Sportif) et JetBrains Mono (Données/Stats) */
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 /* 2. Configuration du thème pour Tailwind v4 */
 @theme {
-  --font-poppins: 'Poppins', sans-serif;
+  /* Définit Exo 2 comme la police principale par défaut pour tout le site */
+  --font-sans: 'Exo 2', sans-serif;
+  
+  /* Associe JetBrains Mono à la classe utilitaire 'font-mono' pour vos données */
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 /* 3. Reset global et balises classiques */
@@ -17,26 +21,33 @@ html {
   scroll-behavior: smooth;
 }
 
+* {
+  font-family: var(--font-sans) !important;
+  font-style: normal !important;
+  font-weight: 500 !important; /* Semi-medium */
+
+}
+
 body {
-  /* On applique Poppins par défaut sur tout le site */
-  font-family: var(--font-poppins);
-  font-weight: 400; /* Poids normal pour les textes longs */
-  line-height: 1.6; /* Un poil plus espacé pour le confort visuel de Poppins */
+  /* On applique Exo 2 par défaut pour un look moderne, fluide et athlétique */
+  font-family: var(--font-sans) !important;
   
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  
+  line-height: 1.8;
+  font-weight: 500;
+  font-size: medium;
+  font-style: normal !important;
   background-color: #0a0a0a;
   color: #ffffff;
   width: 100%;
   margin: 0;
 }
 
-/* Rendre Poppins percutante et bien visible sur les titres */
+/* Rendre les titres très percutants grâce aux lignes dynamiques d'Exo 2 */
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-poppins);
-  font-weight: 600;/* Le "Semi-Bold" ou "Bold" (700) va à ravir à Poppins*/
-  letter-spacing: -0.01em; /* Ajustement esthétique pour les polices géométriques */
+  font-family: var(--font-sans);
+  font-weight: 700; /* Poids lourd pour donner de l'impact */
+  text-transform: uppercase; /* Toujours en majuscules pour le style officiel du tournoi */
+  letter-spacing: 0.08em; /* Léger espacement pour aérer le texte en capitales */
 }
 
 /* 4. Animations et utilitaires personnalisés */
