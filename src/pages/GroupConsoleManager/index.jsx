@@ -381,7 +381,14 @@ const scheduledMatches = useMemo(
                           onChange={(e) => setGroupName(e.target.value)}
                           className="flex-1 min-w-0 bg-zinc-950 border border-zinc-800 focus:border-[#FFD700] rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none"
                         />
-                        <button disabled={group_added} type="submit" className="p-2.5 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-white shrink-0"><Plus size={14} /></button>
+                      <button
+  disabled={group_added}
+  type="submit"
+  className="flex items-center justify-center gap-2 p-2.5 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-white shrink-0 disabled:opacity-50"
+>
+  <Plus size={14} />
+  <span> {group_added ? "En cours": "Ajouter"} </span>
+</button>
                       </div>
                     </form>
 

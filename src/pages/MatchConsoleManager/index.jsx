@@ -18,6 +18,7 @@ import EventEditPanel from './EventEditPanel';
 import RosterButtons from './RosterButtons';
 import EventList from './EventList';
 import MatchStatusBadge from '../../components/MatchStatusBadge';
+import Loader from '../../components/Loader';
 
 const MatchConsoleManager = () => {
   const {
@@ -77,7 +78,14 @@ const MatchConsoleManager = () => {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-zinc-950 text-white p-4 sm:p-6 font-sans">
+
+    {loaded_schedule ?
+    <div className='min-h-screen flex justify-center items-center'>
+     <Loader/>
+     </div>
+     :( 
+      <>
+       <div className="min-h-screen bg-zinc-950 text-white p-4 sm:p-6 font-sans">
         
         {/* HEADER */}
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-900 pb-4 mb-6 gap-4">
@@ -329,6 +337,10 @@ const MatchConsoleManager = () => {
           loading={event_droped}
         />
       )}
+         </>
+      )
+   
+      }
     </AdminLayout>
   );
 };
