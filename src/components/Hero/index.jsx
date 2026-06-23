@@ -201,9 +201,9 @@ export default function FootballTournamentHero() {
         <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
         
         <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10">
-          <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter text-white m-0">
-            PROFILING_EN_COURS
-          </h2>
+       <h2 className="text-4xl sm:text-sm font-black tracking-tighter uppercase text-white m-0 truncate">
+  PROFILING_EN_COURS
+</h2>
           <p className="text-xs sm:text-sm text-zinc-500 max-w-xl mx-auto font-sans leading-relaxed">
             Soumettez votre effectif à la commission d'organisation. Enregistrement direct via les passerelles de communication sécurisées ci-dessous.
           </p>

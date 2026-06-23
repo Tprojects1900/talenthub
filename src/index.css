@@ -35,7 +35,7 @@ body {
 /* Rendre Poppins percutante et bien visible sur les titres */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-poppins);
-  font-weight: 600; /* Le "Semi-Bold" ou "Bold" (700) va à ravir à Poppins */
+  font-weight: 600;/* Le "Semi-Bold" ou "Bold" (700) va à ravir à Poppins*/
   letter-spacing: -0.01em; /* Ajustement esthétique pour les polices géométriques */
 }
 
