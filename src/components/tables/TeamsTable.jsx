@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Loader2 } from 'lucide-react';
+import Loader from '../Loader';
 
 const TeamsTable = ({ 
   columns, 
@@ -114,10 +115,7 @@ const TeamsTable = ({
         {/* Loader Puriste */}
         {loading && (
           <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center gap-2">
-            <Loader2 className="animate-spin text-zinc-500" size={20} strokeWidth={2} />
-            <span className="text-[9px] font-mono tracking-widest text-zinc-600 uppercase animate-pulse">
-              SYNC_DATA_STREAM...
-            </span>
+           <Loader/>
           </div>
         )}
 
