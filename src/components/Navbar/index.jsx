@@ -161,7 +161,7 @@ export default function Navbar() {
                                 )
                             })}
 
-                            <div className="flex items-center justify-between px-3 pt-4 border-t border-white/10">
+                          {!disabled && (  <div className="flex items-center justify-between px-3 pt-4 border-t border-white/10">
                                 <span>Évènement</span>
 
                                 <button
@@ -180,7 +180,7 @@ export default function Navbar() {
                                         }`}
                                     />
                                 </button>
-                            </div>
+                            </div>)}
 
                         </div>
                     </div>
