@@ -692,3 +692,15 @@ query GetMatchById($getMatchByIdId: ID) {
   }
 }
 `;
+
+export const GETTOGGLEDISABLE=gql`
+
+query GetTopSettings {
+  getTopSettings {
+    id
+    key
+    modalEventDisabled
+  }
+}
+
+`;

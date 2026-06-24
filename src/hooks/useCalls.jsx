@@ -1,4 +1,4 @@
-import { useGetTeams,useGetGroups,useGetSchedules ,useEachMatchRosters, useScheduleLive,useTeamStats,useGetMatchById} from "../lib/graphql.service";
+import { useGetTeams,useGetGroups,useGetSchedules ,useEachMatchRosters, useScheduleLive,useTeamStats,useGetMatchById,useGetToggleSettings, useToggleSettings} from "../lib/graphql.service";
 export const useTeams = () => {
   const { data, loading, error, refetch } = useGetTeams();
 
@@ -110,3 +110,11 @@ export const useSingleMatch = (matchId) => {
     refetchMatch
   };
 };
+
+export const useGetToggle=()=>{
+  const {data,loading:load_settings,refetch:refetchSettings} = useGetToggleSettings();
+
+  const settings =data?.getTopSettings || {};
+
+  return { settings,load_settings,refetchSettings }
+}

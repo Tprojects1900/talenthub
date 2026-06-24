@@ -526,3 +526,14 @@ mutation UpdateMatchEventTimeOrPlayer($eventId: ID, $newTime: String, $newPlayer
   }
 }
 `;
+
+export const TOGGLEDISABLE= gql`
+mutation ToggleDisable {
+  toggleDisable {
+    id
+    key
+    modalEventDisabled
+  }
+}
+
+`;
