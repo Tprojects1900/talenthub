@@ -13,7 +13,8 @@ import AdminDashboardPage from "./pages/admin/Dashboard";
 import TeamMangerPage from "./pages/TeamManager";
 import LogoutPage from "./pages/auth/Logout";
 import TeamStatPage from "./pages/admin/TeamStat/index";
-
+import MatchResultPoster from "./pages/MatchPlanche";
+import AdminSettings from "./pages/AdminSettings";
 
 
 function AppRoutes() {
@@ -33,6 +34,9 @@ function AppRoutes() {
         <Route path="/admin/equipe-gestion" element={<TeamCreationManager />} />
         <Route path="/admin/group-gestion" element={<GroupAndMatchManager />} />
         <Route path="/dashboard" element={<AdminDashboardPage />} />
+        <Route path="/result" element={<MatchResultPoster />} />
+        <Route path="/admin/parametres" element={<AdminSettings />} />
+
     </Routes>
   );
 }

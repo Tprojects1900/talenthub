@@ -16,7 +16,7 @@ import { useSwitch } from '../../context/SwitchContext'
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false)
-    const { enabled, toggle } = useSwitch()
+    const { enabled, toggle,disabled } = useSwitch()
     const location = useLocation()
 
     const navLinks = [
@@ -98,7 +98,7 @@ export default function Navbar() {
                     </div>
 
                     {/* Switch */}
-                    <div className="hidden sm:flex items-center gap-3">
+                  {!disabled && (  <div className="hidden sm:flex items-center gap-3">
                         <span className="text-sm font-medium">
                             Évènement
                         </span>
@@ -119,7 +119,7 @@ export default function Navbar() {
                                 }`}
                             />
                         </button>
-                    </div>
+                    </div>)}
 
                     {/* Mobile Toggle */}
                     <button
