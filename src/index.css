@@ -64,3 +64,38 @@ h1, h2, h3, h4, h5, h6 {
   -ms-overflow-style: none;  /* IE et Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+.stadium-bg {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #050a05; /* Base très sombre */
+  background-image: 
+    /* 1. Halo Orange (Haut Gauche) */
+    radial-gradient(circle at 15% 20%, rgba(249, 115, 22, 0.45) 0%, transparent 55%),
+    /* 2. Halo Vert (Haut Droite) */
+    radial-gradient(circle at 85% 20%, rgba(16, 185, 129, 0.45) 0%, transparent 55%),
+    /* 3. Ambiance globale linéaire (Gauche Orange sombre -> Droite Vert sombre) */
+    linear-gradient(90deg, rgba(249, 115, 22, 0.08) 0%, rgba(0,0,0,0.8) 50%, rgba(16, 185, 129, 0.08) 100%);
+    background-blend-mode: screen;
+     image-rendering: '-webkit-optimize-contrast'
+}
+
+.nom-equipe { /* Adapte à tes classes */
+  /* --- LES DEUX PLUS IMPORTANT --- */
+  
+  /* 1. Augmente le line-height. Le standard est souvent trop serré pour html2canvas */
+  line-height: 1.5 !important; /* Force une hauteur de ligne plus grande */
+
+  /* 2. Force l'affichage et empêche le découpage */
+  overflow: visible !important; /* Empêche le 'hidden' qui coupe */
+  
+  /* --- RECOMMANDÉ --- */
+  
+  /* Ajoute un padding en haut/bas pour donner de l'espace */
+  padding-top: 5px; 
+  padding-bottom: 5px;
+
+  /* Force le bloc entier à ne pas être fragmenté */
+  break-inside: avoid;
+  page-break-inside: avoid;
+}

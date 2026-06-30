@@ -15,6 +15,7 @@ import LogoutPage from "./pages/auth/Logout";
 import TeamStatPage from "./pages/admin/TeamStat/index";
 import MatchResultPoster from "./pages/MatchPlanche";
 import AdminSettings from "./pages/AdminSettings";
+import MatchAffichePage from "./pages/MatchAffiche";
 
 
 function AppRoutes() {
@@ -36,6 +37,7 @@ function AppRoutes() {
         <Route path="/dashboard" element={<AdminDashboardPage />} />
         <Route path="/result" element={<MatchResultPoster />} />
         <Route path="/admin/parametres" element={<AdminSettings />} />
+        <Route path="/admin/:matchId/affiches" element={<MatchAffichePage />} />
 
     </Routes>
   );

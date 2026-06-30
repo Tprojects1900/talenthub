@@ -13,6 +13,7 @@ import {
   useSaveSchedule, useRemoveSchedule 
 } from "../../lib/graphql.service";
 import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
 
 const GroupAndMatchManager = () => {
   const { teams: apiTeams, refetchTeams, loading: fetching } = useTeams();
@@ -490,6 +491,7 @@ const scheduledMatches = useMemo(
                                   <span className="bg-emerald-950/40 px-1 rounded border border-emerald-900/30">{prog.typeConfrontation}</span>
                                   <span>• {formatDateTime(prog.date,prog.time)}</span>
                                   <span className="text-zinc-500 truncate">({prog.pitch})</span>
+                                  <Link to ={`/admin/${prog?.id}/affiches`}>Affiche du match</Link>
                                 </div>
                               ) : (
                                 <span className="block text-[10px] text-zinc-600 italic mt-0.5">Pas encore de planification</span>

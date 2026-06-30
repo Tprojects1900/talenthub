@@ -16,8 +16,12 @@ export const MatchCard = ({ match }) => {
   const away = match.awayTeam || match.teamB;
 
   // 3. Récupération des scores réels ou par défaut
-  const scoreHome = match.homeScore !== undefined ? match.homeScore : (match.scoreA || 0);
-  const scoreAway = match.awayScore !== undefined ? match.awayScore : (match.scoreB || 0);
+  const scoreHome = (match.events || []).filter(
+          (e) => e.teamSide === "home" && e.eventType?.toLowerCase().includes("but")
+        ).length;
+  const scoreAway = (match.events || []).filter(
+          (e) => e.teamSide === "away" && e.eventType?.toLowerCase().includes("but")
+        ).length;
 
   const matchId = match._id || match.id;
 

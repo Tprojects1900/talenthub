@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   LayoutGrid, Users, Calendar, Settings, LogOut, 
-  Layers, BarChart3, ShieldAlert, X, Radio ,SlidersHorizontal
+  Layers, BarChart3, ShieldAlert, X, Radio ,SlidersHorizontal,CalendarDays
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSidebar } from '../context/SidebarContext';
@@ -26,6 +26,7 @@ const Sidebar = ({ onNavigate }) => {
    
     { href: "/admin/group-gestion", id: 'tournois', label: 'Poules & Planification', icon: Layers },
     { href: "/admin/equipes", id: 'equipes', label: 'Ajustements', icon: SlidersHorizontal },
+    // { href: "/admin/affiches", id: 'affiches', label: 'Affiches des matchs', icon: CalendarDays },
     // { href: "/admin/planification", id: 'calendrier', label: 'Planification', icon: Calendar },
     { href: "/admin/statistiques", id: 'stats', label: 'Statistiques', icon: BarChart3 },
     { href: "/admin/parametres", id: 'configuration', label: 'Paramètres', icon: Settings },
