@@ -1,5 +1,30 @@
 import { useCallback, useState } from "react";
-import html2canvas from "html2canvas";
+import { toPng } from "html-to-image";
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const waitForFonts = async () => {
+  if (document.fonts?.ready) {
+    await document.fonts.ready;
+  }
+};
+
+const waitForImages = async (element) => {
+  const images = Array.from(element.querySelectorAll("img"));
+
+  await Promise.all(
+    images.map((img) => {
+      if (img.complete && img.naturalWidth > 0) {
+        return Promise.resolve();
+      }
+
+      return new Promise((resolve) => {
+        img.onload = resolve;
+        img.onerror = resolve;
+      });
+    })
+  );
+};
 
 export default function useImageExport(defaultRef) {
   const [loading, setLoading] = useState(false);
@@ -10,6 +35,7 @@ export default function useImageExport(defaultRef) {
       ref = defaultRef,
       fileName = "topfoot-match",
       download = true,
+      pixelRatio = 3,
     } = {}) => {
       try {
         setLoading(true);
@@ -19,35 +45,34 @@ export default function useImageExport(defaultRef) {
           throw new Error("Référence invalide.");
         }
 
-        const element = ref.current;
+        const node = ref.current;
 
-        // CORRECTIF : On utilise width/height réels et on neutralise le scroll
-        const canvas = await html2canvas(element, {
-          scale: 3, // Excellente qualité pour le partage
-          useCORS: true,
-          allowTaint: false,
-          logging: false,
+        await waitForFonts();
+        await waitForImages(node);
+
+        await new Promise(requestAnimationFrame);
+        await new Promise(requestAnimationFrame);
+
+        await wait(100);
+
+        const dataUrl = await toPng(node, {
+          cacheBust: true,
+          pixelRatio,
           backgroundColor: "#0d0f0d",
-          width: element.scrollWidth,    // Capture la largeur totale de l'élément réel
-          height: element.scrollHeight,  // Capture la hauteur totale de l'élément réel
-          scrollX: 0,                   // Ne pas prendre en compte le scroll de la page
-          scrollY: 0,
-          imageTimeout: 10000,
+          skipFonts: false,
+          includeQueryParams: true,
         });
-
-        const dataUrl = canvas.toDataURL("image/png");
 
         if (download) {
           const link = document.createElement("a");
           link.download = `${fileName}.png`;
           link.href = dataUrl;
           link.click();
-          // Pas besoin de revokeObjectURL ici car dataUrl est une String en Base64, pas un Blob Object
         }
 
         return dataUrl;
       } catch (err) {
-        console.error("Erreur export image:", err);
+        console.error(err);
         setError(err);
         throw err;
       } finally {

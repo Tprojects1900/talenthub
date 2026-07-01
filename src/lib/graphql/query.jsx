@@ -704,3 +704,24 @@ query GetTopSettings {
 }
 
 `;
+
+export const TEAMDETAILS=gql`
+query GetTeamDetails($getTeamDetailsId: ID) {
+  getTeamDetails(id: $getTeamDetailsId) {
+    id
+    code
+    logo
+    members {
+      id
+      nom
+      type
+      logo
+      createdAt
+      updatedAt
+    }
+    nom
+    quartier
+    slogan
+  }
+}
+`;

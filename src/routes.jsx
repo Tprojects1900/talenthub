@@ -16,7 +16,7 @@ import TeamStatPage from "./pages/admin/TeamStat/index";
 import MatchResultPoster from "./pages/MatchPlanche";
 import AdminSettings from "./pages/AdminSettings";
 import MatchAffichePage from "./pages/MatchAffiche";
-
+import AddPlayerPage from "./pages/AddPlayerPage";
 
 function AppRoutes() {
   return (
@@ -38,6 +38,7 @@ function AppRoutes() {
         <Route path="/result" element={<MatchResultPoster />} />
         <Route path="/admin/parametres" element={<AdminSettings />} />
         <Route path="/admin/:matchId/affiches" element={<MatchAffichePage />} />
+        <Route path="/:teamId/ajouter-joueur-staff" element={<AddPlayerPage />} />
 
     </Routes>
   );

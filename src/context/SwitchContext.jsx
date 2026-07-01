@@ -46,7 +46,7 @@ export const SwitchProvider = ({ children }) => {
     if (disabled) return;
     setEnabled((prev) => !prev);
   };
-console.log(settings,"settings")
+//console.log(settings,"settings")
   // ACTION ADMIN : Déclencher la mutation GraphQL pour couper/activer le modal pour TOUT LE MONDE
   const disableToggle = async () => {
     try {

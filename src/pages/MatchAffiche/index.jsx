@@ -112,6 +112,7 @@ export default function MatchAffichePage() {
             homeTeam: {
                 name: match.homeTeam?.nom || match.homeTeam?.name,
                 logo: match.homeTeam?.logo,
+                location: match.homeTeam?.quartier || "",
                 scorers: (match.events || [])
                     .filter((e) => e.teamSide === "home" && e.eventType?.toLowerCase().includes("but"))
                     .map((e) => ({
@@ -141,6 +142,7 @@ export default function MatchAffichePage() {
             awayTeam: {
                 name: match.awayTeam?.nom || match.awayTeam?.name,
                 logo: match.awayTeam?.logo,
+                location: match.awayTeam?.quartier || "",
                 scorers: (match.events || [])
                     .filter((e) => e.teamSide === "away" && e.eventType?.toLowerCase().includes("but"))
                     .map((e) => ({

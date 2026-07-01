@@ -4,18 +4,18 @@ import t1 from "../../assets/images/t1.png";
 import t2 from "../../assets/images/t11.png";
 import useImageExport from '../../hooks/useImageExport';
 import MatchStatusBadge from '../MatchStatusBadge';
-
+import TeamScorersCard from '../cards/TeamScorersCard';
 const FinishedGame = ({ game }) => {
   const matchData = game || {
     homeTeam: {
       name: "TALENT FC", score: 2, logo: t1,
       scorers: [{ name: "M. Diallo", minute: "24'" }, { name: "J. Smith", minute: "78'" }],
-      stats: { yellowCards: 2, redCards: 0 }
+      stats: { yellowCards: 0, redCards: 0 }
     },
     awayTeam: {
       name: "UNION AC", score: 1, logo: t2,
       scorers: [{ name: "A. Traoré", minute: "45'" }],
-      stats: { yellowCards: 3, redCards: 1 }
+      stats: { yellowCards: 0, redCards: 0 }
     },
     status: "TERMINÉ", venue: "MAYA KOPÉ", broadcast: "RADIO LA GRÂCE"
   };
@@ -88,12 +88,24 @@ const FinishedGame = ({ game }) => {
         {/* TOP HEADER */}
         <div className="relative z-10 flex flex-col items-center w-full pt-2">
          
-          <h2 className="text-3xl font-black tracking-tight mb-2" style={{ color: '#ffffff' }}>
+          <h2 className="text-3xl font-black tracking-tight mb-1.5" style={{ color: '#ffffff' }}>
             TOPFOOT
           </h2>
 
-           <div className="flex items-center space-x-2 border px-3 py-1 rounded-full backdrop-blur-sm" style={{ backgroundColor: 'rgba(9, 9, 11, 0.6)', borderColor: '#27272a' }}>
-            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#f97316' }} />
+            <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "42px",
+              padding: "0 18px",
+              borderRadius: "999px",
+              border: "2px solid white",
+              background: "rgba(9,9,11,.6)",
+              boxSizing: "border-box",
+            }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: '#f97316' }} />
             <span className="text-[10px] font-black tracking-widest uppercase" style={{ color: '#fb923c' }}>RÉSULTAT FINAL</span>
           </div>
         </div>
@@ -102,28 +114,9 @@ const FinishedGame = ({ game }) => {
         <div className="relative z-10 w-full flex items-start justify-between px-2 my-auto">
           
           {/* Équipe Domicile */}
-          <div className="flex flex-col items-center w-[180px]">
-            <div className="relative p-1 border rounded-2xl shadow-lg backdrop-blur-sm" style={{ backgroundColor: '#18181b', borderColor: '#27272a' }}>
-              <div className="w-24 h-24 border rounded-xl flex items-center justify-center p-3 relative overflow-hidden" style={{ backgroundColor: 'rgba(9, 9, 11, 0.8)', borderColor: 'rgba(82, 82, 91, 0.6)' }}>
-                <div className="absolute top-0 w-full h-1" style={{ backgroundColor: '#10b981' }} />
-                <img className="w-full h-full object-contain" src={matchData.homeTeam.logo} alt={matchData.homeTeam.name} />
-              </div>
-              <div className="absolute -bottom-[1px] -left-[1px] w-4 h-4 border-b border-l" style={{ borderColor: '#34d399' }} />
-            </div>
-            <h3 className="mt-3 text-lg font-black tracking-wide italic uppercase text-center truncate w-full px-1 nom-equipe" style={{ color: '#ffffff' }}>
-              {matchData.homeTeam.name}
-            </h3>
-            
-            {/* Buteurs Domicile */}
-            <div className="mt-2 space-y-0.5 text-center min-h-[36px] w-full">
-              {matchData.homeTeam.scorers.map((scorer, idx) => (
-                <p key={idx} className="text-[10px] font-medium truncate nom-equipe" style={{ color: '#a1a1aa' }}>
-                  {scorer?.name}
-{scorer?.dorsa ? ` (${scorer.dorsa})` : ""}<span className="font-bold" style={{ color: '#fb923c' }}>{scorer.minute}</span>
-                </p>
-              ))}
-            </div>
-          </div>
+        <TeamScorersCard team={matchData.homeTeam} />
+
+
 
           {/* Centre : Affichage Numérique du Score */}
           <div className="flex flex-col items-center justify-center pt-2 w-[160px]">
@@ -150,27 +143,7 @@ const FinishedGame = ({ game }) => {
           </div>
 
           {/* Équipe Extérieur */}
-          <div className="flex flex-col items-center w-[180px]">
-            <div className="relative p-1 border rounded-2xl shadow-lg backdrop-blur-sm" style={{ backgroundColor: '#18181b', borderColor: '#27272a' }}>
-              <div className="w-24 h-24 border rounded-xl flex items-center justify-center p-3 relative overflow-hidden" style={{ backgroundColor: 'rgba(9, 9, 11, 0.8)', borderColor: 'rgba(82, 82, 91, 0.6)' }}>
-                <div className="absolute top-0 w-full h-1" style={{ backgroundColor: '#10b981' }} />
-                <img className="w-full h-full object-contain" src={matchData.awayTeam.logo} alt={matchData.awayTeam.name} />
-              </div>
-              <div className="absolute -top-[1px] -right-[1px] w-4 h-4 border-t border-r" style={{ borderColor: '#34d399' }} />
-            </div>
-            <h3 className="mt-3 text-lg font-black tracking-wide italic uppercase text-center truncate w-full px-1 nom-equipe" style={{ color: '#ffffff' }}>
-              {matchData.awayTeam.name}
-            </h3>
-            
-            {/* Buteurs Extérieur */}
-            <div className="mt-2 space-y-0.5 text-center min-h-[36px] w-full">
-              {matchData.awayTeam.scorers.map((scorer, idx) => (
-                <p key={idx} className="text-[10px] font-medium truncate nom-equipe" style={{ color: '#a1a1aa' }}>
-                  {scorer.name} <span className="font-bold" style={{ color: '#fb923c' }}>{scorer.minute}</span>
-                </p>
-              ))}
-            </div>
-          </div>
+         <TeamScorersCard team={matchData.awayTeam} />
 
         </div>
 

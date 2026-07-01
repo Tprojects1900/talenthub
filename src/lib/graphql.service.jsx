@@ -1,6 +1,6 @@
 import { useLazyQuery, useQuery, useSubscription, useMutation } from "@apollo/client";
 
-import { GETAUTH ,TEAMS,GROUPS, SCHEDULESMATCH, EACHMATCHROSTER, SCHEDULELIVE, TEAMSTATS, GETMATCHBYID, GETTOGGLEDISABLE} from "./graphql/query";
+import { GETAUTH ,TEAMS,GROUPS, SCHEDULESMATCH, EACHMATCHROSTER, SCHEDULELIVE, TEAMSTATS, GETMATCHBYID, GETTOGGLEDISABLE,TEAMDETAILS} from "./graphql/query";
 import { ADDGROUP, ADDPLAYER, ADDSUB, ADDTEAM, CHANGEEVENTSTATUS, DROPACTOR, DROPEVENT, EDITGROUPTEAMS, LOGIN,REMOVEGROUP,REMOVEMATCHROSTER,REMOVEPLAYER,REMOVESCHEDULE,REMOVETEAM, SAVEMATCHROSTER, SCHEDULEMATCH, STANDAREVENT, SWITCHMATCHMODE, TOGGLEDISABLE, UPDATEPLAYER, UPDATETEAM, UPDATETIMERORPLAYER } from "./graphql/mutation";
 
 
@@ -57,6 +57,14 @@ export const useGetMatchById=(matchId)=>{
     return useQuery(GETMATCHBYID, {
     variables: { getMatchByIdId:matchId },
     skip: !matchId,
+  });
+}
+
+export const useGetTeamsDetails=(teamId)=>{
+//  return useQuery(TEAMSTATS);
+    return useQuery(TEAMDETAILS, {
+    variables: { getTeamDetailsId:teamId },
+    skip: !teamId,
   });
 }
 

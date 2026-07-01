@@ -1,4 +1,4 @@
-import { useGetTeams,useGetGroups,useGetSchedules ,useEachMatchRosters, useScheduleLive,useTeamStats,useGetMatchById,useGetToggleSettings, useToggleSettings} from "../lib/graphql.service";
+import { useGetTeams,useGetGroups,useGetSchedules ,useEachMatchRosters, useScheduleLive,useTeamStats,useGetMatchById,useGetToggleSettings, useToggleSettings,useGetTeamsDetails} from "../lib/graphql.service";
 export const useTeams = () => {
   const { data, loading, error, refetch } = useGetTeams();
 
@@ -55,6 +55,23 @@ export const useMatchRosters = (matchId) => {
     rosters,
     roster_loaded,
     refetchRosters
+  };
+};
+
+
+export const useTeamDetails = (teamId) => {
+  const {
+    data,
+    loading: team_loaded,
+    refetch: refetchTeamDetails
+  } = useGetTeamsDetails(teamId);
+
+  const teamDetails = data?.getTeamDetails || {};
+
+  return {
+    teamDetails,
+    team_loaded,
+    refetchTeamDetails
   };
 };
 
