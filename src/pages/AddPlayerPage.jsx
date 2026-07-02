@@ -163,7 +163,7 @@ export default function AddPlayerPage() {
           </div>
 
           <div className="bg-blue-50 px-5 py-3 rounded-xl border border-blue-100 text-center md:text-right flex-shrink-0 w-full md:w-auto">
-            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">Total Validé en BD</span>
+            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">Total Validé</span>
             <div className="text-xl font-black text-blue-900 mt-0.5">{totalRegisteredCount} / 22</div>
             <span className="text-[10px] text-gray-500 block mt-1">Joueurs ({dbPlayers.length}/20) | Staff ({dbStaff.length}/2)</span>
           </div>

@@ -15,7 +15,7 @@ export default function TopFootHeaderBadge({ topfoot }) {
       <div className="w-full flex flex-col items-center justify-center text-center z-999">
         <img src={topfoot} alt="TopFoot" className="h-14 w-14 object-contain mb-1 drop-shadow" />
         <h3 className="font-black text-white text-xs uppercase tracking-widest">TOP FOOT</h3>
-        <span className="text-[8px] font-black text-amber-500 tracking-widest uppercase mt-0.5">SAISON 2026</span>
+        <span className="text-[8px] font-black text-amber-500 tracking-widest uppercase mt-0.5 nom-equipe">SAISON 2026</span>
       </div>
 
       {/* Badge QR Code oblique dans le coin supérieur droit */}

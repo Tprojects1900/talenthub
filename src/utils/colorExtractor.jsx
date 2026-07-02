@@ -5,8 +5,8 @@ export const getDominantColor = (imgSrc) => {
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = imgSrc;
 
+    //  onload/onerror DOIVENT être assignés AVANT img.src
     img.onload = () => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
@@ -15,7 +15,6 @@ export const getDominantColor = (imgSrc) => {
         return resolve("#1e3a8a");
       }
 
-      // Redimensionner pour traiter plus rapidement
       const size = 150;
       canvas.width = size;
       canvas.height = size;
@@ -25,7 +24,8 @@ export const getDominantColor = (imgSrc) => {
       let imageData;
       try {
         imageData = ctx.getImageData(0, 0, size, size).data;
-      } catch {
+      } catch (err) {
+        console.warn("Canvas tainted (CORS) :", err);
         return resolve("#1e3a8a");
       }
 
@@ -34,24 +34,34 @@ export const getDominantColor = (imgSrc) => {
         b = 0,
         count = 0;
 
-      // Parcourir chaque pixel
       for (let i = 0; i < imageData.length; i += 4) {
         const alpha = imageData[i + 3];
         const red = imageData[i];
         const green = imageData[i + 1];
         const blue = imageData[i + 2];
 
-        // Ignorer les pixels transparents
         if (alpha < 125) continue;
 
-        // Ignorer le blanc et le noir trop purs
         const brightness = (red + green + blue) / 3;
-        if (brightness > 230 || brightness < 25) continue;
+        // Filtres assouplis pour ne pas tout exclure sur un logo N&B
+        if (brightness > 245 || brightness < 10) continue;
 
         r += red;
         g += green;
         b += blue;
         count++;
+      }
+
+      // Fallback : si le filtre a tout exclu, on refait une passe SANS filtre de luminosité
+      if (!count) {
+        for (let i = 0; i < imageData.length; i += 4) {
+          const alpha = imageData[i + 3];
+          if (alpha < 125) continue;
+          r += imageData[i];
+          g += imageData[i + 1];
+          b += imageData[i + 2];
+          count++;
+        }
       }
 
       if (!count) return resolve("#1e3a8a");
@@ -62,12 +72,16 @@ export const getDominantColor = (imgSrc) => {
 
       const toHex = (v) => v.toString(16).padStart(2, "0");
 
-      resolve(
-        `#${toHex(avgR)}${toHex(avgG)}${toHex(avgB)}`.toLowerCase()
-      );
+      resolve(`#${toHex(avgR)}${toHex(avgG)}${toHex(avgB)}`.toLowerCase());
     };
 
-    img.onerror = () => resolve("#1e3a8a");
+    img.onerror = (err) => {
+      console.warn("Erreur de chargement image :", err);
+      resolve("#1e3a8a");
+    };
+
+    // src assigné en dernier, une fois les handlers en place
+    img.src = imgSrc;
   });
 };
 
