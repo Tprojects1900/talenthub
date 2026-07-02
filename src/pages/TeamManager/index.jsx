@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Plus, Trash2, Pencil, Shield, Users, UserPlus, CheckCircle, MapPin, Quote, FolderPlus, Image, User
 } from 'lucide-react';
+import {Link} from 'react-router-dom';
 import { useTeams } from '../../hooks/useCalls';
 import TeamsTable from '../../components/tables/TeamsTable';
 import { useRemoveTeam, useAddTeam ,useAddPlayer,useEditTeam,useEditPlayer,useRemovePlayer} from '../../lib/graphql.service';
@@ -77,6 +78,16 @@ const [p_r,setP_r]=useState(null);
     { key: "code", label: "CODE" },
     { key: "slogan", label: "SLOGAN" },
     {
+      key:"licence",
+      label:"LICENCE COLLECTIVE",
+      render:(row)=>(
+        <Link to={`/${row.id}/licences/collectives`} className="flex items-center gap-2 text-[#FFD700] hover:text-[#FFD700]/80 transition-colors">
+          <Shield size={16} />
+          <span className="text-xs font-bold">Voir la licence</span>
+        </Link>
+      )
+    },
+    {
       key: "actions",
       label: "ACTIONS",
       render: (row) => (
@@ -95,6 +106,7 @@ const [p_r,setP_r]=useState(null);
           >
             <Trash2 size={18} />
           </button>
+         
         </div>
       )
     }

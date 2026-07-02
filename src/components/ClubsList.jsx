@@ -6,11 +6,11 @@ import { toast } from 'react-toastify';
 // 1. Sous-composant isolé pour gérer l'affichage/pagination propre à chaque club
 const TeamCard = ({ team, index, handleConfirmP, handleOpenEdit }) => {
   // Changement ici : On utilise une string "5" par défaut ou "all"
-  const [displayLimit, setDisplayLimit] = useState("5");
+  const [displayLimit, setDisplayLimit] = useState("2");
 
   const membres = team.membres || [];
   // Gestion de la découpe en fonction de la valeur du select
-  const membresAffiches = displayLimit === "5" ? membres.slice(0, 5) : membres;
+  const membresAffiches = displayLimit === "2" ? membres.slice(0, 2) : membres;
 
   return (
     <div key={team.id || index} className="bg-zinc-900/40 border border-zinc-850 p-4 rounded-2xl space-y-3">
@@ -69,8 +69,8 @@ const TeamCard = ({ team, index, handleConfirmP, handleOpenEdit }) => {
             onChange={(e) => setDisplayLimit(e.target.value)}
             className="bg-zinc-950 text-zinc-400 text-[9px] font-mono font-bold px-2 py-1 rounded-lg border border-zinc-850/80 focus:outline-none focus:border-zinc-700 cursor-pointer transition-colors"
           >
-            <option value="5" className="bg-zinc-950 text-zinc-300">
-              Afficher : 5 par défaut
+            <option value="2" className="bg-zinc-950 text-zinc-300">
+              Afficher : 2 par défaut
             </option>
             <option value="all" className="bg-zinc-950 text-zinc-300">
               Afficher : Tout ({membres.length})

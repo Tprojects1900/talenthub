@@ -26,7 +26,7 @@ const waitForImages = async (element) => {
   );
 };
 
-export default function useImageExport(defaultRef) {
+export default function useImageExport(defaultRef,bgColor="#0d0f0d") {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -55,12 +55,20 @@ export default function useImageExport(defaultRef) {
 
         await wait(100);
 
-        const dataUrl = await toPng(node, {
+        // const dataUrl = await toPng(node, {
+        //   cacheBust: true,
+        //   pixelRatio,
+        //   backgroundColor: "#0d0f0d",
+        //   skipFonts: false,
+        //   includeQueryParams: true,
+        // });
+           const dataUrl = await toPng(node, {
           cacheBust: true,
           pixelRatio,
-          backgroundColor: "#0d0f0d",
-          skipFonts: false,
+          backgroundColor: bgColor,
           includeQueryParams: true,
+          skipFonts: false,
+          skipFonts: true,
         });
 
         if (download) {
