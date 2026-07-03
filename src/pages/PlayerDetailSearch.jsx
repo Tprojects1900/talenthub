@@ -43,7 +43,8 @@ const PlayerDetails = () => {
         <meta property="og:title" content={`${currentPlayer.nom} - Effectif ${playerTeam?.nom}`} />
         <meta property="og:description" content={`Regardez la fiche technique complète de ${currentPlayer.nom} sur la plateforme TOP FOOT.`} />
         <meta property="og:image" content={currentPlayer.logo || playerTeam?.logo || 'https://talent-hubapp.com/og-image.png'} />
-        <meta property="og:url" content={`https://talent-hubapp.com/#/players/${playerId}/details`} />
+        {/* <meta property="og:url" content={`https://talent-hubapp.com/#/players/${playerId}/details`} /> */}
+        <meta property="og:url" content={`https://talent-hubapp.com/players/${playerId}/details`} />
       </Helmet>
 
       {/* 2. LE LAYOUT enveloppe toute la partie visuelle de l'interface */}
