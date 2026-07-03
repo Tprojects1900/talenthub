@@ -246,7 +246,7 @@ export default function AddPlayerPage() {
           </form>
         ) : (
           <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 p-6 rounded-2xl text-center font-medium">
-            🎉 L'effectif maximal (22 membres) est au complet et validé en base de données.
+            🎉 Félicitations ! Votre effectif de 22 membres est complet et validé.
           </div>
         )}
       </div>
