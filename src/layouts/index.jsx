@@ -10,7 +10,7 @@ import { useTeams } from '../hooks/useCalls'
 
 import { useSchedules } from '../hooks/useCalls'
 export const MainLayout = ({ children, onAdminClick }) => {
-    const {enabled, setEnabled}= useSwitch()
+    const {enabled, setEnabled,disabled}= useSwitch()
     const {teams,loading}=useTeams()
 
       const tournamentEvent = {
@@ -29,12 +29,14 @@ export const MainLayout = ({ children, onAdminClick }) => {
     <div className="min-h-screen bg-background">
       {/* Navbar */}
       <Navbar key="navbar"/>
-         <EventModal
-        isVisible={enabled}
-        eventComing={tournamentEvent}
-        teams={teams}
-        onClose={() => setEnabled(false)}
-      />
+        {!disabled && (
+          <EventModal
+            isVisible={enabled}
+            eventComing={tournamentEvent}
+            teams={teams}
+            onClose={() => setEnabled(false)}
+          />
+        )}
       {/* Main Content */}
       <main key={"main"} className="flex-1 w-full pt-16">
         {children}
