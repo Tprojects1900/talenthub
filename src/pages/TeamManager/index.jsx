@@ -234,7 +234,7 @@ useEffect(() => {
 
   // 1. Récupération sécurisée du fichier binaire brut (comme pour team)
   const rawFile = memberFileRef.current?.files[0] || memberForm.logo;
-     console.log("member form",memberForm,selectedTeamId)
+    //  console.log("member form",memberForm,selectedTeamId)
   try {
     // 2. Appel à la mutation GraphQL
     const { data } = await createPlayer({
@@ -624,7 +624,7 @@ const handleRemovePlayer = async () => {
         </div>
       </div>}
 
-      <TeamsTable columns={columns} data={apiTeams} loading={team_loaded} />
+      <TeamsTable columns={columns} data={apiTeams} loading={team_loaded} searchKey='nom' />
 
       {openconfirm && (
         <ConfirmationModal
