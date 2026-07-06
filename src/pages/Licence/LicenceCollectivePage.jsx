@@ -6,7 +6,7 @@ import { useTeamDetails } from '../../hooks/useCalls';
 import AdminLayout from '../../layouts/AdminLayout';
 import TopFootHeaderBadge from '../../components/TopFootHeaderBadge';
 import topfoot from '../../assets/images/topfoot.png';
-
+import useExportPdf from '../../hooks/useExportToPdf';
 /* ============================================================
    TOKENS — dérivés de la couleur dominante du logo
    ============================================================ */
@@ -228,6 +228,7 @@ export const LicenceCollectivePage = () => {
   const [dominantColor, setDominantColor] = useState('#1e3a8a');
   const posterRef = useRef();
   const { exportImage, loading } = useImageExport(posterRef, 'bg-gray-200/25');
+  const { exportPdf, loading: exportPdfLoading } = useExportPdf(posterRef, 'bg-gray-200/25');
 
   const teamName = teamDetails?.nom ?? '';
   const teamLogo = teamDetails?.logo ?? null;
@@ -282,7 +283,7 @@ export const LicenceCollectivePage = () => {
                 pixelRatio: 4,
               })
             }
-            disabled={loading}
+            disabled={loading || exportPdfLoading}
             className={`px-6 py-3 rounded-xl font-extrabold text-xs uppercase tracking-wider transition-all shadow-xl ${
               loading
                 ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
@@ -290,6 +291,23 @@ export const LicenceCollectivePage = () => {
             }`}
           >
             {loading ? 'Traitement en cours...' : 'Générer & Télécharger'}
+          </button>
+
+            <button
+            onClick={() =>
+              exportPdf({
+                fileName: `Licence_${teamName?.replace(/\s+/g, '_')}`,
+                mode:'fit',
+              })
+            }
+            disabled={exportPdfLoading || loading}
+            className={`px-6 py-3 rounded-xl font-extrabold text-xs uppercase tracking-wider transition-all shadow-xl ${
+              exportPdfLoading
+                ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
+                : 'bg-amber-500 hover:bg-amber-600 text-slate-950'
+            }`}
+          >
+            {exportPdfLoading ? 'Traitement en cours...' : 'En PDF'}
           </button>
         </div>
 
