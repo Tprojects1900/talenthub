@@ -537,3 +537,43 @@ mutation ToggleDisable {
 }
 
 `;
+
+export const ADDLABEL=gql`
+mutation AddLabelToTeam($teamId: ID, $input: AddLabelInput) {
+  addLabelToTeam(teamId: $teamId, input: $input) {
+    id
+    teamId
+    teamLogo
+    teamName
+    cashLabels {
+      id
+      name
+      targetThreshold
+      initialSum
+      initialDate
+      todaySum
+      todayDate
+    }
+  }
+}
+`;
+
+export const UPDATELABEL=gql`
+mutation AdjustCashLabel($teamId: ID, $labelId: ID, $newSum: Float, $newTarget: Float) {
+  adjustCashLabel(teamId: $teamId, labelId: $labelId, newSum: $newSum, newTarget: $newTarget) {
+    id
+    teamId
+    teamName
+    teamLogo
+    cashLabels {
+      id
+      name
+      targetThreshold
+      initialSum
+      initialDate
+      todaySum
+      todayDate
+    }
+  }
+}
+  `;

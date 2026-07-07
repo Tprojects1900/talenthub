@@ -725,3 +725,23 @@ query GetTeamDetails($getTeamDetailsId: ID) {
   }
 }
 `;
+
+export const CAISSEDASHBOARD=gql`
+query GetCaisseDashboard {
+  getCaisseDashboard {
+    teamName
+    teamLogo
+    teamId
+    id
+    cashLabels {
+      id
+      name
+      targetThreshold
+      initialSum
+      initialDate
+      todaySum
+      todayDate
+    }
+  }
+}
+  `;

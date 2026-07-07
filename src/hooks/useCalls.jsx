@@ -1,4 +1,9 @@
-import { useGetTeams,useGetGroups,useGetSchedules ,useEachMatchRosters, useScheduleLive,useTeamStats,useGetMatchById,useGetToggleSettings, useToggleSettings,useGetTeamsDetails} from "../lib/graphql.service";
+import { useGetTeams,useGetGroups,useGetSchedules ,
+  useEachMatchRosters, useGetCaisseDashboard,
+   useScheduleLive,useTeamStats,useGetMatchById,
+   useGetToggleSettings, useToggleSettings,useGetTeamsDetails,
+  
+  } from "../lib/graphql.service";
 export const useTeams = () => {
   const { data, loading, error, refetch } = useGetTeams();
 
@@ -134,4 +139,12 @@ export const useGetToggle=()=>{
   const settings =data?.getTopSettings || {};
 
   return { settings,load_settings,refetchSettings }
+}
+
+export const useCaisseDashboard=()=>{
+  const {data,loading:load_caisse,refetch:refetchCaisse} = useGetCaisseDashboard();
+
+  const caisses =data?.getCaisseDashboard || [];
+
+  return { caisses,load_caisse,refetchCaisse }
 }
