@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import './index.css';
-
+import DebugConsole from "./pages/DebugConsole";
 // 1. Importation du composant HelmetProvider
 import { HelmetProvider } from 'react-helmet-async';
 
@@ -12,6 +12,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     {/* 2. Ajout du Provider autour de App */}
     <HelmetProvider>
       <App />
+      <DebugConsole />
     </HelmetProvider>
   </BrowserRouter>
 );
