@@ -12,7 +12,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     {/* 2. Ajout du Provider autour de App */}
     <HelmetProvider>
       <App />
-      <DebugConsole />
+      {/* <DebugConsole /> */}
     </HelmetProvider>
   </BrowserRouter>
 );
