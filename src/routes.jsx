@@ -25,7 +25,9 @@ function AppRoutes() {
   return (
     <Routes>
   
-        <Route path="/" element={<Home />} />
+        {/* <Route path="/" element={<Home />} /> */}
+       
+<Route path="/" element={<div style={{color: 'white', padding: '20px'}}>Test Affichage iPad Réussi !</div>} />
         <Route path="/matchs" element={<MatchPage />} />
         <Route path="/equipes" element={<TeamsPage />} />
         <Route path="/classement" element={<RankingPage />} />
