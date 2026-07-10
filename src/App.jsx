@@ -11,15 +11,14 @@ import 'react-toastify/dist/ReactToastify.css'
 
 export default function App() {
   return (
-    // <AppProvider>
-    <>
-      {/* <SidebarProvider>
+    <AppProvider>
+      <SidebarProvider>
         <ScreenProvider>
-          <SwitchProvider> */}
+          <SwitchProvider>
             <AppRoutes />
-          {/* </SwitchProvider>
+          </SwitchProvider>
         </ScreenProvider>
-      </SidebarProvider> */}
+      </SidebarProvider>
 
       {/* 2. PLACÉ À LA RACINE EN COMPOSANT AUTO-FERMANT */}
       <ToastContainer 
@@ -34,7 +33,6 @@ export default function App() {
         pauseOnHover
         theme="light"
       />
-      </>
-    // </AppProvider>
+    </AppProvider>
   )
 }
