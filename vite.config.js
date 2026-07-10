@@ -3,12 +3,12 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import legacy from '@vitejs/plugin-legacy'
 
+// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
     legacy({
-      // On cible très large pour inclure toutes les versions de Safari mobiles
       targets: ['ios >= 11', 'safari >= 11', 'defaults', 'not IE 11'],
       modernPolyfills: true,
       renderLegacyChunks: true
@@ -23,19 +23,18 @@ export default defineConfig({
     exclude: ['apollo-upload-client'],
   },
   build: {
-    // 1. Force la compilation en ES2015 (ES6 standard), supporté par TOUS les iPads
+    // 1. Force la compilation en ES2015 (ES6 standard), supporté par les anciens iPads
     target: 'es2015',
     cssTarget: ['ios11', 'safari11'],
     
-    // 2. ⚠️ LA LIGNE CRUCIALE : Désactive le mécanisme d'import dynamique natif de Vite 
-    // qui fait planter le moteur WebKit de l'iPad
-    polyfillDynamicImportOnHtml: false,
+    // 2. Désactive les préchargements de modules natifs de Vite qui font planter WebKit
+    polyfillModulePreload: false,
     
-    minify: 'terser', // Force l'utilisation de terser (plus robuste pour le code legacy)
+    minify: 'terser', // Plus robuste pour le code legacy
     rollupOptions: {
       output: {
-        // Simplifie le format pour éviter les syntaxes de modules trop complexes au runtime
-        format: 'powerview' as any || 'iife' as any || 'es',
+        // Format standard hautement compatible
+        format: 'es',
       }
     }
   }
