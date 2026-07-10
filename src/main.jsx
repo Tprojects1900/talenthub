@@ -1,3 +1,12 @@
+// Tout en haut de main.jsx (Ligne 1 et 2)
+if (typeof globalThis === 'undefined') {
+  window.globalThis = window;
+}
+
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+// ... le reste de votre main.jsx actuel
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";

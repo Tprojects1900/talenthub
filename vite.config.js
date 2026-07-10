@@ -9,6 +9,9 @@ export default defineConfig({
     tailwindcss(),
     legacy({
       targets: ['ios >= 12', 'safari >= 12', 'defaults', 'not IE 11'],
+      // 👈 FORCE l'injection des polyfills indispensables (comme globalThis, Symbol, etc.)
+      modernPolyfills: true, 
+      renderLegacyChunks: true
     }),
   ],
   resolve: {
@@ -16,12 +19,16 @@ export default defineConfig({
       { find: /^@apollo\/client\/link$/, replacement: '@apollo/client' },
     ],
   },
-  optimizeDeps: {
-    exclude: ['apollo-upload-client'],
+  server: {
+    // Évite les bugs de cache agressif pendant vos tests sur iPad
+    fs: { strict: false }
   },
   build: {
-    target: 'es2020',
-    // 👈 AJOUTE CECI : Demande à Vite et LightningCSS de transpiler le CSS pour ton vieil iPad
-    cssTarget: ['ios12', 'safari12']
+    target: 'es2015', // 👈 On descend la cible générale à ES2015 pour maximiser la compatibilité
+    cssTarget: ['ios12', 'safari12'],
+    commonjsOptions: {
+      // Force la conversion des syntaxes modules même dans les dépendances récalcitrantes
+      transformMixedEsModules: true, 
+    }
   }
 })
