@@ -8,9 +8,9 @@ export default defineConfig({
     react(),
     tailwindcss(),
     legacy({
-      targets: ['ios >= 12', 'safari >= 12', 'defaults', 'not IE 11'],
-      // 👈 FORCE l'injection des polyfills indispensables (comme globalThis, Symbol, etc.)
-      modernPolyfills: true, 
+      // On cible très large pour inclure toutes les versions de Safari mobiles
+      targets: ['ios >= 11', 'safari >= 11', 'defaults', 'not IE 11'],
+      modernPolyfills: true,
       renderLegacyChunks: true
     }),
   ],
@@ -19,16 +19,24 @@ export default defineConfig({
       { find: /^@apollo\/client\/link$/, replacement: '@apollo/client' },
     ],
   },
-  server: {
-    // Évite les bugs de cache agressif pendant vos tests sur iPad
-    fs: { strict: false }
+  optimizeDeps: {
+    exclude: ['apollo-upload-client'],
   },
   build: {
-    target: 'es2015', // 👈 On descend la cible générale à ES2015 pour maximiser la compatibilité
-    cssTarget: ['ios12', 'safari12'],
-    commonjsOptions: {
-      // Force la conversion des syntaxes modules même dans les dépendances récalcitrantes
-      transformMixedEsModules: true, 
+    // 1. Force la compilation en ES2015 (ES6 standard), supporté par TOUS les iPads
+    target: 'es2015',
+    cssTarget: ['ios11', 'safari11'],
+    
+    // 2. ⚠️ LA LIGNE CRUCIALE : Désactive le mécanisme d'import dynamique natif de Vite 
+    // qui fait planter le moteur WebKit de l'iPad
+    polyfillDynamicImportOnHtml: false,
+    
+    minify: 'terser', // Force l'utilisation de terser (plus robuste pour le code legacy)
+    rollupOptions: {
+      output: {
+        // Simplifie le format pour éviter les syntaxes de modules trop complexes au runtime
+        format: 'powerview' as any || 'iife' as any || 'es',
+      }
     }
   }
 })
