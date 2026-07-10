@@ -1,15 +1,11 @@
-
-
-/* 1. Importation de la police Poppins depuis Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
 @import "tailwindcss";
-/* 2. Configuration du thème pour Tailwind v4 */
+
+/* Configuration du thème pour Tailwind v4 */
 @theme {
   --font-poppins: 'Poppins', sans-serif;
 }
 
-/* 3. Reset global et balises classiques */
+/* Reset global et balises classiques */
 *, ::before, ::after {
   box-sizing: border-box;
 }
@@ -19,28 +15,24 @@ html {
 }
 
 body {
-  /* On applique Poppins par défaut sur tout le site */
-  font-family: var(--font-poppins);
-  font-weight: 500; /* Poids normal pour les textes longs */
-  line-height: 2; /* Un poil plus espacé pour le confort visuel de Poppins */
+  font-family: var(--font-font-poppins, 'Poppins', sans-serif);
+  font-weight: 500;
+  line-height: 2;
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
   background-color: #0a0a0a;
   color: #ffffff;
   width: 100%;
   margin: 0;
 }
 
-/* Rendre Poppins percutante et bien visible sur les titres */
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-poppins);
-  font-weight: 700;/* Le "Semi-Bold" ou "Bold" (700) va à ravir à Poppins*/
-
+  font-family: var(--font-font-poppins, 'Poppins', sans-serif);
+  font-weight: 700;
 }
 
-/* 4. Animations et utilitaires personnalisés */
+/* Animations et utilitaires personnalisés */
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -62,41 +54,27 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE et Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .stadium-bg {
   width: 100%;
   min-height: 100vh;
-  background-color: #050a05; /* Base très sombre */
+  background-color: #050a05;
   background-image: 
-    /* 1. Halo Orange (Haut Gauche) */
     radial-gradient(circle at 15% 20%, rgba(249, 115, 22, 0.45) 0%, transparent 55%),
-    /* 2. Halo Vert (Haut Droite) */
     radial-gradient(circle at 85% 20%, rgba(16, 185, 129, 0.45) 0%, transparent 55%),
-    /* 3. Ambiance globale linéaire (Gauche Orange sombre -> Droite Vert sombre) */
     linear-gradient(90deg, rgba(249, 115, 22, 0.08) 0%, rgba(0,0,0,0.8) 50%, rgba(16, 185, 129, 0.08) 100%);
-    background-blend-mode: screen;
-     image-rendering: '-webkit-optimize-contrast'
+  background-blend-mode: screen;
+  image-rendering: -webkit-optimize-contrast; /* Corrigé : pas de guillemets et point-virgule ajouté */
 }
 
-.nom-equipe { /* Adapte à tes classes */
-  /* --- LES DEUX PLUS IMPORTANT --- */
-  
-  /* 1. Augmente le line-height. Le standard est souvent trop serré pour html2canvas */
-  line-height: 1.5 !important; /* Force une hauteur de ligne plus grande */
-
-  /* 2. Force l'affichage et empêche le découpage */
-  overflow: visible !important; /* Empêche le 'hidden' qui coupe */
-  
-  /* --- RECOMMANDÉ --- */
-  
-  /* Ajoute un padding en haut/bas pour donner de l'espace */
+.nom-equipe {
+  line-height: 1.5 !important;
+  overflow: visible !important;
   padding-top: 5px; 
   padding-bottom: 5px;
-
-  /* Force le bloc entier à ne pas être fragmenté */
   break-inside: avoid;
   page-break-inside: avoid;
 }
