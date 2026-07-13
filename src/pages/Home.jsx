@@ -1,22 +1,27 @@
-import { useMemo , useState,useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import TopFootHero from "../components/Hero";
 import CurrentMatchDetails from "../components/CurrentMatchDetails";
 import { useCurrentSchedule } from "../hooks/useCalls";
 import { MainLayout } from "../layouts";
 import FootballLoader from "../components/FootBallLoader";
 import { formatDateTime } from "../utils/dateUtils";
+import { useSchedules } from "../hooks/useCalls";
+import MatchesCarousel from "../components/carousels/MatchCards";
 
 export default function Home() {
   // Ajoutez ou vérifiez si votre hook expose une propriété comme 'data' ou s'il permet de savoir
   // si c'est le tout premier chargement. Généralement avec SWR ou React Query, on utilise 'isLoading' vs 'isValidating'.
   const { currentSchedule, isLoadingCurrentSchedule } = useCurrentSchedule();
-  const [loading, setLoading]=useState(false);
+  const { schedules, refetchSchedules, loaded_schedule } = useSchedules()
+  const [loading, setLoading] = useState(false);
   const homeStats = currentSchedule?.homeTeam?.stat || {};
   const awayStats = currentSchedule?.awayTeam?.stat || {};
-  
-useEffect(() => {
-  setLoading(!currentSchedule || Object.keys(currentSchedule).length === 0);
-}, [currentSchedule]);
+
+  useEffect(() => {
+    setLoading(!currentSchedule || Object.keys(currentSchedule).length === 0);
+  }, [currentSchedule]);
+
+  console.log("schedule", schedules);
 
 
   const matchData = useMemo(() => {
@@ -148,7 +153,10 @@ useEffect(() => {
           <FootballLoader />
         ) : matchData ? (
           /* Si on a des données (neuves ou issues du polling précédent), on affiche le match */
-          <CurrentMatchDetails {...matchData} />
+          <>
+            <CurrentMatchDetails {...matchData} />
+            <MatchesCarousel schedules={schedules} currentSchedule={currentSchedule} />
+          </>
         ) : (
           /* Si le chargement est fini (ou en cours de polling) mais qu'il n'y a STRICTEMENT aucun match */
           <TopFootHero />
