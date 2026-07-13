@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo , useState,useEffect } from "react";
 import TopFootHero from "../components/Hero";
 import CurrentMatchDetails from "../components/CurrentMatchDetails";
 import { useCurrentSchedule } from "../hooks/useCalls";
@@ -10,9 +10,14 @@ export default function Home() {
   // Ajoutez ou vérifiez si votre hook expose une propriété comme 'data' ou s'il permet de savoir
   // si c'est le tout premier chargement. Généralement avec SWR ou React Query, on utilise 'isLoading' vs 'isValidating'.
   const { currentSchedule, isLoadingCurrentSchedule } = useCurrentSchedule();
-
+  const [loading, setLoading]=useState(false);
   const homeStats = currentSchedule?.homeTeam?.stat || {};
   const awayStats = currentSchedule?.awayTeam?.stat || {};
+  
+useEffect(() => {
+  setLoading(!currentSchedule || Object.keys(currentSchedule).length === 0);
+}, [currentSchedule]);
+
 
   const matchData = useMemo(() => {
     const match = currentSchedule;
@@ -133,12 +138,12 @@ export default function Home() {
 
   // --- CONTRÔLE DU LOADER POUR LE POLLING ---
   // On affiche le loader UNIQUEMENT si l'API charge ET qu'on n'a encore aucune donnée en mémoire.
-  const isInitialLoading = isLoadingCurrentSchedule && !currentSchedule;
+  // const isInitialLoading =  isLoadingCurrentSchedule && !currentSchedule;
 
   return (
     <MainLayout>
       <div className="w-full p-2">
-        {isInitialLoading ? (
+        {loading ? (
           /* S'affiche uniquement au tout premier chargement de la page */
           <FootballLoader />
         ) : matchData ? (
