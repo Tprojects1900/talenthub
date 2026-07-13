@@ -8,7 +8,7 @@ import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import './index.css';
 import { HelmetProvider } from 'react-helmet-async';
-
+alert("TOPFOOT")
 // On garde la syntaxe officielle propre à ta version de React
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
