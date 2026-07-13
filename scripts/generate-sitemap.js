@@ -57,7 +57,7 @@ async function generateSitemap() {
       if (teamId) {
         // Route pour le détail de l'équipe
         smStream.write({
-          url: `/#/matches/${teamId}/details`, 
+          url: `/matches/${teamId}/details`, 
           changefreq: 'weekly',
           priority: 0.7
         });
@@ -70,7 +70,7 @@ async function generateSitemap() {
           if (playerId) {
             // Route pour le détail du joueur
             smStream.write({
-              url: `/#/players/${playerId}/details`,
+              url: `/players/${playerId}/details`,
               changefreq: 'weekly',
               priority: 0.6
             });
