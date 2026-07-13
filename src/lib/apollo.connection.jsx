@@ -3,7 +3,9 @@ import { setContext } from '@apollo/client/link/context';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions'; 
 import { createClient } from 'graphql-ws'; 
-import createUploadLink from 'apollo-upload-client/createUploadLink.mjs'; // 🚀 IMPORTATION DU LIEN OFFICIEL COMPATIBLE VITE
+ import createUploadLink from 'apollo-upload-client/createUploadLink.mjs'; // 🚀 IMPORTATION DU LIEN OFFICIEL COMPATIBLE VITE
+// 🚀 REFACTION ICI : Import standard compatible avec Webpack
+// import createUploadLink from 'apollo-upload-client/public/createUploadLink.js';
 import Cookies from 'js-cookie';
 
 const isProd = typeof window !== "undefined" && window.location.hostname.includes("talent-hubapp.com");
