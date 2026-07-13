@@ -43,7 +43,7 @@ module.exports = {
                             [
                                 '@babel/preset-react',
                                 {
-                                    runtime: 'automatic',
+                                    runtime: 'classic',
                                 },
                             ],
                         ],
@@ -77,10 +77,11 @@ module.exports = {
             new TerserPlugin({
                 terserOptions: {
                     safari10: true,
+                    ecma: 5,
                     compress: {
                         ecma: 5,
                     },
-                    output: {
+                    format: {
                         ecma: 5,
                     },
                 },
