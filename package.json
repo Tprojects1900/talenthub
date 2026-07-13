@@ -12,6 +12,7 @@
   "dependencies": {
     "@apollo/client": "^3.13.5",
     "apollo-upload-client": "^18.0.1",
+    "core-js": "^3.49.0",
     "extract-files": "^13.0.0",
     "graphql": "^16.14.2",
     "graphql-upload": "^17.0.0",
