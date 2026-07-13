@@ -5,79 +5,99 @@ const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+
     entry: './src/main.jsx',
+
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].[contenthash].js',
         clean: true,
-        publicPath: '/', // 🚀 AJOUTE CETTE LIGNE ICI
+        publicPath: '/',
     },
+
     resolve: {
         extensions: ['.js', '.jsx'],
-        alias: {
-            // Nettoyé : On supprime l'alias Apollo qui brisait les sous-chemins /link/context et /link/subscriptions
-        },
+        mainFields: ['browser', 'module', 'main'],
     },
+
     module: {
         rules: [
             {
                 test: /\.(js|jsx)$/,
-                exclude: /node_modules\/(?!apollo-upload-client)/,
+                exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader',
                     options: {
                         presets: [
-                            ['@babel/preset-env', {
-                                targets: {
-                                    ios: "9",
-                                    safari: "9"
+                            [
+                                '@babel/preset-env',
+                                {
+                                    targets: {
+                                        ios: "9",
+                                        safari: "9",
+                                    },
+                                    useBuiltIns: "usage",
+                                    corejs: 3,
                                 },
-                                useBuiltIns: "usage",
-                                corejs: 3
-                            }],
-                            ['@babel/preset-react', { runtime: 'automatic' }]
+                            ],
+                            [
+                                '@babel/preset-react',
+                                {
+                                    runtime: 'automatic',
+                                },
+                            ],
                         ],
                     },
                 },
             },
+
             {
                 test: /\.css$/,
                 use: [
                     MiniCssExtractPlugin.loader,
                     'css-loader',
-                    'postcss-loader'
+                    'postcss-loader',
                 ],
             },
-            // AJOUT ICI : Gestion des images pour éviter l'erreur "Unexpected character"
+
             {
-                test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                test: /\.(png|svg|jpg|jpeg|gif|webp)$/i,
                 type: 'asset/resource',
                 generator: {
-                    filename: 'assets/images/[hash][ext][query]'
-                }
+                    filename: 'assets/images/[hash][ext][query]',
+                },
             },
         ],
     },
+
     optimization: {
         minimize: true,
+
         minimizer: [
             new TerserPlugin({
                 terserOptions: {
                     safari10: true,
-                    compress: { ecma: 5 },
-                    output: { ecma: 5 }
+                    compress: {
+                        ecma: 5,
+                    },
+                    output: {
+                        ecma: 5,
+                    },
                 },
             }),
         ],
     },
+
     plugins: [
         new HtmlWebpackPlugin({
             template: './index.html',
         }),
+
         new MiniCssExtractPlugin({
             filename: '[name].[contenthash].css',
         }),
     ],
+
     devServer: {
         historyApiFallback: true,
         hot: true,
