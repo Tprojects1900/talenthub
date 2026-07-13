@@ -1,6 +1,6 @@
-import "core-js/stable";
-import "regenerator-runtime/runtime";
-
+if (typeof globalThis === 'undefined') {
+  window.globalThis = window;
+}
 import React from "react";
 import ReactDOM from "react-dom/client"; // On revient à l'import standard
 import App from "./App";

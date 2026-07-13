@@ -77,11 +77,10 @@ module.exports = {
             new TerserPlugin({
                 terserOptions: {
                     safari10: true,
-                    ecma: 5,
                     compress: {
                         ecma: 5,
                     },
-                    format: {
+                    output: {
                         ecma: 5,
                     },
                 },
