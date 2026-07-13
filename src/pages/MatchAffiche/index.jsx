@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import AdminLayout from "../../layouts/AdminLayout";
 import ProgrammedGame from "../../components/Game/Programmed";
 import FinishedGame from "../../components/Game/Finished";
@@ -10,7 +10,7 @@ import { AlertCircle, ArrowLeft } from "lucide-react"; // Import d'icônes utili
 
 export default function MatchAffichePage() {
     const { matchId } = useParams();
-    const navigate = useNavigate();
+    const navigate = useHistory();
 
     const { match: apiMatch, match_loaded } = useSingleMatch(matchId);
     // 1. Récupération des IDs d'équipes du match courant (si disponible)

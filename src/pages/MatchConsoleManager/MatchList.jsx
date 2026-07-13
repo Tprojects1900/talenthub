@@ -1,6 +1,7 @@
 // ==========================================
 // COMPOSANT 2 : LISTE ET RECHERCHE DE MATCHS
 // ==========================================
+import React from 'react';
 import {
   Play, Clock, X, Trash2, ChevronRight, User, Users, AlertTriangle, ArrowRightLeft, CheckCircle, Edit3, RotateCcw
 } from 'lucide-react';

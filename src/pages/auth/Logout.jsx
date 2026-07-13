@@ -1,12 +1,12 @@
 import { useEffect, useRef, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import Loader from "../../components/Loader";
 import { AuthContext } from "../../context/AuthContext";
 
 const LogoutPage = () => {
-  const navigate = useNavigate();
+  const navigate = useHistory();
   const toastShownRef = useRef(false);
   const { setUser, isLoggingOutRef } = useContext(AuthContext);
 

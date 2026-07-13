@@ -1,3 +1,4 @@
+import React from "react";
 import { createContext, useEffect, useRef, useState } from "react";
 import { useGetAuth } from "../lib/graphql.service";
 import Cookies from "js-cookie";

@@ -104,7 +104,7 @@ const Sidebar = ({ onNavigate }) => {
               <Link
                 key={item.href} // Clé unique basée sur le href (plus stable que l'index)
                 to={item.href}
-                onClick={() => handleMenuClick(item.id, item.label)}
+                // onClick={() => handleMenuClick(item.id, item.label)}
                 className={`group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 ${itemStyles}`}
               >
                 <Icon 

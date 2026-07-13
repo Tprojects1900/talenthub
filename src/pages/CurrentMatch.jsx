@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import CurrentMatchDetails from "../components/CurrentMatchDetails";
 import { MainLayout } from "../layouts";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import { useSingleMatch, useTeamStat } from "../hooks/useCalls";
 import FootballLoader from "../components/FootBallLoader";
 import { formatDateTime } from "../utils/dateUtils";
@@ -9,7 +9,7 @@ import { ArrowLeft, AlertCircle } from "lucide-react";
 
 export default function CurrentMatchPage() {
   const { matchId } = useParams();
-  const navigate = useNavigate();
+  const navigate = useHistory();
 
   const { match: apiMatch, match_loaded } = useSingleMatch(matchId);
 

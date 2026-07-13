@@ -1,6 +1,6 @@
 import React, { useState ,useContext} from 'react';
 import { ShieldCheck, User, Lock, Eye, EyeOff, RefreshCw, LogIn } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import topfoot from "../../assets/images/topfoot.png"
 import {toast} from 'react-toastify';
 import {useLogin}  from '../../lib/graphql.service'
@@ -14,7 +14,7 @@ const AdminLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
    const [auth, setAuth] = useState(null)
    const { setUser } = useContext(AuthContext);
-   const navigate = useNavigate()
+   const navigate = useHistory()
 const [login, { loading: log_ing }] = useLogin()
 
 

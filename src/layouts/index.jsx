@@ -2,6 +2,7 @@
 /**
  * MainLayout - Layout principal pour toutes les pages
  */
+import React from "react";
 import Navbar from '../components/Navbar'
 import { Footer } from '../components/Footer'
 import { useSwitch } from '../context/SwitchContext'

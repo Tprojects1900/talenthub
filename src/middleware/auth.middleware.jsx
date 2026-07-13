@@ -1,12 +1,13 @@
+import React from "react";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
 import Loader from "../components/Loader";
 
 const AuthMiddleware = ({ children }) => {
     const { user, loading } = useContext(AuthContext);
-    const navigate = useNavigate();
+    const navigate = useHistory();
     const location = useLocation(); // Permet de savoir où l'utilisateur essaie d'aller
     const token = Cookies.get("token");
     const [isChecking, setIsChecking] = useState(true);
@@ -18,7 +19,7 @@ const AuthMiddleware = ({ children }) => {
         // Si le chargement est fini, on analyse la situation
         if (!token) {
             // Pas de token ? redirection immédiate vers le login
-            navigate("/login", { replace: true });
+            navigate.replace("/login");
         } else if (user?.user) {
             // On a le token ET l'utilisateur est chargé -> Validation réussie !
             // L'utilisateur reste exactement sur la page (location.pathname) où il était

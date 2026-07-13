@@ -1,5 +1,5 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import {
   ArrowLeft, Plus, Trash2, Pencil, MapPin, User, Search,
   Users, Shield, UserPlus, Quote
@@ -78,7 +78,7 @@ const MemberRow = ({ member, onEdit, onDelete }) => {
    ============================================================ */
 const TeamRosterPage = () => {
   const { teamId } = useParams();
-  const navigate = useNavigate();
+  const navigate = useHistory();
   const { teamDetails, loading: teamLoading } = useTeamDetails(teamId);
 
   const [createPlayer, { loading: player_added }] = useAddPlayer();
