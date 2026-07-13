@@ -43,7 +43,7 @@ module.exports = {
                             [
                                 '@babel/preset-react',
                                 {
-                                    runtime: 'classic',
+                                    runtime: 'automatic',
                                 },
                             ],
                         ],
