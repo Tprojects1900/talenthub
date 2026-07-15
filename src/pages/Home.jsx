@@ -18,10 +18,10 @@ export default function Home() {
   const awayStats = currentSchedule?.awayTeam?.stat || {};
 
   useEffect(() => {
-    setLoading(!currentSchedule || Object.keys(currentSchedule).length === 0);
+    setLoading(!currentSchedule || loaded_schedule || Object.keys(currentSchedule).length === 0);
   }, [currentSchedule]);
 
-  console.log("schedule", schedules);
+  // console.log("schedule", schedules);
 
 
   const matchData = useMemo(() => {

@@ -30,6 +30,7 @@ const Sidebar = ({ onNavigate }) => {
     // { href: "/admin/planification", id: 'calendrier', label: 'Planification', icon: Calendar },
     { href: "/admin/statistiques", id: 'stats', label: 'Statistiques', icon: BarChart3 },
     { href: "/admin/caisses", id: 'caisses', label: 'Topfoot Caisse', icon: Wallet },
+    { href: "/admin/tickets", id: 'tickets', label: 'Topfoot Tickets', icon: Wallet },
     { href: "/admin/parametres", id: 'configuration', label: 'Paramètres', icon: Settings },
   ];
 

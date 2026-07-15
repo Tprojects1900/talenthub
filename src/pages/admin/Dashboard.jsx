@@ -18,7 +18,7 @@ const AdminDashboardPage = () => {
   return (
  
       <AdminLayout
-       // currentSection={currentSection}
+         currentSection={currentSection}
         onNavigate={handleNavigation}
         pageTitle={pageTitle}
       >
