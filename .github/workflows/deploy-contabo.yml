@@ -1,4 +1,4 @@
-name: Deploy Contabo
+name: Deploy to Contabo
 
 on:
   push:
@@ -12,33 +12,35 @@ jobs:
     steps:
       - name: Deploy to Contabo
         uses: appleboy/ssh-action@v1.0.3
-
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-
           script: |
-            echo "🚀 Déploiement frontend"
+            # Stopper le script immédiatement au moindre pépin
+            set -e
 
+            echo "🚀 Début du déploiement frontend..."
             cd /var/www/talent-hubapp/frontend
 
-            git pull origin contabo-main
+            # 1. Mise à jour du code source
+            echo "📥 Récupération du dernier code..."
+            git fetch origin contabo-main
+            git reset --hard origin/contabo-main
 
-            npm install
+            # 2. Installation propre des dépendances
+            # On utilise --frozen-lockfile (pour pnpm/yarn) ou ci (pour npm) 
+            # et --legacy-peer-deps pour s'assurer que ça ne bloque pas
+            echo "📦 Installation des dépendances..."
+            npm ci --legacy-peer-deps --loglevel error
 
-            npm run build
+            # 3. Phase de Build
+            # max_old_space_size évite que Node dépasse la RAM de ton VPS Contabo pendant le build
+            echo "⚙️ Lancement du Build de l'application..."
+            NODE_OPTIONS="--max-old-space-size=2048" npm run build
 
+            # 4. Nettoyage de sécurité (optionnel mais recommandé pour libérer de l'espace)
+            echo "🧹 Nettoyage des caches inutiles..."
+            npm cache clean --force
 
-            echo "🚀 Déploiement backend"
-
-            cd /var/www/talent-hubapp/backend
-
-            git pull origin contabo-main
-
-            npm install
-
-
-            echo "🔄 Redémarrage backend"
-
-            pm2 restart talenthub-backend
+            echo "✅ Déploiement et Build terminés avec succès !"
