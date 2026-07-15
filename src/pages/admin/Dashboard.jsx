@@ -7,7 +7,7 @@ import AuthMiddleware from '../../middleware/auth.middleware';
 // import GroupAndMatchManager from './GroupAndMatchManager';
 
 const AdminDashboardPage = () => {
- // const [currentSection, setCurrentSection] = useState('dashboard');
+ const [currentSection, setCurrentSection] = useState('dashboard');
   const [pageTitle, setPageTitle] = useState('Vue d\'ensemble');
 
   const handleNavigation = (id, label) => {
