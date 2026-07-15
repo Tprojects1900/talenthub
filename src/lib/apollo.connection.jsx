@@ -9,9 +9,14 @@ import { createClient } from 'graphql-ws';
 import Cookies from 'js-cookie';
 
 const isProd = typeof window !== "undefined" && window.location.hostname.includes("talent-hubapp.com");
-const api_url = isProd ? "https://topfoot-api.vercel.app/graphql" : "http://localhost:4000/graphql";
-const api_wss_url = isProd ? "wss://topfoot-api.vercel.app/graphql" : "ws://localhost:4000/graphql";
 
+const api_url = isProd 
+  ? "https://talent-hubapp.com/graphql" 
+  : "http://localhost:4000/graphql"; // Ajusté sur 5000 pour correspondre à ton local si besoin
+
+const api_wss_url = isProd 
+  ? "wss://talent-hubapp.com/subscriptions" 
+  : "ws://localhost:4000/subscriptions";
 // Le lien d'authentification reste identique
 const authLink = setContext((_, { headers }) => {
     const token = Cookies.get('token');
