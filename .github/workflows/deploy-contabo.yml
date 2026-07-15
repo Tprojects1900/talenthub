@@ -17,30 +17,38 @@ jobs:
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Stopper le script immédiatement au moindre pépin
+            # S'arrêter au premier plantage
             set -e
 
             echo "🚀 Début du déploiement frontend..."
-            cd /var/www/talent-hubapp/frontend
+            
+            # 1. Créer le dossier parent s'il n'existe pas encore sur le serveur
+            mkdir -p /var/www/talent-hubapp
+            
+            # 2. Gestion intelligente du dépôt Git
+            if [ ! -d "/var/www/talent-hubapp/frontend/.git" ]; then
+              echo "📭 Le dossier n'est pas encore un dépôt Git. Clonage initial..."
+              # On vide le dossier s'il contenait des fichiers résiduels pour éviter les conflits de clonage
+              rm -rf /var/www/talent-hubapp/frontend
+              git clone -b contabo-main https://github.com/Tprojects1900/talenthub.git /var/www/talent-hubapp/frontend
+              cd /var/www/talent-hubapp/frontend
+            else
+              echo "📥 Dépôt existant détecté. Récupération des dernières modifications..."
+              cd /var/www/talent-hubapp/frontend
+              git fetch origin contabo-main
+              git reset --hard origin/contabo-main
+            fi
 
-            # 1. Mise à jour du code source
-            echo "📥 Récupération du dernier code..."
-            git fetch origin contabo-main
-            git reset --hard origin/contabo-main
-
-            # 2. Installation propre des dépendances
-            # On utilise --frozen-lockfile (pour pnpm/yarn) ou ci (pour npm) 
-            # et --legacy-peer-deps pour s'assurer que ça ne bloque pas
+            # 3. Installation propre des dépendances
             echo "📦 Installation des dépendances..."
             npm ci --legacy-peer-deps --loglevel error
 
-            # 3. Phase de Build
-            # max_old_space_size évite que Node dépasse la RAM de ton VPS Contabo pendant le build
+            # 4. Phase de Build (optimisée pour la mémoire de ton VPS Contabo)
             echo "⚙️ Lancement du Build de l'application..."
             NODE_OPTIONS="--max-old-space-size=2048" npm run build
 
-            # 4. Nettoyage de sécurité (optionnel mais recommandé pour libérer de l'espace)
-            echo "🧹 Nettoyage des caches inutiles..."
+            # 5. Libération d'espace disque après compilation
+            echo "🧹 Nettoyage des caches..."
             npm cache clean --force
 
             echo "✅ Déploiement et Build terminés avec succès !"
