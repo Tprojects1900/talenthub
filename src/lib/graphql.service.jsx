@@ -3,6 +3,18 @@ import { useLazyQuery, useQuery, useSubscription, useMutation } from "@apollo/cl
 import { GETAUTH ,TEAMS,GROUPS, SCHEDULESMATCH, EACHMATCHROSTER, SCHEDULELIVE, TEAMSTATS, GETMATCHBYID, GETTOGGLEDISABLE,TEAMDETAILS,CAISSEDASHBOARD} from "./graphql/query";
 import { ADDGROUP, ADDPLAYER, ADDSUB, ADDTEAM, ADDLABEL,UPDATELABEL, CHANGEEVENTSTATUS, DROPACTOR, DROPEVENT, EDITGROUPTEAMS, LOGIN,REMOVEGROUP,REMOVEMATCHROSTER,REMOVEPLAYER,REMOVESCHEDULE,REMOVETEAM, SAVEMATCHROSTER, SCHEDULEMATCH, STANDAREVENT, SWITCHMATCHMODE, TOGGLEDISABLE, UPDATEPLAYER, UPDATETEAM, UPDATETIMERORPLAYER } from "./graphql/mutation";
 
+import { LIVEMATCHEVENTS } from "./graphql/subscription";
+
+//SUBSCRIPTIONS EVENTS MATCH
+
+export const useGetLiveAlert=(matchId)=>{
+  return useSubscription(LIVEMATCHEVENTS,{
+    variables:{
+      matchId,
+      skip: !matchId
+    }
+  })
+}
 
 //LAZY QUERIES
 export const useGetAuth = () => {
@@ -36,12 +48,14 @@ export const useEachMatchRosters = (matchId) => {
     skip: !matchId,
   });
 };
+//commentaire sur
+// // , {
+//     pollInterval: 3000, // ou 5000
+//     notifyOnNetworkStatusChange: true,
+//     fetchPolicy: "network-only",
+//   }
 export const useScheduleLive = () => {
-  return useQuery(SCHEDULELIVE, {
-    pollInterval: 3000, // ou 5000
-    notifyOnNetworkStatusChange: true,
-    fetchPolicy: "network-only",
-  });
+  return useQuery(SCHEDULELIVE);
 };
 
 export const useTeamStats=(teamId)=>{

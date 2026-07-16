@@ -6,19 +6,19 @@ import { useScreen } from '../context/ScreenContext'
 import { Inbox, CalendarX, Search, Trophy, Flame } from "lucide-react"
 import { useGroups, useSchedules } from '../hooks/useCalls'
 import FootballLoader from '../components/FootBallLoader'
-
+import Loader from "../components/Loader";
 export const MatchPage = () => {
     const { isMobile } = useScreen()
     const [activeTab, setActiveTab] = useState('tous')
     const [searchQuery, setSearchQuery] = useState('')
 
     // 1. Récupération des données réelles de l'API
-    const { schedules, loaded_schedule, loa } = useSchedules()
+    const { schedules, loaded_schedule } = useSchedules()
     const { groups, group_loaded } = useGroups()
 
     // 2. Sécurité absolue sur le chargement
-    const isSchedulesReady = loaded_schedule ;
-    const isGroupsReady = group_loaded ;
+    const isSchedulesReady = loaded_schedule;
+    const isGroupsReady = group_loaded;
     const isFullyLoaded = isSchedulesReady && isGroupsReady;
     // console.log("load full",isGroupsReady,isSchedulesReady)
     // 3. Filtrage dynamique, Recherche, et Tri intelligent des matchs
@@ -59,7 +59,7 @@ export const MatchPage = () => {
                 // Règle 2 : Tri par date (du plus récent ou chronologique)
                 const dateA = a.date ? new Date(`${a.date}T${a.time || '00:00'}`) : new Date(0);
                 const dateB = b.date ? new Date(`${b.date}T${b.time || '00:00'}`) : new Date(0);
-                return dateB - dateA; 
+                return dateB - dateA;
             });
     }, [schedules, activeTab, searchQuery]);
 
@@ -67,12 +67,12 @@ export const MatchPage = () => {
     const apiGroupsData = useMemo(() => {
         if (!groups) return [];
         return groups.map(group => {
-            const groupMatches = filteredAndSortedMatches.filter(match => 
+            const groupMatches = filteredAndSortedMatches.filter(match =>
                 String(match.groupId || match.groupName || '').toLowerCase() === String(group.id || group.name || '').toLowerCase()
             );
             return {
                 ...group,
-                teams: group.teams || [], 
+                teams: group.teams || [],
                 weekMatches: groupMatches
             };
         });
@@ -94,7 +94,7 @@ export const MatchPage = () => {
     return (
         <MainLayout>
             <div className="bg-zinc-950 min-h-screen text-zinc-100 selection:bg-orange-500/30 selection:text-orange-400">
-                
+
                 {/* HERO BANNER & SEARCH CONTROL */}
                 <header className="border-b border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md sticky top-0 z-50">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -126,22 +126,20 @@ export const MatchPage = () => {
                         <div className="flex items-center gap-3 mt-4 pt-2 border-t border-zinc-800/40">
                             <button
                                 onClick={() => setActiveTab('tous')}
-                                className={`px-4 py-1.5 rounded-lg font-semibold text-xs tracking-wide uppercase transition-all duration-200 ${
-                                    activeTab === 'tous'
-                                        ? 'bg-zinc-100 text-zinc-950 shadow-lg shadow-black/20'
-                                        : 'bg-zinc-900 text-zinc-400 border border-zinc-800/60 hover:text-zinc-200 hover:bg-zinc-800/50'
-                                }`}
+                                className={`px-4 py-1.5 rounded-lg font-semibold text-xs tracking-wide uppercase transition-all duration-200 ${activeTab === 'tous'
+                                    ? 'bg-zinc-100 text-zinc-950 shadow-lg shadow-black/20'
+                                    : 'bg-zinc-900 text-zinc-400 border border-zinc-800/60 hover:text-zinc-200 hover:bg-zinc-800/50'
+                                    }`}
                             >
                                 Tous les matchs
                             </button>
 
                             <button
                                 onClick={() => setActiveTab('direct')}
-                                className={`px-4 py-1.5 rounded-lg font-semibold text-xs tracking-wide uppercase flex items-center gap-2 transition-all duration-200 ${
-                                    activeTab === 'direct'
-                                        ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/20'
-                                        : 'bg-zinc-900 text-zinc-400 border border-zinc-800/60 hover:text-zinc-200 hover:bg-zinc-800/50'
-                                }`}
+                                className={`px-4 py-1.5 rounded-lg font-semibold text-xs tracking-wide uppercase flex items-center gap-2 transition-all duration-200 ${activeTab === 'direct'
+                                    ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/20'
+                                    : 'bg-zinc-900 text-zinc-400 border border-zinc-800/60 hover:text-zinc-200 hover:bg-zinc-800/50'
+                                    }`}
                             >
                                 <span className={`w-2 h-2 rounded-full bg-current ${activeTab === 'direct' ? 'animate-ping' : ''}`}></span>
                                 En direct
@@ -155,67 +153,87 @@ export const MatchPage = () => {
                     <div className={`flex ${isMobile ? 'flex-col-reverse gap-8' : 'md:flex-row gap-8'}`}>
 
                         {/* SECTION CLASSEMENTS ET POULES (65%) */}
-                        <div className="w-full md:w-[62%] bg-zinc-900/30 border border-zinc-800/50 rounded-2xl p-6 backdrop-blur-sm">
-                            <section>
-                                <div className="flex items-center justify-between mb-6 border-b border-zinc-800 pb-3">
-                                    <h2 className="text-lg font-bold text-zinc-100 tracking-tight">
-                                        Tableaux des Groupes
-                                    </h2>
-                                    <span className="text-xs font-mono text-zinc-500 bg-zinc-900 px-2 py-1 rounded border border-zinc-800">
-                                        {apiGroupsData.length} Poules
-                                    </span>
-                                </div>
+                        {
+                            isGroupsReady ? (
+                                <div className="w-full md:w-[62%] bg-zinc-900/30 border border-zinc-800/50 rounded-2xl p-6 backdrop-blur-sm">
 
-                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                                    {apiGroupsData.length === 0 ? (
-                                        <div className="col-span-full flex flex-col items-center justify-center py-20 text-zinc-600">
-                                            <Inbox size={40} className="mb-3 text-zinc-700" />
-                                            <p className="text-sm font-medium">Aucun groupe ne correspond</p>
-                                        </div>
-                                    ) : (
-                                        apiGroupsData.map((group) => (
-                                            <div key={group.id || group.name} className="transition-all hover:translate-y-[-2px] duration-300">
-                                                <GroupTable group={group} />
-                                            </div>
-                                        ))
-                                    )}
+                                    <Loader />
                                 </div>
-                            </section>
-                        </div>
+                            ) : (
+                                <div className="w-full md:w-[62%] bg-zinc-900/30 border border-zinc-800/50 rounded-2xl p-6 backdrop-blur-sm">
+                                    <section>
+                                        <div className="flex items-center justify-between mb-6 border-b border-zinc-800 pb-3">
+                                            <h2 className="text-lg font-bold text-zinc-100 tracking-tight">
+                                                Tableaux des Groupes
+                                            </h2>
+                                            <span className="text-xs font-mono text-zinc-500 bg-zinc-900 px-2 py-1 rounded border border-zinc-800">
+                                                {apiGroupsData.length} Poules
+                                            </span>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                                            {apiGroupsData.length === 0 ? (
+                                                <div className="col-span-full flex flex-col items-center justify-center py-20 text-zinc-600">
+                                                    <Inbox size={40} className="mb-3 text-zinc-700" />
+                                                    <p className="text-sm font-medium">Aucun groupe ne correspond</p>
+                                                </div>
+                                            ) : (
+                                                apiGroupsData.map((group) => (
+                                                    <div key={group.id || group.name} className="transition-all hover:translate-y-[-2px] duration-300">
+                                                        <GroupTable group={group} />
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    </section>
+                                </div>
+                            )
+                        }
 
                         {/* SECTION FLUX DES MATCHS (38%) */}
-                        <div className="w-full md:w-[38%] bg-zinc-900/30 border border-zinc-800/50 rounded-2xl p-6 backdrop-blur-sm">
-                            <section>
-                                <div className="flex items-center justify-between mb-6 border-b border-zinc-800 pb-3">
-                                    <h2 className="text-lg font-bold text-zinc-100 tracking-tight flex items-center gap-2">
-                                        <span>Rencontres</span>
-                                        {filteredAndSortedMatches.some(m => ['live', 'half-time'].includes(String(m.status).toLowerCase())) && (
-                                            <span className="flex h-2 w-2 relative">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                                            </span>
-                                        )}
-                                    </h2>
-                                    <span className="text-xs font-mono text-zinc-500 bg-zinc-900 px-2 py-1 rounded border border-zinc-800">
-                                        {filteredAndSortedMatches.length} Matchs
-                                    </span>
-                                </div>
+                        {
+                            isSchedulesReady ? (
+                                <div className="w-full md:w-[38%] bg-zinc-900/30 border border-zinc-800/50 rounded-2xl p-6 backdrop-blur-sm">
+                                    <Loader />
 
-                                <div className="flex flex-col gap-4 max-h-[70vh] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-hide">
-                                    {filteredAndSortedMatches.length === 0 ? (
-                                        <div className="flex flex-col items-center justify-center py-20 text-zinc-600">
-                                            <CalendarX size={40} className="mb-3 text-zinc-700" />
-                                            <p className="text-sm font-medium">Aucun match trouvé</p>
-                                            <p className="text-xs text-zinc-600 text-center mt-1">Ajustez vos filtres ou votre terme de recherche.</p>
-                                        </div>
-                                    ) : (
-                                        filteredAndSortedMatches.map((match) => (
-                                            <MatchCard key={match?.id || match?._id} match={match} />
-                                        ))
-                                    )}
                                 </div>
-                            </section>
-                        </div>
+                            )
+                                :
+                                (
+                                    <div className="w-full md:w-[38%] bg-zinc-900/30 border border-zinc-800/50 rounded-2xl p-6 backdrop-blur-sm">
+                                        <section>
+                                            <div className="flex items-center justify-between mb-6 border-b border-zinc-800 pb-3">
+                                                <h2 className="text-lg font-bold text-zinc-100 tracking-tight flex items-center gap-2">
+                                                    <span>Rencontres</span>
+                                                    {filteredAndSortedMatches.some(m => ['live', 'half-time'].includes(String(m.status).toLowerCase())) && (
+                                                        <span className="flex h-2 w-2 relative">
+                                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                                        </span>
+                                                    )}
+                                                </h2>
+                                                <span className="text-xs font-mono text-zinc-500 bg-zinc-900 px-2 py-1 rounded border border-zinc-800">
+                                                    {filteredAndSortedMatches.length} Matchs
+                                                </span>
+                                            </div>
+
+                                            <div className="flex flex-col gap-4 max-h-[70vh] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-hide">
+                                                {filteredAndSortedMatches.length === 0 ? (
+                                                    <div className="flex flex-col items-center justify-center py-20 text-zinc-600">
+                                                        <CalendarX size={40} className="mb-3 text-zinc-700" />
+                                                        <p className="text-sm font-medium">Aucun match trouvé</p>
+                                                        <p className="text-xs text-zinc-600 text-center mt-1">Ajustez vos filtres ou votre terme de recherche.</p>
+                                                    </div>
+                                                ) : (
+                                                    filteredAndSortedMatches.map((match) => (
+                                                        <MatchCard key={match?.id || match?._id} match={match} />
+                                                    ))
+                                                )}
+                                            </div>
+                                        </section>
+                                    </div>
+                                )
+                        }
 
                     </div>
                 </main>

@@ -29,14 +29,14 @@ export const MainLayout = ({ children, onAdminClick }) => {
     <div className="min-h-screen bg-background">
       {/* Navbar */}
       <Navbar key="navbar"/>
-        {!disabled && (
+        {/* {!disabled && (
           <EventModal
             isVisible={enabled}
             eventComing={tournamentEvent}
             teams={teams}
             onClose={() => setEnabled(false)}
           />
-        )}
+        )} */}
       {/* Main Content */}
       <main key={"main"} className="flex-1 w-full pt-16">
         {children}

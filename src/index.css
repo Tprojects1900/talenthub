@@ -54,8 +54,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
 
 .stadium-bg {

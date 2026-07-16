@@ -6,6 +6,7 @@ import { useSingleMatch, useTeamStat } from "../hooks/useCalls";
 import FootballLoader from "../components/FootBallLoader";
 import { formatDateTime } from "../utils/dateUtils";
 import { ArrowLeft, AlertCircle } from "lucide-react";
+import Loader from "../components/Loader";
 
 export default function CurrentMatchPage() {
   const { matchId } = useParams();
@@ -171,8 +172,13 @@ export default function CurrentMatchPage() {
         </div>
 
         {/* CONDITION DU CONTENU : Si pas de données de match après chargement */}
-        {!matchData ? (
+        {match_loaded && !matchData ? (
           <div className="max-w-md mx-auto mt-12 p-6 bg-zinc-900/40 border border-zinc-800/60 rounded-2xl flex flex-col items-center text-center gap-4 shadow-xl">
+           
+           <Loader/>
+          </div>
+        ) : !match_loaded && !matchData ? (
+           <div className="max-w-md mx-auto mt-12 p-6 bg-zinc-900/40 border border-zinc-800/60 rounded-2xl flex flex-col items-center text-center gap-4 shadow-xl">
             <AlertCircle size={40} className="text-zinc-500" />
             <div>
               <h3 className="text-base font-semibold text-zinc-200">Match introuvable</h3>
@@ -181,7 +187,8 @@ export default function CurrentMatchPage() {
               </p>
             </div>
           </div>
-        ) : (
+        )
+        : (
           /* DETAILS DU MATCH (S'affiche en continu sans clignoter grâce au polling contrôlé) */
           <CurrentMatchDetails {...matchData} />
         )}

@@ -4,6 +4,7 @@ import CurrentMatchDetails from "../components/CurrentMatchDetails";
 import { useCurrentSchedule } from "../hooks/useCalls";
 import { MainLayout } from "../layouts";
 import FootballLoader from "../components/FootBallLoader";
+import Loader from "../components/Loader"
 import { formatDateTime } from "../utils/dateUtils";
 import { useSchedules } from "../hooks/useCalls";
 import MatchesCarousel from "../components/carousels/MatchCards";
@@ -17,11 +18,7 @@ export default function Home() {
   const homeStats = currentSchedule?.homeTeam?.stat || {};
   const awayStats = currentSchedule?.awayTeam?.stat || {};
 
-  useEffect(() => {
-    setLoading(!currentSchedule || loaded_schedule || Object.keys(currentSchedule).length === 0);
-  }, [currentSchedule]);
-
-  // console.log("schedule", schedules);
+ 
 
 
   const matchData = useMemo(() => {
@@ -143,19 +140,21 @@ export default function Home() {
 
   // --- CONTRÔLE DU LOADER POUR LE POLLING ---
   // On affiche le loader UNIQUEMENT si l'API charge ET qu'on n'a encore aucune donnée en mémoire.
-  // const isInitialLoading =  isLoadingCurrentSchedule && !currentSchedule;
+  const isInitialLoading = isLoadingCurrentSchedule && !currentSchedule;
 
   return (
     <MainLayout>
       <div className="w-full p-2">
-        {loading ? (
+        {isInitialLoading ? (
           /* S'affiche uniquement au tout premier chargement de la page */
           <FootballLoader />
         ) : matchData ? (
           /* Si on a des données (neuves ou issues du polling précédent), on affiche le match */
           <>
             <CurrentMatchDetails {...matchData} />
-            <MatchesCarousel schedules={schedules} currentSchedule={currentSchedule} />
+           {
+            loaded_schedule ? (<Loader/>) :(<MatchesCarousel schedules={schedules} currentSchedule={currentSchedule} />)
+           } 
           </>
         ) : (
           /* Si le chargement est fini (ou en cours de polling) mais qu'il n'y a STRICTEMENT aucun match */

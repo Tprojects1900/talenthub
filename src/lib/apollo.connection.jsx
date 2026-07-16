@@ -15,8 +15,8 @@ const api_url = isProd
   : "http://localhost:4000/graphql"; // Ajusté sur 5000 pour correspondre à ton local si besoin
 
 const api_wss_url = isProd 
-  ? "wss://talent-hubapp.com/subscriptions" 
-  : "ws://localhost:4000/subscriptions";
+  ? "wss://talent-hubapp.com/graphql" 
+  : "ws://localhost:4000/graphql";
 // Le lien d'authentification reste identique
 const authLink = setContext((_, { headers }) => {
     const token = Cookies.get('token');
@@ -28,13 +28,29 @@ const authLink = setContext((_, { headers }) => {
     };
 });
 
-// Le lien WebSocket reste identique
 const wsLink = new GraphQLWsLink(
   createClient({
     url: api_wss_url,
+
+    lazy:false,
+
     connectionParams: () => ({
       authToken: Cookies.get('token') || '',
     }),
+
+    on:{
+      connecting(){
+        console.log("WS connecting");
+      },
+
+      opened(){
+        console.log("WS opened");
+      },
+
+      connected(){
+        console.log("WS connected");
+      }
+    }
   })
 );
 

@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
     Tv, Clock, Award, Shield,
     ChevronRight, Activity, TrendingUp, Goal,
-    RefreshCcw, Square, CircleAlert, Map
+    RefreshCcw, Square, CircleAlert, Map, Users, Info
 } from 'lucide-react';
 
 import { useScreen } from '../context/ScreenContext';
 import MatchStatusBadge from './MatchStatusBadge';
 import MatchTimer from './MatchTimer';
+import Loader from "./Loader"
 
 const CurrentMatchDetails = ({
-    homeTeam,
-    awayTeam,
+    homeTeam = {},
+    awayTeam = {},
     matchType,
     date,
     status,
@@ -21,246 +22,430 @@ const CurrentMatchDetails = ({
 }) => {
     const { isMobile } = useScreen();
     const [activeTab, setActiveTab] = useState('live');
+    const timer = match?.timer || "00:00";
 
-    // console.log("match",match)
-    // SÉCURITÉ : Ajout d'une valeur par défaut pour le tri afin d'éviter le crash de localeCompare
-    const allEvents = [
-        ...(homeTeam.teamEvents || []).map(e => ({ ...e, side: 'home' })),
-        ...(awayTeam.teamEvents || []).map(e => ({ ...e, side: 'away' }))
-    ].sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+    const [minutes, seconds] = timer.split(":").map(Number);
+    const totalSeconds = minutes * 60 + seconds;
+
+    const percentage = Math.min((totalSeconds / (120 * 60)) * 100, 100);
+
+    // Sécurisation de la liste des événements triés par temps
+    const allEvents = useMemo(() => {
+        const events = [
+            ...(homeTeam.teamEvents || []).map(e => ({ ...e, side: 'home' })),
+            ...(awayTeam.teamEvents || []).map(e => ({ ...e, side: 'away' }))
+        ];
+        return events.sort((a, b) => {
+            const timeA = (a.time || "").toString();
+            const timeB = (b.time || "").toString();
+            return timeA.localeCompare(timeB, undefined, { numeric: true });
+        });
+    }, [homeTeam.teamEvents, awayTeam.teamEvents]);
 
     const renderEventIcon = (type = "") => {
-        if (type.includes("But")) {
-            return <Goal className="w-5 h-5 text-emerald-500" />;
+        const lowerType = type.toLowerCase();
+        if (lowerType.includes("but") || lowerType.includes("goal")) {
+            return <Goal className="w-4 h-4 text-emerald-400 animate-bounce" />;
         }
-        if (type.includes("Carton Jaune")) {
-            return (
-                <Square
-                    className="w-4 h-5 text-yellow-400 fill-yellow-400"
-                    strokeWidth={1.5}
-                />
-            );
+        if (lowerType.includes("jaune") || lowerType.includes("yellow")) {
+            return <Square className="w-3.5 h-4 text-amber-400 fill-amber-400 rounded-sm" strokeWidth={1} />;
         }
-        if (type.includes("Carton Rouge")) {
-            return (
-                <Square
-                    className="w-4 h-5 text-red-500 fill-red-500"
-                    strokeWidth={1.5}
-                />
-            );
+        if (lowerType.includes("rouge") || lowerType.includes("red")) {
+            return <Square className="w-3.5 h-4 text-rose-500 fill-rose-500 rounded-sm" strokeWidth={1} />;
         }
-        if (type.includes("Changement")) {
-            return (
-                <RefreshCcw
-                    className="w-4 h-4 text-blue-500"
-                    strokeWidth={2.5}
-                />
-            );
+        if (lowerType.includes("changement") || lowerType.includes("sub")) {
+            return <RefreshCcw className="w-4 h-4 text-sky-400" strokeWidth={2.5} />;
         }
-        return (
-            <CircleAlert
-                className="w-4 h-4 text-zinc-400"
-                strokeWidth={1.5}
-            />
-        );
+        return <CircleAlert className="w-4 h-4 text-zinc-400" strokeWidth={1.5} />;
     };
 
-    // VÉRIFICATION CORRIGÉE : S'aligne sur ton énumération backend ('live')
     const isLive = status === 'live' || status === 'En cours';
+    const isProg = status === "programmed" || status === "programmé";
+
+    const statusText = (status) => {
+        switch (status?.toLowerCase()) {
+            case "programmed":
+                return "Match programmé";
+
+            case "live":
+                return "Match en direct";
+
+            case "half-time":
+                return "Mi-temps";
+
+            case "finished":
+                return "Match terminé";
+
+            default:
+                return "Statut indisponible";
+        }
+    };
+
+    // Extraction des buteurs pour affichage direct sous le score (comme sur la maquette UEFA)
+    const goalsEvents = useMemo(() => {
+        return allEvents.filter(e => e.eventType?.toLowerCase().includes("but"));
+    }, [allEvents]);
 
     return (
-        <div className="w-full max-w-4xl mx-auto bg-zinc-950 text-white rounded-0 shadow-2xl border-0 border-zinc-800/80 overflow-hidden font-sans">
-            
-            {/* HEADER */}
-            <div className="bg-zinc-900/50 px-6 py-4 border-b border-zinc-800/50 flex flex-col sm:flex-row justify-between items-center gap-2">
-                <div className="flex items-center gap-2">
-                    <span className="text-[#FFD700] bg-[#FFD700]/10 px-3 py-1 rounded-md text-xs font-black tracking-widest uppercase border border-[#FFD700]/20">
+     loading ? (
+        <Loader/>
+     ):
+     (
+          <div className="w-full max-w-7xl mx-auto bg-[#0d0d0e] text-zinc-100 rounded-2xl border border-zinc-800/60 shadow-2xl overflow-hidden font-sans">
+
+            {/* EN-TÊTE ÉPURÉ */}
+            <div className="bg-[#121214]/80 backdrop-blur-md px-6 py-4 border-b border-zinc-800/60
+                flex flex-wrap sm:flex-nowrap
+                sm:justify-between items-center">
+
+                <div className="w-1/2 flex justify-center sm:w-auto sm:justify-start">
+                    <span className="text-[#FFD700] bg-[#FFD700]/10 px-3 py-1 rounded-full text-[11px] font-black tracking-wider uppercase border border-[#FFD700]/20">
                         {matchType || 'Match'}
                     </span>
-                    <span className="text-zinc-400 text-xs flex items-center gap-1">• {date}</span>
                 </div>
-                <div><MatchStatusBadge status={status}/></div>
-            </div>
 
-            {/* SCOREBOARD PRINCIPAL */}
-            <div className="relative px-4 py-8 sm:p-10 bg-gradient-to-b from-zinc-900 via-zinc-950 to-zinc-950">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-[#FFD700]/5 blur-[80px] rounded-full pointer-events-none" />
-                <div className="grid grid-cols-3 items-center justify-center relative z-10">
-                    {/* Home */}
-                    <div className="flex flex-col items-center text-center">
-                        <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center p-3 sm:p-4 shadow-xl transition-transform hover:scale-105">
-                            {homeTeam.logo ? <img src={homeTeam.logo} alt={homeTeam.name} className="w-full h-full object-contain" /> : <Shield size={40} className="text-zinc-600" />}
-                        </div>
-                        <h3 className="mt-3 font-bold text-sm sm:text-lg text-zinc-100 line-clamp-1">{homeTeam.name}</h3>
-                    </div>
-
-                    {/* Score */}
-                    <div className="flex flex-col items-center justify-center">
-                        <div className="flex items-center gap-3 sm:gap-6 font-mono text-4xl sm:text-6xl font-black tracking-tight">
-                            <span className={isLive ? 'text-emerald-400 animate-pulse' : 'text-white'}>{homeTeam.score ?? 0}</span>
-                            <span className="text-[#FFD700] text-2xl sm:text-4xl font-light opacity-60">:</span>
-                            <span className={isLive ? 'text-emerald-400 animate-pulse' : 'text-white'}>{awayTeam.score ?? 0}</span>
-                        </div>
-                        <MatchTimer selectedMatch={match} size='text-xs' loading={loading}/>
-                        <div className="mt-2 flex items-center gap-1 text-xs text-zinc-500 uppercase tracking-widest font-semibold">
-                            <Map size={12} className="text-[#FFD700]" /> {pitch}
-                        </div>
-                    </div>
-
-                    {/* Away */}
-                    <div className="flex flex-col items-center text-center">
-                        <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center p-3 sm:p-4 shadow-xl transition-transform hover:scale-105">
-                            {awayTeam.logo ? <img src={awayTeam.logo} alt={awayTeam.name} className="w-full h-full object-contain" /> : <Shield size={40} className="text-zinc-600" />}
-                        </div>
-                        <h3 className="mt-3 font-bold text-sm sm:text-lg text-zinc-100 line-clamp-1">{awayTeam.name}</h3>
-                    </div>
+                <div className="w-1/2 flex justify-center sm:w-auto">
+                    <span className="text-zinc-400 text-xs font-semibold flex items-center gap-1.5">
+                        <Clock size={12} className="text-zinc-500" />
+                        {date}
+                    </span>
                 </div>
+
+                <div className="w-full mt-2 flex justify-center sm:w-auto sm:mt-0">
+                    <MatchStatusBadge status={status} />
+                </div>
+
             </div>
 
-            {/* ONGLETS */}
-            <div className="flex border-b border-zinc-800 bg-zinc-900/30 px-4">
-                <button onClick={() => setActiveTab('live')} className={`flex-1 sm:flex-none px-6 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${activeTab === 'live' ? 'border-[#FFD700] text-[#FFD700] bg-[#FFD700]/5' : 'border-transparent text-zinc-400 hover:text-white'}`}>Fil du Match</button>
-                <button onClick={() => setActiveTab('stats')} className={`flex-1 sm:flex-none px-6 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${activeTab === 'stats' ? 'border-[#FFD700] text-[#FFD700] bg-[#FFD700]/5' : 'border-transparent text-zinc-400 hover:text-white'}`}>Classement</button>
-            </div>
+            {/* VUE PRINCIPALE DESKTOP / MOBILE */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-px bg-zinc-900">
 
-            {/* CONTENU */}
-            <div className="p-4 sm:p-6 min-h-[250px]">
-                {activeTab === 'live' && (
-                    <div className="space-y-4">
-                        {allEvents.length === 0 ? (
-                            <div className="text-center py-10 text-zinc-500 text-sm">Aucun événement majeur pour le moment.</div>
-                        ) : (
-                            <div className="relative border-l sm:border-l-0 sm:before:absolute sm:before:left-1/2 sm:before:top-0 sm:before:bottom-0 sm:before:w-[1px] sm:before:bg-zinc-800 pl-4 sm:pl-0 space-y-6">
-                                {allEvents.map((event, index) => {
-                                    const isHome = event.side === 'home';
-                                   // console.log("event",isHome,"=>",index)
+                {/* BLOC GAUCHE : LE JEU (SCOREBOARD & TERRAIN ISOMÉTRIQUE) - Prend 7 colonnes sur 12 en Desktop */}
+                <div className="lg:col-span-7 bg-gradient-to-b from-[#121214] to-[#0d0d0e] p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden">
+
+                    {/* Halo lumineux dynamique vert/jaune en fond */}
+                    <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
+
+                    {/* Tableau d'affichage de score façon UEFA */}
+                    <div className="relative z-10 grid grid-cols-3 items-center justify-between my-4">
+                        {/* Équipe Domicile */}
+                        <div className="flex flex-col items-center text-center group">
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 overflow-hidden shadow-xl transition-all duration-300 group-hover:scale-105 group-hover:border-zinc-700">
+                                {homeTeam.logo ? (
+                                    <img
+                                        src={homeTeam.logo}
+                                        alt={homeTeam.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        <Shield size={36} className="text-zinc-600" />
+                                    </div>
+                                )}
+                            </div>
+
+                            <h3 className="mt-3 font-bold text-xs sm:text-sm md:text-base text-white tracking-wide line-clamp-1">
+                                {homeTeam.name}
+                            </h3>
+                        </div>
+
+                        {/* Zone du Score & Timer */}
+                        <div className="flex flex-col items-center justify-center">
+                            <div className="flex items-center gap-3 sm:gap-5 font-mono text-4xl sm:text-5xl font-black tracking-tighter">
+                                <span className={isLive ? 'text-emerald-400 drop-shadow-[0_0_12px_rgba(16,185,129,0.2)]' : 'text-white'}>
+                                    {homeTeam.score ?? 0}
+                                </span>
+                                <span className="text-zinc-600 font-light text-2xl sm:text-3xl">:</span>
+                                <span className={isLive ? 'text-emerald-400 drop-shadow-[0_0_12px_rgba(16,185,129,0.2)]' : 'text-white'}>
+                                    {awayTeam.score ?? 0}
+                                </span>
+                            </div>
+                            <div className="mt-1">
+                                <MatchTimer selectedMatch={match} size='text-xs' loading={loading} />
+                            </div>
+                            <div className="mt-3 flex items-center gap-1.5 text-[10px] text-zinc-400 bg-zinc-900/60 px-2.5 py-1 rounded-full border border-zinc-800/50 uppercase tracking-widest font-semibold">
+                                <Map size={10} className="text-[#FFD700]" /> {pitch || 'Terrain principal'}
+                            </div>
+                        </div>
+
+                        {/* Équipe Extérieur */}
+                        <div className="flex flex-col items-center text-center group">
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 overflow-hidden shadow-xl transition-all duration-300 group-hover:scale-105 group-hover:border-zinc-700">
+                                {awayTeam.logo ? (
+                                    <img src={awayTeam.logo} alt={awayTeam.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        <Shield size={36} className="text-zinc-600" />
+                                    </div>
+                                )}
+                            </div>
+                            <h3 className="mt-3 font-bold text-xs sm:text-sm md:text-base text-white tracking-wide line-clamp-1">{awayTeam.name}</h3>
+                        </div>
+                    </div>
+
+                    {/* BUTEURS DU MATCH (SOUS LE SCORE) */}
+                    {goalsEvents.length > 0 && (
+                        <div className="border-t border-zinc-900/80 pt-3 pb-2 px-4 flex justify-between gap-4 text-[11px] text-zinc-400">
+                            <div className="w-1/2 text-left space-y-1">
+                                {goalsEvents.filter(e => e.side === 'home').map((e, i) => (
+                                    <p key={i} className="truncate">⚽ {e.player?.name} <span className="text-[9px] text-zinc-500">({e.time})</span></p>
+                                ))}
+                            </div>
+                            <div className="w-1/2 text-right space-y-1">
+                                {goalsEvents.filter(e => e.side === 'away').map((e, i) => (
+                                    <p key={i} className="truncate"><span className="text-[9px] text-zinc-500">({e.time})</span> {e.player?.name} ⚽</p>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* TERRAIN ISOMÉTRIQUE EN 3D (Sublime représentation comme l'écran UEFA) */}
+                    <div className="mt-6 mb-2 flex flex-col items-center">
+                        <div className="relative w-full max-w-[400px] aspect-[16/10] overflow-hidden rounded-xl border border-emerald-950/20 shadow-[0_20px_50px_-10px_rgba(16,185,129,0.15)] bg-emerald-950/5">
+                            {/* SVG de terrain de foot isométrique réaliste */}
+                            <svg viewBox="0 0 400 250" className="w-full h-full opacity-85">
+                                <defs>
+                                    <radialGradient id="fieldGrad" cx="50%" cy="50%" r="50%">
+                                        <stop offset="0%" stopColor="#1e541f" />
+                                        <stop offset="100%" stopColor="#0d2810" />
+                                    </radialGradient>
+                                </defs>
+                                {/* Surface du terrain */}
+                                <polygon points="200,30 380,125 200,220 20,125" fill="url(#fieldGrad)" stroke="#58a05b" strokeWidth="2" />
+                                {/* Ligne médiane */}
+                                <line x1="200" y1="30" x2="200" y2="220" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
+                                {/* Cercle central */}
+                                <ellipse cx="200" cy="125" rx="35" ry="18" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
+                                <circle cx="200" cy="125" r="2" fill="rgba(255,255,255,0.8)" />
+                                {/* But Gauche */}
+                                <polygon points="20,125 50,110 50,140" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
+                                <path d="M 5,115 L 20,125 L 5,135 Z" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
+                                {/* But Droite */}
+                                <polygon points="380,125 350,110 350,140" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
+                                <path d="M 395,115 L 380,125 L 395,135 Z" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
+                            </svg>
+                            {/* Indicateurs interactifs */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+                                <span className="animate-ping absolute inline-flex h-4 w-4 rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                            </div>
+                        </div>
+
+                        {/* Barre de chronologie du match (Timeline) */}
+                        <div className="w-full mt-4 px-2">
+                            <div className="flex justify-between items-center text-[10px] text-zinc-500 font-mono mb-1">
+                                <span>0'</span>
+                                <span className="text-emerald-500 font-bold">
+                                    {statusText(status)}
+                                </span>
+                                <span>90'</span>
+                            </div>
+                            <div className="h-1 bg-zinc-800 rounded-full relative w-full overflow-visible">
+                                <div className={`absolute left-0 top-0 h-full bg-emerald-500 rounded-full w-[${percentage}%]`} />
+                                {/* Marqueurs d'événements */}
+                                {allEvents.slice(-10).map((e, index) => {
+                                    const parsedTime = parseInt(e.time, 10) || 45;
+                                    const positionPercentage = Math.min(Math.max((parsedTime / 90) * 100, 5), 100);
                                     return (
-                                        <div key={index} className={`flex flex-col sm:flex-row items-start sm:items-center ${isHome ? '' : 'sm:flex-row-reverse'} relative`}>
-                                            
-                                            {/* Temps au milieu */}
-                                            <div className="absolute -left-[25px] sm:left-1/2 sm:-translate-x-1/2 bg-zinc-900 border border-zinc-700 text-[#FFD700] text-[10px] font-mono px-1.5 py-0.5 rounded-md z-10 shadow-md">
-                                                {event.time}
-                                            </div>
-
-                                            {/* Carte de l'Événement */}
-                                            <div className={`w-full sm:w-1/2 ${isHome ? 'sm:pl-8' : 'sm:pr-8'} flex ${isHome ? 'justify-start' : 'sm:justify-end'}`}>
-                                                <div className="bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-3 flex items-center gap-3 max-w-sm w-full shadow-md hover:border-zinc-700/50 transition-all relative overflow-hidden">
-                                                    
-                                                    {event.teamLogo && (
-                                                        <img src={event.teamLogo} alt="" className="w-5 h-5 object-contain opacity-80 flex-shrink-0" />
-                                                    )}
-
-                                                    <div className="bg-zinc-800 p-2 rounded-lg flex-shrink-0">
-                                                        {renderEventIcon(event.eventType)}
-                                                    </div>
-
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-[10px] font-semibold uppercase text-zinc-400 tracking-wide">{event.eventType}</p>
-                                                        
-                                                        {event.isSubstitution ? (
-                                                            <div className="space-y-0.5 mt-0.5">
-                                                                <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold">
-                                                                    <span>▲</span> 
-                                                                    <span className="truncate">{event.playerIn?.name}</span>
-                                                                    {event.playerIn?.dorsa && <span className="text-[9px] font-mono bg-zinc-800 text-zinc-400 px-1 rounded">N°{event.playerIn.dorsa}</span>}
-                                                                </div>
-                                                                <div className="flex items-center gap-1.5 text-xs text-red-400 font-medium opacity-80">
-                                                                    <span>▼</span> 
-                                                                    <span className="truncate">{event.playerOut?.name}</span>
-                                                                    {event.playerOut?.dorsa && <span className="text-[9px] font-mono bg-zinc-800 text-zinc-400 px-1 rounded">N°{event.playerOut.dorsa}</span>}
-                                                                </div>
-                                                            </div>
-                                                        ) : (
-                                                            <>
-                                                                <p className="text-sm font-bold text-white truncate">{event.player?.name || 'Joueur inconnu'}</p>
-                                                                {event.player?.dorsa && (
-                                                                    <span className="inline-block mt-0.5 text-[10px] font-mono bg-zinc-800 text-[#FFD700] px-1.5 py-0.2 rounded">
-                                                                        N°{event.player.dorsa}
-                                                                    </span>
-                                                                )}
-                                                        </>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="hidden sm:block sm:w-1/2" />
+                                        <div
+                                            key={index}
+                                            className="absolute -top-1.5 w-4 h-4 -ml-2 bg-[#121214] border border-zinc-700 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:scale-125 transition-transform"
+                                            style={{ left: `${positionPercentage}%` }}
+                                            title={`${e.eventType} - ${e.time}`}
+                                        >
+                                            <span className="scale-[0.7]">{renderEventIcon(e.eventType)}</span>
                                         </div>
                                     );
                                 })}
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* BLOC DROITE : CONTENU DES ONGLETS (FIL DU MATCH, STATS / CLASSEMENT) - Prend 5 colonnes */}
+                <div className="lg:col-span-5 bg-[#0f0f11] flex flex-col border-t lg:border-t-0 lg:border-l border-zinc-800/80">
+
+                    {/* Navigation des Onglets Internes */}
+                    <div className="flex border-b border-zinc-800 bg-zinc-950/40 p-2">
+                        <button
+                            onClick={() => setActiveTab('live')}
+                            className={`flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 ${activeTab === 'live' ? 'bg-[#FFD700]/10 text-[#FFD700] border border-[#FFD700]/20' : 'text-zinc-400 hover:text-white'}`}
+                        >
+                            Fil du Match
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('stats')}
+                            className={`flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 ${activeTab === 'stats' ? 'bg-[#FFD700]/10 text-[#FFD700] border border-[#FFD700]/20' : 'text-zinc-400 hover:text-white'}`}
+                        >
+                            Classement
+                        </button>
+                    </div>
+
+                    {/* Zone de défilement du contenu */}
+                    <div className="p-4 sm:p-5 flex-1 overflow-y-auto max-h-[460px] custom-scrollbar scrollbar-hide">
+
+                        {/* 1. Onglet Fil du Match */}
+                        {activeTab === 'live' && (
+                            <div className="space-y-4">
+                                {allEvents.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center py-16 text-center text-zinc-500">
+                                        <Info size={32} className="text-zinc-700 mb-2" />
+                                        <p className="text-sm">Aucun événement marquant enregistré.</p>
+                                    </div>
+                                ) : (
+                                    <div className="relative border-l border-zinc-800/80 ml-3 pl-5 space-y-5">
+                                        {allEvents.map((event, index) => {
+                                            const isHome = event.side === 'home';
+                                            return (
+                                                <div key={index} className="relative group  ">
+                                                    {/* Badge du chronomètre accroché à la ligne de gauche */}
+                                                    <div className="absolute -left-[31px] top-1 bg-[#121214] border border-zinc-800 text-[#FFD700] text-[9px] font-mono px-1.5 py-0.5 rounded-md font-bold shadow">
+                                                        {event.time || "0'"}
+                                                    </div>
+
+                                                    {/* Carte de l'Événement */}
+                                                    <div className="bg-[#151518]/90 border border-zinc-800/80 rounded-xl p-3 flex items-center gap-3 hover:border-zinc-700/80 transition-all shadow-sm">
+
+                                                        {event.teamLogo && (
+                                                            <img src={event.teamLogo} alt="" className="w-5 h-5 object-contain opacity-70 flex-shrink-0" />
+                                                        )}
+
+                                                        <div className="bg-zinc-800/50 p-2 rounded-lg flex-shrink-0">
+                                                            {renderEventIcon(event.eventType)}
+                                                        </div>
+
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex justify-between items-start">
+                                                                <p className="text-[10px] font-extrabold uppercase text-zinc-400 tracking-wider">
+                                                                    {event.eventType}
+                                                                </p>
+                                                                <span className="text-[9px] text-zinc-500 font-semibold uppercase">
+                                                                    {isHome ? 'DOM' : 'EXT'}
+                                                                </span>
+                                                            </div>
+
+                                                            {event.isSubstitution ? (
+                                                                <div className="space-y-0.5 mt-1">
+                                                                    <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold">
+                                                                        <span>▲</span>
+                                                                        <span className="truncate">{event.playerIn?.name}</span>
+                                                                        {event.playerIn?.dorsa && <span className="text-[9px] font-mono bg-zinc-800 text-zinc-400 px-1 rounded">N°{event.playerIn.dorsa}</span>}
+                                                                    </div>
+                                                                    <div className="flex items-center gap-1.5 text-xs text-rose-400 font-medium opacity-80">
+                                                                        <span>▼</span>
+                                                                        <span className="truncate">{event.playerOut?.name}</span>
+                                                                        {event.playerOut?.dorsa && <span className="text-[9px] font-mono bg-zinc-800 text-zinc-400 px-1 rounded">N°{event.playerOut.dorsa}</span>}
+                                                                    </div>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="flex items-center gap-1.5 mt-1">
+                                                                    <p className="text-xs font-bold text-white truncate">{event.player?.name || 'Joueur'}</p>
+                                                                    {event.player?.dorsa && (
+                                                                        <span className="text-[9px] font-mono bg-zinc-800 text-[#FFD700] px-1 rounded">
+                                                                            N°{event.player.dorsa}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* 2. Onglet Classement */}
+                        {activeTab === 'stats' && (
+                            <div className="space-y-5 animate-fadeIn">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left text-xs font-semibold">
+                                        <thead>
+                                            <tr className="border-b border-zinc-800 text-zinc-400 uppercase tracking-widest text-[9px] font-black">
+                                                <th className="py-3 px-2">Équipe</th>
+                                                <th className="py-3 px-1 text-center">MJ</th>
+                                                <th className="py-3 px-1 text-center text-[#FFD700]">Pts</th>
+                                                <th className="py-3 px-1 text-center text-emerald-400">BP</th>
+                                                <th className="py-3 px-1 text-center text-rose-400">BC</th>
+                                                <th className="py-3 px-1 text-center">Diff</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-zinc-900 font-medium">
+                                            {/* Home Team */}
+                                            <tr className="hover:bg-zinc-800/20 transition-colors">
+                                                <td className="py-3.5 px-2 flex items-center gap-2 font-bold text-white">
+                                                    <span className="w-2 h-2 bg-emerald-500 rounded-full" />
+                                                    {homeTeam.name}
+                                                </td>
+                                                <td className="py-3.5 px-1 text-center text-zinc-300">{homeTeam.played ?? 0}</td>
+                                                <td className="py-3.5 px-1 text-center text-[#FFD700] font-black">{homeTeam.points ?? 0}</td>
+                                                <td className="py-3.5 px-1 text-center text-zinc-300">{homeTeam.goalsScored ?? 0}</td>
+                                                <td className="py-3.5 px-1 text-center text-zinc-500">{homeTeam.goalsConceded ?? 0}</td>
+                                                <td className="py-3.5 px-1 text-center text-zinc-400">{(homeTeam.goalsScored || 0) - (homeTeam.goalsConceded || 0)}</td>
+                                            </tr>
+                                            {/* Away Team */}
+                                            <tr className="hover:bg-zinc-800/20 transition-colors">
+                                                <td className="py-3.5 px-2 flex items-center gap-2 font-bold text-white">
+                                                    <span className="w-2 h-2 bg-rose-500 rounded-full" />
+                                                    {awayTeam.name}
+                                                </td>
+                                                <td className="py-3.5 px-1 text-center text-zinc-300">{awayTeam.played ?? 0}</td>
+                                                <td className="py-3.5 px-1 text-center text-[#FFD700] font-black">{awayTeam.points ?? 0}</td>
+                                                <td className="py-3.5 px-1 text-center text-zinc-300">{awayTeam.goalsScored ?? 0}</td>
+                                                <td className="py-3.5 px-1 text-center text-zinc-500">{awayTeam.goalsConceded ?? 0}</td>
+                                                <td className="py-3.5 px-1 text-center text-zinc-400">{(awayTeam.goalsScored || 0) - (awayTeam.goalsConceded || 0)}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <hr className="border-zinc-800/80" />
+
+                                {/* Buteurs Vedettes */}
+                                <div className="space-y-3">
+                                    <h4 className="text-[10px] font-bold uppercase text-zinc-500 tracking-widest">Meilleurs Buteurs</h4>
+
+                                    <div className="space-y-2.5">
+                                        {/* Buteur Domicile */}
+                                        <div className="bg-[#151518]/60 p-3 rounded-xl border border-zinc-800/80 flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-lg bg-[#FFD700]/10 border border-[#FFD700]/20 flex items-center justify-center text-[#FFD700]"><Award size={16} /></div>
+                                                <div>
+                                                    <p className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-wider">{homeTeam.name}</p>
+                                                    <p className="text-xs font-bold text-white">{homeTeam.topScorer?.name || 'Aucun'}</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="text-base font-black text-[#FFD700]">{homeTeam.topScorer?.goals || 0}</span>
+                                                <span className="text-[8px] text-zinc-500 uppercase font-extrabold block">Buts</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Buteur Extérieur */}
+                                        <div className="bg-[#151518]/60 p-3 rounded-xl border border-zinc-800/80 flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-lg bg-[#FFD700]/10 border border-[#FFD700]/20 flex items-center justify-center text-[#FFD700]"><Award size={16} /></div>
+                                                <div>
+                                                    <p className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-wider">{awayTeam.name}</p>
+                                                    <p className="text-xs font-bold text-white">{awayTeam.topScorer?.name || 'Aucun'}</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="text-base font-black text-[#FFD700]">{awayTeam.topScorer?.goals || 0}</span>
+                                                <span className="text-[8px] text-zinc-500 uppercase font-extrabold block">Buts</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         )}
                     </div>
-                )}
-
-                {/* TAB STATS */}
-                {activeTab === 'stats' && (
-                    <div className="space-y-6">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left text-xs sm:text-sm overflow">
-                                <thead>
-                                    <tr className="border-b border-zinc-800 text-zinc-400 uppercase tracking-wider text-[11px]">
-                                        <th className="py-3 px-2">Équipe</th>
-                                        <th className="py-3 px-2 text-center">MJ</th>
-                                        <th className="py-3 px-2 text-center text-[#FFD700]">Pts</th>
-                                        <th className="py-3 px-2 text-center text-emerald-400">BP</th>
-                                        <th className="py-3 px-2 text-center text-red-400">BC</th>
-                                        <th className="py-3 px-2 text-center ">Diff</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-zinc-900 font-medium">
-                                    <tr className="hover:bg-zinc-900/30 transition-colors">
-                                        <td className="py-3 px-2 flex items-center gap-2 font-bold text-white"><span className="w-2 h-2 bg-blue-500 rounded-full" /> {homeTeam.name}</td>
-                                        <td className="py-3 px-2 text-center text-zinc-300">{homeTeam.played ?? 0}</td>
-                                        <td className="py-3 px-2 text-center text-[#FFD700] font-black">{homeTeam.points ?? 0}</td>
-                                        <td className="py-3 px-2 text-center text-zinc-300">{homeTeam.goalsScored ?? 0}</td>
-                                        <td className="py-3 px-2 text-center text-zinc-500">{homeTeam.goalsConceded ?? 0}</td>
-                                        <td className="py-3 px-2 text-center  text-zinc-400">{(homeTeam.goalsScored || 0) - (homeTeam.goalsConceded || 0)}</td>
-                                    </tr>
-                                    <tr className="hover:bg-zinc-900/30 transition-colors">
-                                        <td className="py-3 px-2 flex items-center gap-2 font-bold text-white"><span className="w-2 h-2 bg-orange-500 rounded-full" /> {awayTeam.name}</td>
-                                        <td className="py-3 px-2 text-center text-zinc-300">{awayTeam.played ?? 0}</td>
-                                        <td className="py-3 px-2 text-center text-[#FFD700] font-black">{awayTeam.points ?? 0}</td>
-                                        <td className="py-3 px-2 text-center text-zinc-300">{awayTeam.goalsScored ?? 0}</td>
-                                        <td className="py-3 px-2 text-center text-zinc-500">{awayTeam.goalsConceded ?? 0}</td>
-                                        <td className="py-3 px-2 text-center  text-zinc-400">{(awayTeam.goalsScored || 0) - (awayTeam.goalsConceded || 0)}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <hr className="border-zinc-800" />
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="bg-gradient-to-r from-zinc-900 to-zinc-950 p-4 rounded-xl border border-zinc-800 flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-lg bg-[#FFD700]/10 border border-[#FFD700]/20 flex items-center justify-center text-[#FFD700]"><Award size={20} /></div>
-                                    <div>
-                                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Meilleur Buteur - {homeTeam.name}</p>
-                                        <p className="text-sm font-black text-white">{homeTeam.topScorer?.name || 'Aucun'}</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <span className="text-lg font-black text-[#FFD700]">{homeTeam.topScorer?.goals || 0}</span>
-                                    <span className="text-xs text-zinc-400 block -mt-1">Buts</span>
-                                </div>
-                            </div>
-                            <div className="bg-gradient-to-r from-zinc-900 to-zinc-950 p-4 rounded-xl border border-zinc-800 flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-lg bg-[#FFD700]/10 border border-[#FFD700]/20 flex items-center justify-center text-[#FFD700]"><Award size={20} /></div>
-                                    <div>
-                                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Meilleur Buteur - {awayTeam.name}</p>
-                                        <p className="text-sm font-black text-white">{awayTeam.topScorer?.name || 'Aucun'}</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <span className="text-lg font-black text-[#FFD700]">{awayTeam.topScorer?.goals || 0}</span>
-                                    <span className="text-xs text-zinc-400 block -mt-1">Buts</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                </div>
             </div>
         </div>
+     )
     );
 };
 
