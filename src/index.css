@@ -1,8 +1,31 @@
 @import "tailwindcss";
 
-/* Configuration du thème pour Tailwind v4 */
-@theme {
-  --font-poppins: 'Poppins', sans-serif;
+@font-face {
+  font-family: "Poppins";
+  src: url("./assets/fonts/Poppins/Poppins-Regular.ttf") format("truetype");
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Poppins";
+  src: url("./assets/fonts/Poppins/Poppins-Medium.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Poppins";
+  src: url("./assets/fonts/Poppins/Poppins-SemiBold.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Poppins";
+  src: url("./assets/fonts/Poppins/Poppins-Bold.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
 }
 
 /* Reset global et balises classiques */
@@ -15,21 +38,12 @@ html {
 }
 
 body {
-  font-family: var(--font-font-poppins, 'Poppins', sans-serif);
-  font-weight: 500;
-  line-height: 2;
-  font-size: 16px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #0a0a0a;
-  color: #ffffff;
-  width: 100%;
-  margin: 0;
+  font-family: "Poppins", sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-font-poppins, 'Poppins', sans-serif);
-  font-weight: 700;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
 }
 
 /* Animations et utilitaires personnalisés */
@@ -83,4 +97,8 @@ h1, h2, h3, h4, h5, h6 {
   white-space: nowrap !important;
   word-break: keep-all !important;
   overflow-wrap: normal !important;
+}
+
+.export-pdf {
+  font-family: "Poppins", sans-serif !important;
 }

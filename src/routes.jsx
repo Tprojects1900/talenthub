@@ -22,6 +22,7 @@ import { LicenceCollectivePage } from "./pages/Licence/LicenceCollectivePage";
 import CaissePage from "./pages/caisses";
 import NotFound from "./pages/Notfound";
 import TopFootTickets from "./pages/admin/TicketPlanche";
+import FicheDuMatch from "./pages/FicheDuMatch";
 function AppRoutes() {
   return (
     <Routes>
@@ -49,6 +50,7 @@ function AppRoutes() {
         <Route path="/admin/:teamId/equipe-joueurs" element={<TeamRosterPage />} />
         <Route path="/admin/caisses" element={<CaissePage />} />
         <Route path="/admin/tickets" element={<TopFootTickets />} />
+        <Route path="/admin/fiche-du-match" element={<FicheDuMatch />} />
         <Route path="*" element={<NotFound />} />
 
     </Routes>

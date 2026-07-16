@@ -13,6 +13,12 @@ export default function ClubsList({ teams = [], handleConfirmP, handleOpenEdit, 
   const [copiedId, setCopiedId] = useState(null);
   const scrollContainerRef = useRef(null);
 
+  useEffect(() => {
+  if (!selectedTeamId && teams.length > 0) {
+    setSelectedTeamId(teams[0].id);
+  }
+}, [teams, selectedTeamId]);
+
   // --- ÉTATS DE PAGINATION ---
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5); // Valeurs possibles : 5, 10, 25, 50, -1 (pour tout)

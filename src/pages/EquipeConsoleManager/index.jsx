@@ -56,13 +56,20 @@ const TeamCreationManager = () => {
   const [teams, setTeams] = useState([]);
 
   useEffect(() => {
-    if (!apiTeams) return;
-    const formatted = apiTeams.map(team => ({
-      ...team,
-      membres: team.membres || team.members || []
-    }));
-    setTeams(formatted);
-  }, [apiTeams]);
+  if (!apiTeams) return;
+
+  const formatted = apiTeams.map(team => ({
+    ...team,
+    membres: team.membres || team.members || []
+  }));
+
+  setTeams(prev => {
+    const same = JSON.stringify(prev) === JSON.stringify(formatted);
+
+    return same ? prev : formatted;
+  });
+
+}, [apiTeams]);
 
   // --- ÉTATS DES MEMBRES ---
   const [selectedTeamId, setSelectedTeamId] = useState('');

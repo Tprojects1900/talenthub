@@ -40,15 +40,15 @@ const wsLink = new GraphQLWsLink(
 
     on:{
       connecting(){
-        console.log("WS connecting");
+        // console.log("WS connecting");
       },
 
       opened(){
-        console.log("WS opened");
+        // console.log("WS opened");
       },
 
       connected(){
-        console.log("WS connected");
+        // console.log("WS connected");
       }
     }
   })

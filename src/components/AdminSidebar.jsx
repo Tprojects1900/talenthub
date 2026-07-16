@@ -6,33 +6,12 @@ import {
 import { Link, useLocation } from 'react-router-dom';
 import { useSidebar } from '../context/SidebarContext';
 import { useScreen } from '../context/ScreenContext';
-
+import {menuItems} from "../utils/constants";
 const Sidebar = ({ onNavigate }) => {
   const { closeSidebar } = useSidebar();
   const { isMobile, isTablet } = useScreen();
   const location = useLocation();
 
-  // Liste des menus configurée proprement
-  const menuItems = [
-    { href: "/dashboard", id: 'dashboard', label: 'Vue d\'ensemble', icon: LayoutGrid },
-     { 
-      href: "/admin/match-gestion", 
-      id: 'ges-match', 
-      label: 'Match en cours..', 
-      icon: Radio, // Changement pour l'icône Radio (Live)
-      isLive: true // Flag pour appliquer le style spécifique rouge
-    },
-    { href: "/admin/equipe-gestion", id: 'ges-equipes', label: 'Gestion Équipes', icon: Users },
-   
-    { href: "/admin/group-gestion", id: 'tournois', label: 'Poules & Planification', icon: Layers },
-    { href: "/admin/equipes", id: 'equipes', label: 'Ajustements', icon: SlidersHorizontal },
-    // { href: "/admin/affiches", id: 'affiches', label: 'Affiches des matchs', icon: CalendarDays },
-    // { href: "/admin/planification", id: 'calendrier', label: 'Planification', icon: Calendar },
-    { href: "/admin/statistiques", id: 'stats', label: 'Statistiques', icon: BarChart3 },
-    { href: "/admin/caisses", id: 'caisses', label: 'Topfoot Caisse', icon: Wallet },
-    { href: "/admin/tickets", id: 'tickets', label: 'Topfoot Tickets', icon: Wallet },
-    { href: "/admin/parametres", id: 'configuration', label: 'Paramètres', icon: Settings },
-  ];
 
   const handleMenuClick = (id, label) => {
     // Exécute la callback si elle existe sans bloquer le comportement naturel du <Link>
