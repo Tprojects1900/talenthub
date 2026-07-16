@@ -164,15 +164,15 @@ export default function FicheDuMatch({ numTitulaires = 9, numRemplacants = 7,fed
             <div className="grid grid-cols-2 border-b-2 border-black bg-gray-200 font-bold text-center">
               {/* Colonne Gauche (Équipe A) */}
               <div className="grid grid-cols-[1fr_60px_40px] border-r-4 border-black divide-x divide-black">
-                <div className="py-1">Prénoms-Nom</div>
-                <div className="py-1">N° Lic.</div>
-                <div className="py-1">N°M</div>
+                <div className="py-1">Prénoms-Nom(sur licence)</div>
+                {/* <div className="py-1">N° Lic.</div> */}
+                <div className="py-1">N° dorsal</div>
               </div>
               {/* Colonne Droite (Équipe B) */}
               <div className="grid grid-cols-[1fr_60px_40px] divide-x divide-black">
-                <div className="py-1">Prénoms-Nom</div>
-                <div className="py-1">N° Lic.</div>
-                <div className="py-1">N°M</div>
+                <div className="py-1">Prénoms-Nom(sur licence)</div>
+                {/* <div className="py-1">N° Lic.</div> */}
+                <div className="py-1">N° dorsal</div>
               </div>
             </div>
 
@@ -186,13 +186,13 @@ export default function FicheDuMatch({ numTitulaires = 9, numRemplacants = 7,fed
                   {/* Équipe Gauche */}
                   <div className="grid grid-cols-[1fr_60px_40px] border-r-4 border-black divide-x divide-gray-400">
                     <div className="px-1 py-0.5"></div>
-                    <div></div>
+                    {/* <div></div> */}
                     <div></div>
                   </div>
                   {/* Équipe Droite */}
                   <div className="grid grid-cols-[1fr_60px_40px] divide-x divide-gray-400">
                     <div className="px-1 py-0.5"></div>
-                    <div></div>
+                    {/* <div></div> */}
                     <div></div>
                   </div>
                 </div>
@@ -206,7 +206,7 @@ export default function FicheDuMatch({ numTitulaires = 9, numRemplacants = 7,fed
             </div>
 
             {/* LIGNES REMPLACANTS */}
-            <div className="flex flex-col" style={{ flexGrow: 0.7 }}>
+            <div className="flex flex-col" style={{ flexGrow: 0.2 }}>
               {rowsRemplacant.map((_, i) => (
                 <div
                   key={`remplacant-${i}`}
@@ -215,13 +215,13 @@ export default function FicheDuMatch({ numTitulaires = 9, numRemplacants = 7,fed
                   {/* Équipe Gauche */}
                   <div className="grid grid-cols-[1fr_60px_40px] border-r-4 border-black divide-x divide-gray-400">
                     <div className="px-1 py-0.5"></div>
-                    <div></div>
+                    {/* <div></div> */}
                     <div></div>
                   </div>
                   {/* Équipe Droite */}
                   <div className="grid grid-cols-[1fr_60px_40px] divide-x divide-gray-400">
                     <div className="px-1 py-0.5"></div>
-                    <div></div>
+                    {/* <div></div> */}
                     <div></div>
                   </div>
                 </div>
