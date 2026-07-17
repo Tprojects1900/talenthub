@@ -10,6 +10,9 @@ subscription GetMatchEventsLive($matchId: ID) {
     homeId
     awayId
     timer
+    eachHalf
+    currentHalf
+    
     homeTeam {
       id
       nom

@@ -236,6 +236,8 @@ query GetScheduledMatches {
   getScheduledMatches {
     id
     timer
+    currentHalf
+    eachHalf
     typeConfrontation
     groupId
     groupName
@@ -354,6 +356,8 @@ query GetLastLiveMatch {
     homeId
     awayId
     timer
+    currentHalf
+    eachHalf
     homeTeam {
       id
       nom
@@ -688,6 +692,8 @@ query GetMatchById($getMatchByIdId: ID) {
     
     typeConfrontation
     timer
+    currentHalf
+    eachHalf
     updatedAt
   }
 }

@@ -1,7 +1,7 @@
 import { 
   LayoutGrid, Users, Calendar, Settings, LogOut, 
   Layers, BarChart3, ShieldAlert, X, Radio ,SlidersHorizontal,CalendarDays,Wallet,
-  File,
+  File,Timer,
 } from 'lucide-react';
   
   // Liste des menus configurée proprement
@@ -14,6 +14,13 @@ import {
       icon: Radio, // Changement pour l'icône Radio (Live)
       isLive: true // Flag pour appliquer le style spécifique rouge
     },
+// Exemple d'élément de sidebar :
+{
+  label: "Temps de jeu",
+  id:"temps_jeux",
+  icon: Timer,
+  href: "/admin/parametre-temps-de-jeux" // ou l'ID de votre onglet
+},
     { href: "/admin/equipe-gestion", id: 'ges-equipes', label: 'Gestion Équipes', icon: Users },
    
     { href: "/admin/group-gestion", id: 'tournois', label: 'Poules & Planification', icon: Layers },

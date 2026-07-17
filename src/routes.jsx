@@ -23,6 +23,7 @@ import CaissePage from "./pages/caisses";
 import NotFound from "./pages/Notfound";
 import TopFootTickets from "./pages/admin/TicketPlanche";
 import FicheDuMatch from "./pages/FicheDuMatch";
+import MatchTimerSettingsPage from "./pages/admin/MatchTimerSettings";
 function AppRoutes() {
   return (
     <Routes>
@@ -51,6 +52,7 @@ function AppRoutes() {
         <Route path="/admin/caisses" element={<CaissePage />} />
         <Route path="/admin/tickets" element={<TopFootTickets />} />
         <Route path="/admin/fiche-du-match" element={<FicheDuMatch />} />
+        <Route path="/admin/parametre-temps-de-jeux" element={<MatchTimerSettingsPage />} />
         <Route path="*" element={<NotFound />} />
 
     </Routes>

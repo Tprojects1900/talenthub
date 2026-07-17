@@ -577,3 +577,13 @@ mutation AdjustCashLabel($teamId: ID, $labelId: ID, $newSum: Float, $newTarget: 
   }
 }
   `;
+
+  export const ADDHALFTIME=gql`
+  mutation SaveEachHalfTime($eachHalf: Int, $matchId: ID) {
+  saveEachHalfTime(eachHalf: $eachHalf, matchId: $matchId) {
+    eachHalf
+    id
+    currentHalf
+  }
+}
+  `;
