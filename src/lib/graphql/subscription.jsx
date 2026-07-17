@@ -1,8 +1,8 @@
 import {gql} from "graphql-tag"
 
 export const LIVEMATCHEVENTS= gql`
-subscription GetMatchEventsLive($matchId: ID) {
-  getMatchEventsLive(matchId: $matchId) {
+subscription GetLiveMatch {
+  getLiveMatch {
     id
     typeConfrontation
     groupId
@@ -199,6 +199,102 @@ subscription GetMatchEventsLive($matchId: ID) {
         name
         dorsa
       }
+    }
+  }
+}
+`;
+
+
+export const SCHEDULESMATCHLive=gql`
+query GetScheduledMatchesLive {
+  getScheduledMatchesLive {
+    id
+    timer
+    currentHalf
+    eachHalf
+    typeConfrontation
+    groupId
+    groupName
+    homeId
+    awayId
+    homeTeam {
+      id
+      nom
+      slogan
+      code
+      quartier
+      logo
+      members {
+        id
+        nom
+        type
+        logo
+        team {
+          id
+          nom
+          slogan
+          code
+          quartier
+          logo
+        }
+        createdAt
+        updatedAt
+      }
+    }
+    awayTeam {
+      id
+      nom
+      slogan
+      code
+      quartier
+      logo
+      members {
+        id
+        nom
+        type
+        logo
+        createdAt
+        updatedAt
+        team {
+          id
+          nom
+          slogan
+          code
+          quartier
+          logo
+        }
+      }
+    }
+    date
+    time
+    
+    pitch
+    status
+    createdAt
+    updatedAt
+    events {
+      id
+      eventType
+      isSubstitution
+      matchId
+      player {
+        id
+        name
+        dorsa
+      }
+      playerIn {
+        id
+        name
+        dorsa
+      }
+      playerOut {
+        id
+        name
+        dorsa
+      }
+      teamSide
+      time
+      
     }
   }
 }

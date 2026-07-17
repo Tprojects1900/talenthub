@@ -101,14 +101,12 @@ export const useCurrentSchedule = () => {
   const {
     data: liveData,
     loading: liveLoading
-  } = useGetLiveAlert(
-    currentSchedule?.id
-  );
+  } = useGetLiveAlert();
 
 
   return {
 
-    currentSchedule: liveData?.getMatchEventsLive || currentSchedule,
+    currentSchedule: liveData?.getLiveMatch || currentSchedule,
 
 
     isLoadingCurrentSchedule:

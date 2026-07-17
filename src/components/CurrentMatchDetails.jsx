@@ -27,10 +27,34 @@ const CurrentMatchDetails = ({
 
     // console.log("timer", timer, match)
 
-    const [minutes, seconds] = timer.split(":").map(Number);
-    const totalSeconds = minutes * 60 + seconds;
+   let totalSeconds = 0;
 
-    const percentage = Math.min((totalSeconds / (match?.eachHalf * 2)) * 100, 100);
+// 1. Extraction propre des secondes selon le format (Normal ou Additionnel)
+if (timer.includes("+")) {
+  // Cas "35:00 + 01:24"
+  const [partNormal, partExtra] = timer.split("+").map(str => str.trim());
+
+  const [nMins, nSecs] = partNormal.split(":").map(Number);
+  const [eMins, eSecs] = partExtra.split(":").map(Number);
+
+  const normalSecs = (!isNaN(nMins) && !isNaN(nSecs)) ? (nMins * 60 + nSecs) : 0;
+  const extraSecs = (!isNaN(eMins) && !isNaN(eSecs)) ? (eMins * 60 + eSecs) : 0;
+
+  totalSeconds = normalSecs + extraSecs;
+} else if (timer.includes(":")) {
+  // Cas classique "24:12"
+  const [minutes, seconds] = timer.split(":").map(Number);
+  if (!isNaN(minutes) && !isNaN(seconds)) {
+    totalSeconds = minutes * 60 + seconds;
+  }
+}
+
+// 2. Calcul du temps total réglementaire du match EN SECONDES (ex: 35 min * 2 * 60 = 4200 secondes)
+const eachHalfMinutes = match?.eachHalf || 45;
+const totalMatchSeconds = eachHalfMinutes * 2 * 60;
+
+// 3. Calcul du pourcentage (plafonné à 100% max pour ne pas dépasser de la barre)
+const percentage = Math.min((totalSeconds / totalMatchSeconds) * 100, 100);
 
     // console.log("percentage", percentage)
 

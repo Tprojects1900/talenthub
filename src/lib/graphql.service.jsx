@@ -8,12 +8,7 @@ import { LIVEMATCHEVENTS } from "./graphql/subscription";
 //SUBSCRIPTIONS EVENTS MATCH
 
 export const useGetLiveAlert=(matchId)=>{
-  return useSubscription(LIVEMATCHEVENTS,{
-    variables:{
-      matchId,
-      skip: !matchId
-    }
-  })
+  return useSubscription(LIVEMATCHEVENTS)
 }
 
 //LAZY QUERIES
