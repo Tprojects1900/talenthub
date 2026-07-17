@@ -122,6 +122,7 @@ export default function MatchTimerSettings({
                   min="1"
                   max="120"
                   value={eachHalfValue}
+                  readOnly={!isProg}
                   onChange={(e) => setEachHalfValue(e.target.value)}
                   className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-xl font-mono font-black text-white focus:outline-none focus:border-[#FFD700]/50 transition-colors shadow-inner"
                 />
