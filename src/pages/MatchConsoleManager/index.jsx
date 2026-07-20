@@ -43,30 +43,48 @@ const MatchConsoleManager = () => {
   };
 
   const handleDynamicPlayerClick = (player, eventType) => {
-    if (eventType !== 'Changement') {
-      submitStandardEvent(player);
-      return;
-    }
+  if (eventType !== 'Changement') {
+    submitStandardEvent(player);
+    return;
+  }
 
-    const playerId = player.playerId || player.id;
-    const isOut = player.role?.includes('Titulaire');
+  const playerId = player.playerId || player.id;
+  const role = player.role || '';
+  const matchStatus = player.matchStatus || '';
 
-    if (isOut) {
-      if (multipleSubsOut.some(p => (p.playerId || p.id) === playerId)) {
-        setMultipleSubsOut(multipleSubsOut.filter(p => (p.playerId || p.id) !== playerId));
-      } else {
-        setMultipleSubsOut([...multipleSubsOut, player]);
-      }
+  // 1. Un joueur est SUR LE TERRAIN (peut SORTIR) si :
+  // - Son matchStatus est 'Titulaire' ET qu'il n'est pas marqué comme 'Remplacé'
+  // - OU son role est 'Titulaire (Entré)' (remplaçant déjà entré en jeu)
+  const isOnField = (matchStatus === 'Titulaire' && role !== 'Remplacé') || role === 'Titulaire (Entré)';
+
+  // 2. Un joueur est SUR LE BANC (peut ENTRER) si :
+  // - Son matchStatus est 'Remplaçant' ET qu'il n'est pas encore 'Titulaire (Entré)'
+  const isAvailableSub = matchStatus === 'Remplaçant' && role !== 'Titulaire (Entré)';
+
+  // Si le joueur est sur le terrain, on gère la SORTIE (OUT)
+  if (isOnField) {
+    if (multipleSubsOut.some(p => (p.playerId || p.id) === playerId)) {
+      // Retirer de la liste des sortants
+      setMultipleSubsOut(multipleSubsOut.filter(p => (p.playerId || p.id) !== playerId));
     } else {
-      if (multipleSubsOut.length === 0) return;
-      if (multipleSubsIn.some(p => (p.playerId || p.id) === playerId)) {
-        setMultipleSubsIn(multipleSubsIn.filter(p => (p.playerId || p.id) !== playerId));
-      } else {
-        if (multipleSubsIn.length >= multipleSubsOut.length) return;
-        setMultipleSubsIn([...multipleSubsIn, player]);
-      }
+      // Ajouter à la liste des sortants
+      setMultipleSubsOut([...multipleSubsOut, player]);
     }
-  };
+  } 
+  // Si le joueur est sur le banc, on gère l'ENTRÉE (IN)
+  else if (isAvailableSub) {
+    if (multipleSubsOut.length === 0) return; // Il faut d'abord sélectionner au moins un joueur sortant
+
+    if (multipleSubsIn.some(p => (p.playerId || p.id) === playerId)) {
+      // Retirer de la liste des entrants
+      setMultipleSubsIn(multipleSubsIn.filter(p => (p.playerId || p.id) !== playerId));
+    } else {
+      // Ne pas dépasser le nombre de joueurs sortants sélectionnés
+      if (multipleSubsIn.length >= multipleSubsOut.length) return;
+      setMultipleSubsIn([...multipleSubsIn, player]);
+    }
+  }
+};
 
   const handleSavedEditEvent = (updatedData) => {
     if (updatedData.isDeleted) deleteEvent(updatedData.id);
