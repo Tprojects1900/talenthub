@@ -8,6 +8,7 @@ import Loader from "../components/Loader"
 import { formatDateTime } from "../utils/dateUtils";
 import { useSchedules } from "../hooks/useCalls";
 import MatchesCarousel from "../components/carousels/MatchCards";
+import AdsManager from "../components/AdsManager";
 
 export default function Home() {
   // Ajoutez ou vérifiez si votre hook expose une propriété comme 'data' ou s'il permet de savoir
@@ -142,25 +143,63 @@ export default function Home() {
   // On affiche le loader UNIQUEMENT si l'API charge ET qu'on n'a encore aucune donnée en mémoire.
   const isInitialLoading = isLoadingCurrentSchedule && !currentSchedule;
 
+  // return (
+  //   <MainLayout>
+  //     <div className="w-full p-2">
+  //       {isInitialLoading ? (
+  //         /* S'affiche uniquement au tout premier chargement de la page */
+  //         <FootballLoader />
+  //       ) : matchData ? (
+  //         /* Si on a des données (neuves ou issues du polling précédent), on affiche le match */
+  //         <>
+  //           <CurrentMatchDetails {...matchData} />
+  //          {
+  //           loaded_schedule ? (<Loader/>) :(<MatchesCarousel schedules={schedules} currentSchedule={currentSchedule} />)
+  //          } 
+  //         </>
+  //       ) : (
+  //         /* Si le chargement est fini (ou en cours de polling) mais qu'il n'y a STRICTEMENT aucun match */
+  //         <TopFootHero />
+  //       )}
+  //     </div>
+  //   </MainLayout>
+  // );
+
   return (
-    <MainLayout>
+<MainLayout>
+
+  <div className="w-full flex flex-col items-center">
+
+      <AdsManager />
+
       <div className="w-full p-2">
-        {isInitialLoading ? (
-          /* S'affiche uniquement au tout premier chargement de la page */
-          <FootballLoader />
-        ) : matchData ? (
-          /* Si on a des données (neuves ou issues du polling précédent), on affiche le match */
-          <>
-            <CurrentMatchDetails {...matchData} />
-           {
-            loaded_schedule ? (<Loader/>) :(<MatchesCarousel schedules={schedules} currentSchedule={currentSchedule} />)
-           } 
-          </>
-        ) : (
-          /* Si le chargement est fini (ou en cours de polling) mais qu'il n'y a STRICTEMENT aucun match */
-          <TopFootHero />
-        )}
+
+        {
+          isInitialLoading ? (
+            <FootballLoader />
+          ) : matchData ? (
+            <>
+              <CurrentMatchDetails {...matchData} />
+
+              {
+                loaded_schedule 
+                ? <Loader/>
+                : <MatchesCarousel 
+                    schedules={schedules}
+                    currentSchedule={currentSchedule}
+                  />
+              }
+
+            </>
+          ) : (
+            <TopFootHero />
+          )
+        }
+
       </div>
-    </MainLayout>
-  );
+
+  </div>
+
+</MainLayout>
+);
 }
