@@ -3,7 +3,7 @@ import {
   useEachMatchRosters, useGetCaisseDashboard,
   useScheduleLive, useTeamStats, useGetMatchById,
   useGetToggleSettings, useToggleSettings, useGetTeamsDetails,
-  useGetLiveAlert,
+  useGetLiveAlert,useGetSingleRoster,
 
 } from "../lib/graphql.service";
 export const useTeams = () => {
@@ -158,6 +158,15 @@ export const useGetToggle = () => {
   const settings = data?.getTopSettings || {};
 
   return { settings, load_settings, refetchSettings }
+}
+
+export const useSingleRoster = (matchId,teamId) => {
+  // console.log("matchid",matchId,"teamId=>",teamId)
+  const { data, loading: loaded_roster, refetch: refetchRoster } = useGetSingleRoster(matchId,teamId);
+
+  const roster = data?.getSingleTeamRoster || {};
+
+  return { roster, loaded_roster, refetchRoster }
 }
 
 export const useCaisseDashboard = () => {

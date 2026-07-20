@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useSingleRoster } from '../hooks/useCalls';
 import {
     Tv, Clock, Award, Shield,
     ChevronRight, Activity, TrendingUp, Goal,
@@ -9,6 +10,7 @@ import { useScreen } from '../context/ScreenContext';
 import MatchStatusBadge from './MatchStatusBadge';
 import MatchTimer from './MatchTimer';
 import Loader from "./Loader"
+import MatchLineups from './LineUps';
 
 const CurrentMatchDetails = ({
     homeTeam = {},
@@ -23,38 +25,49 @@ const CurrentMatchDetails = ({
     const { isMobile } = useScreen();
     const [activeTab, setActiveTab] = useState('live');
     const timer = match?.timer || "00:00";
-    const globaltime= match?.eachHalf * 2;
+    const globaltime = match?.eachHalf * 2;
+    const matchId= match?.id || match?._id;
+    const homeTeamId=homeTeam?.id || homeTeam?._id;
+    const awayTeamId=awayTeam?.id || awayTeam?._id;
+
+    const {roster:home_roster,loaded_roster:home_rostered}=useSingleRoster(matchId,homeTeamId);
+    const {roster:away_roster,loaded_roster:away_rostered}=useSingleRoster(matchId,awayTeamId);
+    const isRostered = home_rostered || away_rostered;
+    const teamAName=homeTeam?.nom || homeTeam?.name;
+    const teamBName=awayTeam?.nom || awayTeam?.name;
+    const codeA=homeTeam?.code;
+    const codeB=awayTeam?.code;
 
     // console.log("timer", timer, match)
 
-   let totalSeconds = 0;
+    let totalSeconds = 0;
 
-// 1. Extraction propre des secondes selon le format (Normal ou Additionnel)
-if (timer.includes("+")) {
-  // Cas "35:00 + 01:24"
-  const [partNormal, partExtra] = timer.split("+").map(str => str.trim());
+    // 1. Extraction propre des secondes selon le format (Normal ou Additionnel)
+    if (timer.includes("+")) {
+        // Cas "35:00 + 01:24"
+        const [partNormal, partExtra] = timer.split("+").map(str => str.trim());
 
-  const [nMins, nSecs] = partNormal.split(":").map(Number);
-  const [eMins, eSecs] = partExtra.split(":").map(Number);
+        const [nMins, nSecs] = partNormal.split(":").map(Number);
+        const [eMins, eSecs] = partExtra.split(":").map(Number);
 
-  const normalSecs = (!isNaN(nMins) && !isNaN(nSecs)) ? (nMins * 60 + nSecs) : 0;
-  const extraSecs = (!isNaN(eMins) && !isNaN(eSecs)) ? (eMins * 60 + eSecs) : 0;
+        const normalSecs = (!isNaN(nMins) && !isNaN(nSecs)) ? (nMins * 60 + nSecs) : 0;
+        const extraSecs = (!isNaN(eMins) && !isNaN(eSecs)) ? (eMins * 60 + eSecs) : 0;
 
-  totalSeconds = normalSecs + extraSecs;
-} else if (timer.includes(":")) {
-  // Cas classique "24:12"
-  const [minutes, seconds] = timer.split(":").map(Number);
-  if (!isNaN(minutes) && !isNaN(seconds)) {
-    totalSeconds = minutes * 60 + seconds;
-  }
-}
+        totalSeconds = normalSecs + extraSecs;
+    } else if (timer.includes(":")) {
+        // Cas classique "24:12"
+        const [minutes, seconds] = timer.split(":").map(Number);
+        if (!isNaN(minutes) && !isNaN(seconds)) {
+            totalSeconds = minutes * 60 + seconds;
+        }
+    }
 
-// 2. Calcul du temps total réglementaire du match EN SECONDES (ex: 35 min * 2 * 60 = 4200 secondes)
-const eachHalfMinutes = match?.eachHalf || 45;
-const totalMatchSeconds = eachHalfMinutes * 2 * 60;
+    // 2. Calcul du temps total réglementaire du match EN SECONDES (ex: 35 min * 2 * 60 = 4200 secondes)
+    const eachHalfMinutes = match?.eachHalf || 45;
+    const totalMatchSeconds = eachHalfMinutes * 2 * 60;
 
-// 3. Calcul du pourcentage (plafonné à 100% max pour ne pas dépasser de la barre)
-const percentage = Math.min((totalSeconds / totalMatchSeconds) * 100, 100);
+    // 3. Calcul du pourcentage (plafonné à 100% max pour ne pas dépasser de la barre)
+    const percentage = Math.min((totalSeconds / totalMatchSeconds) * 100, 100);
 
     // console.log("percentage", percentage)
 
@@ -311,13 +324,30 @@ const percentage = Math.min((totalSeconds / totalMatchSeconds) * 100, 100);
                                 >
                                     Classement
                                 </button>
+
+                                <button
+                                    onClick={() => setActiveTab('line-ups')}
+                                    className={`flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 ${activeTab === 'line-ups' ? 'bg-[#FFD700]/10 text-[#FFD700] border border-[#FFD700]/20' : 'text-zinc-400 hover:text-white'}`}
+                                >
+                                    Composition
+                                </button>
                             </div>
 
                             {/* Zone de défilement du contenu */}
                             <div className="p-4 sm:p-5 flex-1 overflow-y-auto max-h-[460px] custom-scrollbar scrollbar-hide">
 
                                 {/* 1. Onglet Fil du Match */}
-                                {activeTab === 'live' && (
+                                {activeTab === 'line-ups' ? (
+                                    <MatchLineups 
+                                    loading={isRostered}
+                                    homeRoster={home_roster}
+                                    awayRoster={away_roster}
+                                    teamA={teamAName}
+                                    teamB={teamBName}
+                                    codeA={codeA}
+                                    codeB={codeB}
+                                    />
+                                ) : activeTab === 'live' ? (
                                     <div className="space-y-4">
                                         {allEvents.length === 0 ? (
                                             <div className="flex flex-col items-center justify-center py-16 text-center text-zinc-500">
@@ -329,15 +359,14 @@ const percentage = Math.min((totalSeconds / totalMatchSeconds) * 100, 100);
                                                 {allEvents.map((event, index) => {
                                                     const isHome = event.side === 'home';
                                                     return (
-                                                        <div key={index} className="relative group  ">
-                                                            {/* Badge du chronomètre accroché à la ligne de gauche */}
+                                                        <div key={index} className="relative group">
+                                                            {/* Badge du chronomètre */}
                                                             <div className="absolute -left-[31px] top-1 bg-[#121214] border border-zinc-800 text-[#FFD700] text-[9px] font-mono px-1.5 py-0.5 rounded-md font-bold shadow">
                                                                 {event.time || "0'"}
                                                             </div>
 
                                                             {/* Carte de l'Événement */}
                                                             <div className="bg-[#151518]/90 border border-zinc-800/80 rounded-xl p-3 flex items-center gap-3 hover:border-zinc-700/80 transition-all shadow-sm">
-
                                                                 {event.teamLogo && (
                                                                     <img src={event.teamLogo} alt="" className="w-5 h-5 object-contain opacity-70 flex-shrink-0" />
                                                                 )}
@@ -361,17 +390,27 @@ const percentage = Math.min((totalSeconds / totalMatchSeconds) * 100, 100);
                                                                             <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold">
                                                                                 <span>▲</span>
                                                                                 <span className="truncate">{event.playerIn?.name}</span>
-                                                                                {event.playerIn?.dorsa && <span className="text-[9px] font-mono bg-zinc-800 text-zinc-400 px-1 rounded">N°{event.playerIn.dorsa}</span>}
+                                                                                {event.playerIn?.dorsa && (
+                                                                                    <span className="text-[9px] font-mono bg-zinc-800 text-zinc-400 px-1 rounded">
+                                                                                        N°{event.playerIn.dorsa}
+                                                                                    </span>
+                                                                                )}
                                                                             </div>
                                                                             <div className="flex items-center gap-1.5 text-xs text-rose-400 font-medium opacity-80">
                                                                                 <span>▼</span>
                                                                                 <span className="truncate">{event.playerOut?.name}</span>
-                                                                                {event.playerOut?.dorsa && <span className="text-[9px] font-mono bg-zinc-800 text-zinc-400 px-1 rounded">N°{event.playerOut.dorsa}</span>}
+                                                                                {event.playerOut?.dorsa && (
+                                                                                    <span className="text-[9px] font-mono bg-zinc-800 text-zinc-400 px-1 rounded">
+                                                                                        N°{event.playerOut.dorsa}
+                                                                                    </span>
+                                                                                )}
                                                                             </div>
                                                                         </div>
                                                                     ) : (
                                                                         <div className="flex items-center gap-1.5 mt-1">
-                                                                            <p className="text-xs font-bold text-white truncate">{event.player?.name || 'Joueur'}</p>
+                                                                            <p className="text-xs font-bold text-white truncate">
+                                                                                {event.player?.name || 'Joueur'}
+                                                                            </p>
                                                                             {event.player?.dorsa && (
                                                                                 <span className="text-[9px] font-mono bg-zinc-800 text-[#FFD700] px-1 rounded">
                                                                                     N°{event.player.dorsa}
@@ -387,7 +426,7 @@ const percentage = Math.min((totalSeconds / totalMatchSeconds) * 100, 100);
                                             </div>
                                         )}
                                     </div>
-                                )}
+                                ) : null}
 
                                 {/* 2. Onglet Classement */}
                                 {activeTab === 'stats' && (

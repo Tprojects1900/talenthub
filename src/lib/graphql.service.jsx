@@ -1,6 +1,6 @@
 import { useLazyQuery, useQuery, useSubscription, useMutation } from "@apollo/client";
 
-import { GETAUTH ,TEAMS,GROUPS, SCHEDULESMATCH, EACHMATCHROSTER, SCHEDULELIVE, TEAMSTATS, GETMATCHBYID, GETTOGGLEDISABLE,TEAMDETAILS,CAISSEDASHBOARD} from "./graphql/query";
+import { GETAUTH ,TEAMS,GROUPS, SCHEDULESMATCH, EACHMATCHROSTER, SCHEDULELIVE, TEAMSTATS, GETMATCHBYID, GETTOGGLEDISABLE,TEAMDETAILS,CAISSEDASHBOARD, SINGLEROSTER} from "./graphql/query";
 import { ADDGROUP,ADDHALFTIME, ADDPLAYER, ADDSUB, ADDTEAM, ADDLABEL,UPDATELABEL, CHANGEEVENTSTATUS, DROPACTOR, DROPEVENT, EDITGROUPTEAMS, LOGIN,REMOVEGROUP,REMOVEMATCHROSTER,REMOVEPLAYER,REMOVESCHEDULE,REMOVETEAM, SAVEMATCHROSTER, SCHEDULEMATCH, STANDAREVENT, SWITCHMATCHMODE, TOGGLEDISABLE, UPDATEPLAYER, UPDATETEAM, UPDATETIMERORPLAYER } from "./graphql/mutation";
 
 import { LIVEMATCHEVENTS } from "./graphql/subscription";
@@ -11,19 +11,17 @@ export const useGetLiveAlert=(matchId)=>{
   return useSubscription(LIVEMATCHEVENTS)
 }
 
-//LAZY QUERIES
+//LAZY QUERIES , {
+  //   fetchPolicy: "network-only", // ignore le cache
+  // }
 export const useGetAuth = () => {
-    return useLazyQuery(GETAUTH, {
-    fetchPolicy: "network-only", // ignore le cache
-  });
+    return useLazyQuery(GETAUTH);
 }
 
 //QUERIES
 
 export const useGetTeams=()=>{
-   return useQuery(TEAMS,{
-     fetchPolicy: "network-only",
-   });
+   return useQuery(TEAMS);
 }
 
 export const useGetGroups=()=>{
@@ -31,15 +29,13 @@ export const useGetGroups=()=>{
 }
 
 export const useGetSchedules = () => {
-  return useQuery(SCHEDULESMATCH, {
-    fetchPolicy: "network-only",
-  });
+  return useQuery(SCHEDULESMATCH);
 };
 
 export const useEachMatchRosters = (matchId) => {
   return useQuery(EACHMATCHROSTER, {
     variables: { matchId },
-     fetchPolicy: "network-only",
+    //  fetchPolicy: "network-only",
     skip: !matchId,
   });
 };
@@ -85,6 +81,16 @@ export const useGetToggleSettings=()=>{
 
 export const useGetCaisseDashboard=()=>{
   return useQuery(CAISSEDASHBOARD)
+}
+
+export const useGetSingleRoster=(matchId,teamId)=>{
+  return useQuery(SINGLEROSTER,{
+    variables: {
+      matchId,
+      teamId
+    },
+     skip: !matchId || !teamId,
+  })
 }
 
 

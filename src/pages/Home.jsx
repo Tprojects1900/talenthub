@@ -104,8 +104,10 @@ export default function Home() {
       pitch: match.pitch,
 
       homeTeam: {
+         id:match?.homeTeam?.id ,
         name: match.homeTeam?.nom || match.homeTeam?.name,
         logo: match.homeTeam?.logo,
+        code: match.homeTeam?.code,
         score: (match.events || []).filter(
           (e) => e.teamSide === "home" && e.eventType?.toLowerCase().includes("but")
         ).length,
@@ -121,8 +123,10 @@ export default function Home() {
       },
 
       awayTeam: {
+        id:match?.awayTeam?.id ,
         name: match.awayTeam?.nom || match.awayTeam?.name,
         logo: match.awayTeam?.logo,
+        code: match.awayTeam?.code,
         score: (match.events || []).filter(
           (e) => e.teamSide === "away" && e.eventType?.toLowerCase().includes("but")
         ).length,

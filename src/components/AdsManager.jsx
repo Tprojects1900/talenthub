@@ -1,66 +1,40 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export default function AdsManager() {
   const adRef = useRef(null);
-  const pushed = useRef(false);
-  const [show, setShow] = useState(false);
-
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!adRef.current) return;
 
-    if (pushed.current) return;
-
-    pushed.current = true;
-
-
-    try {
-      window.adsbygoogle = window.adsbygoogle || [];
-      window.adsbygoogle.push({});
-    } catch (error) {
-      console.error("AdSense error:", error);
-    }
-
-
-    const timer = setInterval(() => {
-
-      if (adRef.current) {
-
-        const height = adRef.current.offsetHeight;
-
-        if (height > 50) {
-          setShow(true);
-          clearInterval(timer);
-        }
-
+      // Évite de pousser deux fois la même annonce
+      if (adRef.current.getAttribute("data-adsbygoogle-status")) {
+        return;
       }
 
-    }, 500);
+      // Vérifie que le conteneur a une largeur
+      if (adRef.current.offsetWidth === 0) {
+        return;
+      }
 
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (error) {
+        console.error("AdSense:", error);
+      }
+    }, 300);
 
-    return () => clearInterval(timer);
-
-
+    return () => clearTimeout(timer);
   }, []);
 
-
-
-  if (!show) {
-    return null;
-  }
-
-
   return (
-    <div
-      ref={adRef}
-      className="w-full flex justify-center"
-    >
+    <div className="w-full flex justify-center my-4">
       <ins
+        ref={adRef}
         className="adsbygoogle"
-        style={{
-          display: "block",
-          width: "100%"
-        }}
+        style={{ display: "block" }}
         data-ad-client="ca-pub-6278463521673732"
+        data-ad-slot="5121065354"
         data-ad-format="auto"
         data-full-width-responsive="true"
       />
