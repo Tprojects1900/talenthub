@@ -1,30 +1,33 @@
 import React, { useRef } from 'react';
-import { Download, FileText } from "lucide-react";
-import t1 from "../../assets/images/t1.png";
-import t2 from "../../assets/images/t11.png";
+import { Download, FileText, MapPin, Calendar, Clock, Star } from "lucide-react";
 import useImageExport from '../../hooks/useImageExport';
 import { useScreen } from '../../context/ScreenContext';
 import TeamCard from '../cards/TeamCard';
+
 const ProgrammedGame = ({ game }) => {
+  // Données fallback ou réelles transmises via props
   const matchData = game || {
-    homeTeam: { name: "TALENT FC", location: "Adamavo", logo: t1 },
-    awayTeam: { name: "UNION AC", location: "Adakpame", logo: t2 },
-    venue: "MAYA KOPE",
-    time: "14:00",
-    stage: "GROUP STAGE",
-    isLive: true
+    homeTeam: { name: "TUDOR FC", location: "Tokoin", logo: "" },
+    awayTeam: { name: "FC AFRICA SPORTS", location: "Noudo-kope", logo: "" },
+    venue: "MAYA KOPÉ",
+    date: "DIMANCHE 26 JUIL. 2026",
+    time: "15:30",
+    stage: "2ÈME JOURNÉE",
+    broadcast: "5ÈMÉ ÉDITION",
+    price: "TICKET: 100F"
   };
-  const { isMobile, isTablet, isDesktop } = useScreen()
+
+  const { isMobile } = useScreen();
   const posterRef = useRef();
   const { exportImage, loading } = useImageExport(posterRef);
 
   return (
-    <div className="flex flex-col items-center gap-4 p-4 min-h-screen justify-center text-white font-sans select-none scrollbar-hide" style={{ backgroundColor: '' }}>
-
+    <div className="flex flex-col items-center gap-4 p-4 min-h-screen justify-center text-white font-sans select-none scrollbar-hide">
+      
       {/* --- BLOC UTILS HORS CAPTURE --- */}
-      <div className="w-full max-w-[600px] flex items-center justify-between border p-4 rounded-xl backdrop-blur-md" style={{ backgroundColor: 'rgba(30, 41, 59, 0.8)', borderColor: '#334155' }}>
+      <div className="w-full max-w-[600px] flex items-center justify-between border p-4 rounded-xl backdrop-blur-md bg-slate-900/80 border-slate-700">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md bg-gradient-to-br from-orange-600 to-emerald-600">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md bg-gradient-to-br from-amber-500 to-emerald-600">
             <FileText className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -34,10 +37,10 @@ const ProgrammedGame = ({ game }) => {
         </div>
 
         <button
-          className="group flex items-center gap-3 rounded-xl bg-gradient-to-r from-orange-600 to-emerald-600 px-5 py-2.5 text-sm font-semibold shadow-lg shadow-orange-600/10 transition-all duration-300 hover:scale-105 active:scale-95"
+          className="group flex items-center gap-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-5 py-2.5 text-sm font-semibold text-black shadow-lg shadow-amber-500/20 transition-all duration-300 hover:scale-105 active:scale-95"
           onClick={() =>
             exportImage({
-              fileName: `Match_${matchData.homeTeam.name}_vs_${matchData.awayTeam.name}`,
+              fileName: `Match_${matchData?.homeTeam?.name}_vs_${matchData?.awayTeam?.name}`,
               pixelRatio: 3,
             })
           }
@@ -47,107 +50,125 @@ const ProgrammedGame = ({ game }) => {
         </button>
       </div>
 
-      {/* --- L'AFFICHE FINALE (SANS AUCUN OKLCH) --- */}
+      {/* --- L'AFFICHE FINALE (DESIGN FIDÈLE À LA MAQUETTE) --- */}
       <div
         ref={posterRef}
-        className="relative h-[600px] w-[600px] stadium-bg text-white overflow-hidden flex flex-col justify-between p-8 border shadow-2xl"
+        className="relative h-[600px] w-[600px] bg-black text-white overflow-hidden flex flex-col justify-between p-6 border border-zinc-800 shadow-2xl"
         style={{
-          minWidth: '600px', minHeight: '600px', maxWidth: '600px', maxHeight: '600px',
-          borderColor: '#1e293b'
+          minWidth: '600px', minHeight: '600px', maxWidth: '600px', maxHeight: '600px'
         }}
       >
-        {/* Grille d'arrière-plan */}
-        <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-
-        {/* Cercles de repère */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] rounded-full pointer-events-none flex items-center justify-center" style={{ border: '1px solid rgba(16, 185, 129, 0.1)' }}>
-          <div className="w-[320px] h-[320px] rounded-full" style={{ border: '1px solid rgba(16, 185, 129, 0.05)' }} />
-        </div>
+        {/* Fond d'écran / Stade & Effets Lumineux */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/40 via-zinc-950 to-black pointer-events-none" />
+        
+        {/* Lignes dorées décoratives en arrière-plan */}
+        <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(45deg,transparent_25%,rgba(245,158,11,0.05)_50%,transparent_75%)] pointer-events-none" />
 
         {/* TOP HEADER */}
-        <div className="relative z-10 flex flex-col items-center">
-          <h2
-            className="text-4xl font-black leading-none"
-            style={{ color: "#fff" }}
-          >
-            TOPFOOT
+        <div className="relative z-10 flex flex-col items-center text-center mt-2">
+          {/* Logo / Trophée TopFoot Header */}
+          <div className="flex flex-col items-center">
+            <span className="text-2xl font-black tracking-wider text-white uppercase drop-shadow-md">
+              TOPFOOT
+            </span>
+            <span className="text-[10px] tracking-[0.3em] font-bold text-amber-400 uppercase -mt-1">
+              TOURNOI
+            </span>
+          </div>
+
+          {/* Titre Principal */}
+          <h2 className="text-4xl font-black tracking-tight text-white uppercase mt-3 drop-shadow-lg">
+            MATCH DU JOUR
           </h2>
 
-          <div className="h-6" />
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: "42px",
-              padding: "0 18px",
-              borderRadius: "999px",
-              border: "2px solid white",
-              background: "rgba(9,9,11,.6)",
-              boxSizing: "border-box",
-            }}
-          >
-            {matchData?.isLive && (
-              <span
-                className="w-2 h-2 rounded-full mr-2"
-                style={{ backgroundColor: "#f97316" }}
-              />
-            )}
-
-            <span
-              style={{
-                color: "#fb923c",
-                fontSize: "20px",
-                fontWeight: 900,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                lineHeight: "10px",
-                display: "block",
-              }}
-            >
-              MATCH DU JOUR
-            </span>
+          {/* Badge Sous-titre */}
+          <div className="mt-2 px-6 py-1 bg-amber-500 rounded-full text-black font-extrabold text-xs tracking-wider uppercase shadow-md">
+            MATCH DU TOURNOI TOP FOOT
           </div>
         </div>
 
-        {/* CONFRONTATION */}
-        <div className="relative z-10 w-full flex items-center justify-between px-4 my-auto">
-
+        {/* CONFRONTATION (EQUIPES + VS) */}
+        <div className="relative z-10 w-full flex items-center justify-between px-2 my-auto">
           {/* Équipe Domicile */}
-          <TeamCard team={matchData.homeTeam} />
+          <div className="flex-1 flex justify-center">
+            <TeamCard team={matchData?.homeTeam} />
+          </div>
 
-          {/* VS */}
-          <div className="flex flex-col items-center justify-center">
-            <span className="text-4xl font-black italic tracking-tighter" style={{ color: '#f97316', filter: 'drop-shadow(0 0 15px rgba(249, 115, 22, 0.4))' }}>
+          {/* Monogramme VS */}
+          <div className="flex flex-col items-center justify-center px-2">
+            <span className="text-5xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-amber-300 to-amber-600 drop-shadow-[0_4px_10px_rgba(245,158,11,0.5)]">
               VS
             </span>
           </div>
 
           {/* Équipe Extérieur */}
-          <TeamCard team={matchData.awayTeam} />
-
+          <div className="flex-1 flex justify-center">
+            <TeamCard team={matchData?.awayTeam} />
+          </div>
         </div>
 
-        {/* PIED DE L'AFFICHE */}
-        <div className="relative z-10 flex flex-col items-center w-full pb-2">
-          <div className="border backdrop-blur-md px-8 py-4 rounded-xl w-full text-center shadow-xl" style={{ backgroundColor: 'rgba(9, 9, 11, 0.8)', borderColor: 'rgba(39, 39, 42, 0.8)' }}>
-            <p className="text-[9px] font-black tracking-widest uppercase mb-1" style={{ color: '#fb923c' }}>
-              LIEU & HEURE DU MATCH
-            </p>
-            <h2 className="text-xl font-black tracking-tight uppercase" style={{ color: '#ffffff' }}>
-              {matchData.venue} <span style={{ color: '#f97316' }}>•</span> <span>{matchData.time}</span>
-            </h2>
+        {/* SECTION INFOS (LIEU, DATE, HEURE) */}
+        <div className="relative z-10 flex flex-col items-center w-full gap-3 mb-2">
+          
+          {/* Grille d'informations principale */}
+          <div className="w-full bg-zinc-950/80 border border-amber-500/30 rounded-2xl p-3 backdrop-blur-md grid grid-cols-3 divide-x divide-zinc-800 text-center">
+            
+            {/* Lieu */}
+            <div className="flex flex-col items-center justify-center px-2">
+              <div className="flex items-center gap-1 text-[10px] font-bold text-amber-400 tracking-wider uppercase mb-1">
+                <MapPin className="w-3 h-3 text-amber-400" />
+                LIEU
+              </div>
+              <p className="text-sm font-black text-white uppercase line-clamp-1">
+                {matchData?.venue || "STADE"}
+              </p>
+            </div>
 
-            <div className="flex items-center justify-center space-x-2 mt-3">
-              <span className="text-[9px] font-extrabold tracking-wider px-2.5 py-1 rounded-md uppercase" style={{ backgroundColor: '#10b981', color: '#09090b' }}>
-                {matchData.stage}
-              </span>
-              <span className="text-[9px] font-extrabold tracking-wider px-2.5 py-1 rounded-md border uppercase" style={{ backgroundColor: '#18181b', color: '#a1a1aa', borderColor: '#27272a' }}>
-                {matchData?.broadcast}
-              </span>
+            {/* Date */}
+            <div className="flex flex-col items-center justify-center px-2">
+              <div className="flex items-center gap-1 text-[10px] font-bold text-amber-400 tracking-wider uppercase mb-1">
+                <Calendar className="w-3 h-3 text-amber-400" />
+                DATE
+              </div>
+              <p className="text-sm font-black text-white uppercase leading-tight">
+                {matchData?.date || "A VENIR"}
+              </p>
+            </div>
+
+            {/* Heure */}
+            <div className="flex flex-col items-center justify-center px-2">
+              <div className="flex items-center gap-1 text-[10px] font-bold text-amber-400 tracking-wider uppercase mb-1">
+                <Clock className="w-3 h-3 text-amber-400" />
+                HEURE
+              </div>
+              <p className="text-sm font-black text-white uppercase">
+                {matchData?.time || "--:--"}
+              </p>
             </div>
           </div>
+
+          {/* BADGES DU BAS (JOURNÉE, ÉDITION, PRICE) */}
+          <div className="flex items-center justify-center gap-2 w-full">
+            <div className="flex items-center gap-1 px-4 py-1.5 rounded-full bg-amber-500 text-black font-extrabold text-xs uppercase shadow-md">
+              <Star className="w-3 h-3 fill-black text-black" />
+              <span>{matchData?.stage || matchData?.matchType}</span>
+            </div>
+
+            <div className="px-4 py-1.5 rounded-full bg-zinc-900 border border-zinc-700 text-zinc-300 font-extrabold text-xs uppercase">
+              {matchData?.broadcast || "ÉDITION 2026"}
+            </div>
+
+            {/* {matchData && ( */}
+              <div className="px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/50 text-amber-400 font-extrabold text-xs uppercase">
+                TICKET: 100F
+              </div>
+            {/* )} */}
+          </div>
+
+          {/* FOOTER TEXT */}
+          <p className="text-[9px] font-extrabold tracking-[0.25em] text-zinc-400 uppercase mt-1">
+            LE TOURNOI. LA PASSION. LE FOOT.
+          </p>
         </div>
 
       </div>
