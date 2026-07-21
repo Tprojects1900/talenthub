@@ -18,6 +18,8 @@
 //         </HelmetProvider>
 //     </BrowserRouter>
 // );
-import React from "react";
+console.log("Début");
 
-document.getElementById("root").innerHTML = "<h1>React import OK</h1>";
+document.getElementById("root").innerHTML = "<h1>Hello HTML</h1>";
+
+console.log("Fin");
