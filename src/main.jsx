@@ -1,17 +1,30 @@
-if (typeof globalThis === 'undefined') {
-  window.globalThis = window;
-}
+// import "./debug";
+
+// if (typeof globalThis === "undefined") {
+//     window.globalThis = window;
+// }
+
+// import React from "react";
+// import ReactDOM from "react-dom/client";
+// import App from "./App";
+// import { BrowserRouter } from "react-router-dom";
+// import "./index.css";
+// import { HelmetProvider } from "react-helmet-async";
+
+// ReactDOM.createRoot(document.getElementById("root")).render(
+//     <BrowserRouter>
+//         <HelmetProvider>
+//             <App />
+//         </HelmetProvider>
+//     </BrowserRouter>
+// );
+
 import React from "react";
-import ReactDOM from "react-dom/client"; // On revient à l'import standard
-import App from "./App";
+import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import './index.css';
-import { HelmetProvider } from 'react-helmet-async';
-// On garde la syntaxe officielle propre à ta version de React
+
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <BrowserRouter>
-    <HelmetProvider>
-      <App />
-    </HelmetProvider>
-  </BrowserRouter>
+    <BrowserRouter>
+        <h1>Hello</h1>
+    </BrowserRouter>
 );
