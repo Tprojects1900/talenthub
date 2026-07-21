@@ -18,9 +18,4 @@
 //         </HelmetProvider>
 //     </BrowserRouter>
 // );
-import React from "react";
-import ReactDOM from "react-dom/client";
-
-ReactDOM.createRoot(document.getElementById("root")).render(
-    <h1>Hello 1</h1>
-);
+document.getElementById("root").innerHTML = "<h1>Hello HTML</h1>";
