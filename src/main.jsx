@@ -18,13 +18,9 @@
 //         </HelmetProvider>
 //     </BrowserRouter>
 // );
-
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-    <BrowserRouter>
-        <h1>Hello</h1>
-    </BrowserRouter>
+    <h1>Hello 1</h1>
 );
