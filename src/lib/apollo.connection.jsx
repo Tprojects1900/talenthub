@@ -76,15 +76,8 @@ const link = split(
 export const client = new ApolloClient({
   cache: new InMemoryCache({
     typePolicies: {
-      Offre: {
-        keyFields: ["id"], 
-        fields: {
-          recommendationScore: {
-            merge(existing, incoming) {
-              return incoming ?? existing ?? 0;
-            },
-          },
-        },
+      Scorer: {
+        keyFields: false,
       },
     },
   }),

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo,useRef } from "react";
 import TeamsTable from "../components/tables/TeamsTable";
 import { MainLayout } from '../layouts';
 import { Trophy, Star, Loader2, Award } from "lucide-react";
@@ -10,8 +10,16 @@ const TeamRowLoader = ({ team, index, onStatsLoaded }) => {
   const teamId = team.id || team._id;
   const { teamStats, t_loaded } = useTeamStat(teamId);
 
+  const alreadyLoaded = React.useRef(false);
+
   useEffect(() => {
-    if (!t_loaded && teamStats) {
+    if (
+      !alreadyLoaded.current &&
+      !t_loaded &&
+      teamStats
+    ) {
+      alreadyLoaded.current = true;
+
       onStatsLoaded(teamId, {
         id: teamId,
         logo: team.logo,
@@ -22,7 +30,9 @@ const TeamRowLoader = ({ team, index, onStatsLoaded }) => {
         defaite: teamStats.p || 0,
         butM: teamStats.bp || 0,
         butE: teamStats.bc || 0,
-        diffB: teamStats.db !== undefined ? (teamStats.db > 0 ? `+${teamStats.db}` : `${teamStats.db}`) : "0",
+        diffB: teamStats.db !== undefined
+          ? (teamStats.db > 0 ? `+${teamStats.db}` : `${teamStats.db}`)
+          : "0",
         point: teamStats.pts || 0
       });
     }
@@ -107,30 +117,51 @@ const RankingPage = () => {
     setGlobalGroupsData(prev => ({ ...prev, [groupId]: data }));
   };
 
-  // Extraction directe, performante et fiable du TOP 10 depuis useTeams
-  const topScorers = useMemo(() => {
-    if (!apiTeams || apiTeams.length === 0) return [];
 
-    const allScorers = [];
 
-    apiTeams.forEach(team => {
-      // Extraction depuis la structure GraphQL team.stat.listOfScorers
-      const scorers = team.stat?.listOfScorers || [];
-      scorers.forEach(scorer => {
-        allScorers.push({
-          id: scorer.id,
-          nom: scorer.nom,
-          dorsa: scorer.dorsa,
-          goals: scorer.goals,
-          teamName: team.nom,
-          teamLogo: team.logo
-        });
+
+ const topScorers = useMemo(() => {
+  if (!apiTeams || apiTeams.length === 0) return [];
+
+  const allScorers = [];
+
+  apiTeams.forEach((team) => {
+    const scorers = team.stat?.listOfScorers || [];
+
+    scorers.forEach((scorer) => {
+      const goals = Number(scorer.goals) || 0;
+
+      allScorers.push({
+        id: scorer.id,
+        nom: scorer.nom,
+        dorsa: scorer.dorsa,
+        goals,
+        teamName: team.nom,
+        teamLogo: team.logo,
       });
     });
+  });
+  // AJOUTE LA CONSOLE ICI
+// console.log("APITEAMS :", apiTeams);
+// console.log("teams=>",apiTeams[0].stat.topScorer);
 
-    // Tri absolu décroissant par buts marqués et limitation au Top 10
-    return allScorers.sort((a, b) => b.goals - a.goals).slice(0, 10);
-  }, [apiTeams]);
+  // Classement GLOBAL : le nombre de buts est prioritaire
+  return allScorers
+    .filter((scorer) => scorer.goals > 0)
+    .sort((a, b) => {
+      // 1. Plus grand nombre de buts en premier
+      if (b.goals !== a.goals) {
+        return b.goals - a.goals;
+      }
+
+      // 2. En cas d'égalité, éventuellement trier par nom
+      return (a.nom || "").localeCompare(b.nom || "");
+    })
+    .slice(0, 10);
+}, [apiTeams]);
+
+// // AJOUTE LA CONSOLE ICI
+// console.log("TOUS LES BUTEURS :", allScorers);
 
   // État de chargement global de la page
   const isGlobalDataLoading = useMemo(() => {
@@ -215,6 +246,8 @@ const RankingPage = () => {
       render: (item) => <span className="text-sm font-black font-mono text-zinc-100">{item.point}</span>
     }
   ];
+
+// console.log("i anna see the topScorrers=>",topScorers,"all=>")
 
   return (
     <MainLayout>

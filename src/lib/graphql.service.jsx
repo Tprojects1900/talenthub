@@ -21,7 +21,9 @@ export const useGetAuth = () => {
 //QUERIES
 
 export const useGetTeams=()=>{
-   return useQuery(TEAMS);
+   return useQuery(TEAMS,{
+ fetchPolicy:"no-cache"
+   });
 }
 
 export const useGetGroups=()=>{
@@ -29,13 +31,15 @@ export const useGetGroups=()=>{
 }
 
 export const useGetSchedules = () => {
-  return useQuery(SCHEDULESMATCH);
+  return useQuery(SCHEDULESMATCH,{
+     fetchPolicy:"no-cache"
+  });
 };
 
 export const useEachMatchRosters = (matchId) => {
   return useQuery(EACHMATCHROSTER, {
     variables: { matchId },
-    //  fetchPolicy: "network-only",
+   fetchPolicy:"no-cache",
     skip: !matchId,
   });
 };
@@ -46,14 +50,16 @@ export const useEachMatchRosters = (matchId) => {
 //     fetchPolicy: "network-only",
 //   }
 export const useScheduleLive = () => {
-  return useQuery(SCHEDULELIVE);
+  return useQuery(SCHEDULELIVE,{
+     fetchPolicy:"no-cache"
+  });
 };
 
 export const useTeamStats=(teamId)=>{
-//  return useQuery(TEAMSTATS);
-    return useQuery(TEAMSTATS, {
-    variables: { teamId },
-    skip: !teamId,
+  return useQuery(TEAMSTATS, {
+    variables:{teamId},
+    skip:!teamId,
+     fetchPolicy:"no-cache",
   });
 }
 
